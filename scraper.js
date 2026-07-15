@@ -34,10 +34,27 @@ function formatDate(date) {
   targets.forEach(t => console.log(`  - In ${t.leadDays} days: ${t.dateStr}`));
 
   const routes = [
-    { from: 'HAN', to: 'SGN' },
-    { from: 'SGN', to: 'HAN' },
-    { from: 'HAN', to: 'PXU' },
-    { from: 'PXU', to: 'HAN' }
+    { from: 'HAN', to: 'SGN' }, { from: 'SGN', to: 'HAN' },
+    { from: 'HAN', to: 'DAD' }, { from: 'DAD', to: 'HAN' },
+    { from: 'SGN', to: 'DAD' }, { from: 'DAD', to: 'SGN' },
+    { from: 'HAN', to: 'CXR' }, { from: 'CXR', to: 'HAN' },
+    { from: 'SGN', to: 'CXR' }, { from: 'CXR', to: 'SGN' },
+    { from: 'HAN', to: 'PQC' }, { from: 'PQC', to: 'HAN' },
+    { from: 'SGN', to: 'PQC' }, { from: 'PQC', to: 'SGN' },
+    { from: 'HAN', to: 'PXU' }, { from: 'PXU', to: 'HAN' },
+    { from: 'SGN', to: 'PXU' }, { from: 'PXU', to: 'SGN' },
+    { from: 'HAN', to: 'DLI' }, { from: 'DLI', to: 'HAN' },
+    { from: 'SGN', to: 'DLI' }, { from: 'DLI', to: 'SGN' },
+    { from: 'HAN', to: 'UIH' }, { from: 'UIH', to: 'HAN' },
+    { from: 'SGN', to: 'UIH' }, { from: 'UIH', to: 'SGN' },
+    { from: 'HAN', to: 'HUI' }, { from: 'HUI', to: 'HAN' },
+    { from: 'SGN', to: 'HUI' }, { from: 'HUI', to: 'SGN' },
+    { from: 'HAN', to: 'VII' }, { from: 'VII', to: 'HAN' },
+    { from: 'SGN', to: 'VII' }, { from: 'VII', to: 'SGN' },
+    { from: 'HAN', to: 'BMV' }, { from: 'BMV', to: 'HAN' },
+    { from: 'SGN', to: 'BMV' }, { from: 'BMV', to: 'SGN' },
+    { from: 'HAN', to: 'VCS' }, { from: 'VCS', to: 'HAN' },
+    { from: 'SGN', to: 'VCS' }, { from: 'VCS', to: 'SGN' }
   ];
 
   console.log("Launching browser...");
@@ -47,21 +64,35 @@ function formatDate(date) {
     defaultViewport: { width: 1280, height: 1000 }
   });
 
-  const page = await browser.newPage();
-  await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-
   const records = [];
+  const queue = [];
 
-  for (const route of routes) {
-    for (const target of targets) {
+  routes.forEach(route => {
+    targets.forEach(target => {
+      queue.push({ route, target });
+    });
+  });
+
+  console.log(`Total tasks to execute in parallel: ${queue.length}`);
+  
+  const concurrency = 2; // Run 2 pages in parallel
+  const worker = async (workerId) => {
+    const page = await browser.newPage();
+    await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+    
+    while (queue.length > 0) {
+      const task = queue.shift();
+      if (!task) break;
+      
+      const { route, target } = task;
       const routeStr = `${route.from}-${route.to}`;
-      console.log(`\nQuerying ${routeStr} for date ${target.dateStr}...`);
+      console.log(`[Worker ${workerId}] Querying ${routeStr} for date ${target.dateStr}... (${queue.length} tasks remaining)`);
       
       const url = `https://www.google.com/travel/flights?q=Flights%20from%20${route.from}%20to%20${route.to}%20on%20${target.dateStr}%20oneway`;
       
       try {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-        await new Promise(r => setTimeout(r, 8000)); // Wait 8s for lazy loading content
+        await new Promise(r => setTimeout(r, 6000)); // Wait 6s for lazy loading
 
         const flights = await page.evaluate(() => {
           const listItems = Array.from(document.querySelectorAll('li.pIav2d'));
@@ -73,18 +104,15 @@ function formatDate(date) {
             else if (text.includes('Vietravel')) carrier = 'Vietravel Airlines';
             else if (text.includes('Bamboo')) carrier = 'Bamboo Airways';
             
-            // Match price like ₫1,326,781 or 1,326,781
             const priceMatch = text.match(/₫\s*([0-9,.]+)/) || text.match(/([0-9,.]+)\s*₫/);
             let priceVal = null;
             if (priceMatch) {
               priceVal = parseInt(priceMatch[1].replace(/[,.]/g, ''), 10);
             }
             
-            // Match departure time from start of string
             const depTimeMatch = text.match(/^(\d{1,2}:\d{2}\s*(?:AM|PM| AM| PM)?)/i);
             const depTime = depTimeMatch ? depTimeMatch[1].replace(/\s+/g, ' ').trim() : '';
             
-            // Match duration (e.g., "1 hr 35 min")
             const durMatch = text.match(/(\d+\s*hr\s*\d+\s*min|\d+\s*hr|\d+\s*min)/);
             const duration = durMatch ? durMatch[1] : '';
             
@@ -99,7 +127,6 @@ function formatDate(date) {
           return listItems.map(item => parseText(item.innerText || ''));
         });
 
-        // Deduplicate flights
         const uniqueFlights = [];
         const seen = new Set();
         for (const f of flights) {
@@ -110,16 +137,13 @@ function formatDate(date) {
           }
         }
 
-        // Filter for VietJet flights
         const vietjetFlights = uniqueFlights.filter(f => f.carrier === 'Vietjet' && f.price !== null);
-        console.log(`Found ${uniqueFlights.length} total flights, including ${vietjetFlights.length} Vietjet flights.`);
-
+        
         if (vietjetFlights.length > 0) {
-          // Find lowest VietJet price
           vietjetFlights.sort((a, b) => a.price - b.price);
           const lowestPrice = vietjetFlights[0].price;
 
-          const record = {
+          records.push({
             crawlTimestamp: startTime.toISOString(),
             route: routeStr,
             departureDate: target.dateStr,
@@ -127,12 +151,9 @@ function formatDate(date) {
             carrier: 'Vietjet',
             lowestPrice: lowestPrice,
             allFlights: vietjetFlights
-          };
-
-          records.push(record);
-          console.log(`Lowest Vietjet price: ₫${lowestPrice.toLocaleString()}`);
+          });
+          console.log(`[Worker ${workerId}] ${routeStr} Lowest: ₫${lowestPrice.toLocaleString()}`);
         } else {
-          console.log("No Vietjet flights found with valid pricing.");
           records.push({
             crawlTimestamp: startTime.toISOString(),
             route: routeStr,
@@ -142,13 +163,18 @@ function formatDate(date) {
             lowestPrice: null,
             allFlights: []
           });
+          console.log(`[Worker ${workerId}] ${routeStr}: Không tìm thấy chuyến bay VietJet.`);
         }
 
       } catch (err) {
-        console.error(`Error crawling ${routeStr} for ${target.dateStr}:`, err.message);
+        console.error(`[Worker ${workerId}] Error crawling ${routeStr} for ${target.dateStr}:`, err.message);
       }
     }
-  }
+    await page.close();
+  };
+
+  const workers = Array.from({ length: concurrency }, (_, id) => worker(id + 1));
+  await Promise.all(workers);
 
   await browser.close();
   console.log("\nCrawl complete. Saving data...");

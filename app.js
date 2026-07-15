@@ -106,80 +106,95 @@ function updateLastUpdated() {
   el.innerText = `Lần quét cuối: ${formatDateTime(latest.toISOString())}`;
 }
 
-// Calculate recommendations and update stat cards
+// Calculate recommendations and update stat cards dynamically based on currentRoute
 function updateStatsCards() {
-  const routes = ['HAN-SGN', 'SGN-HAN', 'HAN-PXU', 'PXU-HAN'];
+  const routeRecords = flightDatabase.filter(r => r.route === currentRoute && r.lowestPrice !== null);
   
-  routes.forEach(route => {
-    const cardEl = document.getElementById(`card-${route}`);
-    if (!cardEl) return;
-    
-    // Filter database for this route
-    const routeRecords = flightDatabase.filter(r => r.route === route && r.lowestPrice !== null);
-    
-    if (routeRecords.length === 0) {
-      cardEl.querySelector('.price-val').innerText = 'K/A';
-      cardEl.querySelector('.trend-desc').innerText = 'Đang tính toán...';
-      return;
+  const valLatest = document.getElementById('val-latest-price');
+  const descLatest = document.getElementById('desc-latest-price');
+  const valAvg = document.getElementById('val-avg-price');
+  const valMin = document.getElementById('val-min-price');
+  const descMin = document.getElementById('desc-min-price');
+  
+  const valRec = document.getElementById('val-recommendation');
+  const badgeRec = document.getElementById('badge-rec');
+  const descRec = document.getElementById('desc-recommendation');
+  const iconRec = document.getElementById('icon-rec');
+
+  if (routeRecords.length === 0) {
+    if (valLatest) valLatest.innerText = 'K/A';
+    if (valAvg) valAvg.innerText = 'K/A';
+    if (valMin) valMin.innerText = 'K/A';
+    if (valRec) valRec.innerText = 'Đang tính toán...';
+    return;
+  }
+  
+  // Sort by crawlTimestamp descending
+  routeRecords.sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp));
+  const latestRecord = routeRecords[0];
+  const latestPrice = latestRecord.lowestPrice;
+  
+  // Calculate average
+  const prices = routeRecords.map(r => r.lowestPrice);
+  const avgPrice = Math.round(prices.reduce((sum, p) => sum + p, 0) / prices.length);
+  
+  // Calculate min
+  const minPrice = Math.min(...prices);
+  const minRecords = routeRecords.filter(r => r.lowestPrice === minPrice);
+  const minRecord = minRecords[minRecords.length - 1]; // oldest min run
+  
+  // Update values
+  if (valLatest) valLatest.innerText = formatVND(latestPrice);
+  if (descLatest) descLatest.innerText = `Mua trước ${latestRecord.leadDays} ngày (${latestRecord.departureDate})`;
+  
+  if (valAvg) valAvg.innerText = formatVND(avgPrice);
+  
+  if (valMin) valMin.innerText = formatVND(minPrice);
+  if (descMin) descMin.innerText = `Ghi nhận lúc: ${formatDateTime(minRecord.crawlTimestamp)}`;
+  
+  // Recommendations
+  if (iconRec) iconRec.className = 'fa-solid trend-icon ';
+  if (badgeRec) badgeRec.className = 'recommendation-badge ';
+  
+  if (latestPrice < avgPrice * 0.97) {
+    if (iconRec) iconRec.classList.add('fa-arrow-trend-down', 'green');
+    if (badgeRec) {
+      badgeRec.classList.add('buy');
+      badgeRec.innerText = 'MUA NGAY';
     }
-    
-    // Sort by timestamp descending to find latest price
-    routeRecords.sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp));
-    const latestRecord = routeRecords[0];
-    const latestPrice = latestRecord.lowestPrice;
-    
-    // Calculate average price of this route
-    const prices = routeRecords.map(r => r.lowestPrice);
-    const avgPrice = prices.reduce((sum, p) => sum + p, 0) / prices.length;
-    
-    cardEl.querySelector('.price-val').innerText = formatVND(latestPrice);
-    
-    // Determine trend and recommendation based on average
-    const trendIcon = cardEl.querySelector('.trend-icon');
-    const recBadge = cardEl.querySelector('.recommendation-badge');
-    const trendDesc = cardEl.querySelector('.trend-desc');
-    
-    // Reset classes
-    trendIcon.className = 'fa-solid trend-icon ';
-    recBadge.className = 'recommendation-badge ';
-    
-    if (latestPrice < avgPrice * 0.97) {
-      // Significantly below average -> Buy!
-      trendIcon.classList.add('fa-arrow-trend-down', 'green');
-      recBadge.classList.add('buy');
-      recBadge.innerText = 'MUA NGAY';
-      const diffPercent = Math.round(((avgPrice - latestPrice) / avgPrice) * 100);
-      trendDesc.innerText = `${diffPercent}% thấp hơn TB`;
-    } else if (latestPrice > avgPrice * 1.03) {
-      // Significantly above average -> Wait!
-      trendIcon.classList.add('fa-arrow-trend-up', 'red');
-      recBadge.classList.add('wait');
-      recBadge.innerText = 'CHỜ THÊM';
-      const diffPercent = Math.round(((latestPrice - avgPrice) / avgPrice) * 100);
-      trendDesc.innerText = `${diffPercent}% cao hơn TB`;
-    } else {
-      // Stable
-      trendIcon.classList.add('fa-equals', 'yellow');
-      recBadge.classList.add('buy');
-      recBadge.innerText = 'MUA NGAY';
-      trendDesc.innerText = 'Giá ổn định';
+    const diffPercent = Math.round(((avgPrice - latestPrice) / avgPrice) * 100);
+    if (valRec) valRec.innerText = 'Thời điểm vàng!';
+    if (descRec) descRec.innerText = `Thấp hơn trung bình ${diffPercent}%`;
+  } else if (latestPrice > avgPrice * 1.03) {
+    if (iconRec) iconRec.classList.add('fa-arrow-trend-up', 'red');
+    if (badgeRec) {
+      badgeRec.classList.add('wait');
+      badgeRec.innerText = 'CHỜ THÊM';
     }
-  });
+    const diffPercent = Math.round(((latestPrice - avgPrice) / avgPrice) * 100);
+    if (valRec) valRec.innerText = 'Nên chờ thêm';
+    if (descRec) descRec.innerText = `Cao hơn trung bình ${diffPercent}%`;
+  } else {
+    if (iconRec) iconRec.classList.add('fa-equals', 'yellow');
+    if (badgeRec) {
+      badgeRec.classList.add('buy');
+      badgeRec.innerText = 'MUA NGAY';
+    }
+    if (valRec) valRec.innerText = 'Giá vé bình ổn';
+    if (descRec) descRec.innerText = 'Mức giá ngang giá trung bình';
+  }
 }
 
 function setRoute(route) {
   currentRoute = route;
   
-  // Update active states on buttons
-  const buttons = document.querySelectorAll('.chart-header button');
-  buttons.forEach(btn => {
-    if (btn.id === `btn-route-${route}`) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
-  });
+  // Update select select dropdown if changed externally
+  const select = document.getElementById('route-select');
+  if (select && select.value !== route) {
+    select.value = route;
+  }
   
+  updateStatsCards();
   renderChart();
 }
 
