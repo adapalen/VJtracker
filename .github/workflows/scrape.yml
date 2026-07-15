@@ -1,0 +1,40 @@
+name: Scrape Flights Daily
+
+on:
+  schedule:
+    # Runs thrice daily at 1:00, 7:00, and 13:00 UTC (8:00 AM, 2:00 PM, and 8:00 PM ICT Vietnam Time)
+    - cron: '0 1,7,13 * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Scraper
+        run: node scraper.js
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add flights_db.json
+          git commit -m "Auto-update flight prices: $(date)" || echo "No changes to commit"
+          git push
