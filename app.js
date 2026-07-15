@@ -13,19 +13,63 @@ const routeColors = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  initTheme();
   await loadDatabase();
   initDashboard();
 });
+
+// Theme Management (Light/Dark Mode)
+function initTheme() {
+  const themeToggle = document.getElementById('theme-toggle');
+  if (!themeToggle) return;
+
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+  } else {
+    document.body.classList.remove('light-theme');
+    themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    
+    // Dynamically update chart styling
+    updateChartTheme();
+  });
+}
+
+function getChartColors() {
+  const isLight = document.body.classList.contains('light-theme');
+  return {
+    text: isLight ? '#4a4d5c' : '#a0a5c0',
+    grid: isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.05)'
+  };
+}
+
+function updateChartTheme() {
+  if (!priceChart) return;
+  const colors = getChartColors();
+  priceChart.options.plugins.legend.labels.color = colors.text;
+  priceChart.options.scales.x.ticks.color = colors.text;
+  priceChart.options.scales.x.grid.color = colors.grid;
+  priceChart.options.scales.y.ticks.color = colors.text;
+  priceChart.options.scales.y.grid.color = colors.grid;
+  priceChart.update();
+}
 
 // Fetch database json file
 async function loadDatabase() {
   try {
     const res = await fetch('flights_db.json');
-    if (!res.ok) throw new Error('DB file not found');
+    if (!res.ok) throw new Error('Không tìm thấy tệp cơ sở dữ liệu');
     flightDatabase = await res.json();
-    console.log(`Loaded ${flightDatabase.length} records from database.`);
+    console.log(`Đã tải thành công ${flightDatabase.length} bản ghi.`);
   } catch (err) {
-    console.warn("Could not load flights_db.json, loading mock data for presentation:", err.message);
+    console.warn("Không thể tải flights_db.json, đang tải dữ liệu mô phỏng:", err.message);
     flightDatabase = generateMockData();
   }
 }
@@ -52,14 +96,14 @@ function initDashboard() {
 function updateLastUpdated() {
   const el = document.getElementById('last-updated').querySelector('span');
   if (flightDatabase.length === 0) {
-    el.innerText = 'Last Crawled: No runs yet';
+    el.innerText = 'Lần quét cuối: Chưa có dữ liệu';
     return;
   }
   
   // Find latest crawl timestamp
   const timestamps = flightDatabase.map(r => new Date(r.crawlTimestamp));
   const latest = new Date(Math.max(...timestamps));
-  el.innerText = `Last Crawled: ${formatDateTime(latest.toISOString())}`;
+  el.innerText = `Lần quét cuối: ${formatDateTime(latest.toISOString())}`;
 }
 
 // Calculate recommendations and update stat cards
@@ -74,8 +118,8 @@ function updateStatsCards() {
     const routeRecords = flightDatabase.filter(r => r.route === route && r.lowestPrice !== null);
     
     if (routeRecords.length === 0) {
-      cardEl.querySelector('.price-val').innerText = 'No Data';
-      cardEl.querySelector('.trend-desc').innerText = 'Run crawler to start';
+      cardEl.querySelector('.price-val').innerText = 'K/A';
+      cardEl.querySelector('.trend-desc').innerText = 'Đang tính toán...';
       return;
     }
     
@@ -103,22 +147,22 @@ function updateStatsCards() {
       // Significantly below average -> Buy!
       trendIcon.classList.add('fa-arrow-trend-down', 'green');
       recBadge.classList.add('buy');
-      recBadge.innerText = 'BUY NOW';
+      recBadge.innerText = 'MUA NGAY';
       const diffPercent = Math.round(((avgPrice - latestPrice) / avgPrice) * 100);
-      trendDesc.innerText = `${diffPercent}% below average`;
+      trendDesc.innerText = `${diffPercent}% thấp hơn TB`;
     } else if (latestPrice > avgPrice * 1.03) {
       // Significantly above average -> Wait!
       trendIcon.classList.add('fa-arrow-trend-up', 'red');
       recBadge.classList.add('wait');
-      recBadge.innerText = 'WAIT';
+      recBadge.innerText = 'CHỜ THÊM';
       const diffPercent = Math.round(((latestPrice - avgPrice) / avgPrice) * 100);
-      trendDesc.innerText = `${diffPercent}% above average`;
+      trendDesc.innerText = `${diffPercent}% cao hơn TB`;
     } else {
       // Stable
       trendIcon.classList.add('fa-equals', 'yellow');
       recBadge.classList.add('buy');
-      recBadge.innerText = 'BUY NOW';
-      trendDesc.innerText = 'Stable price';
+      recBadge.innerText = 'MUA NGAY';
+      trendDesc.innerText = 'Giá ổn định';
     }
   });
 }
@@ -167,13 +211,14 @@ function renderChart() {
   }
   
   const colors = routeColors[currentRoute] || routeColors['HAN-SGN'];
+  const themeColors = getChartColors();
   
   priceChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
       datasets: [{
-        label: `${currentRoute} Lowest Price (VND)`,
+        label: `Giá thấp nhất chặng ${currentRoute} (VND)`,
         data: prices,
         borderColor: colors.border,
         backgroundColor: colors.bg,
@@ -193,7 +238,7 @@ function renderChart() {
       plugins: {
         legend: {
           labels: {
-            color: '#a0a5c0',
+            color: themeColors.text,
             font: { family: 'Outfit', size: 13 }
           }
         },
@@ -206,13 +251,13 @@ function renderChart() {
       },
       scales: {
         x: {
-          grid: { color: 'rgba(255, 255, 255, 0.05)' },
-          ticks: { color: '#a0a5c0', font: { family: 'Outfit', size: 11 } }
+          grid: { color: themeColors.grid },
+          ticks: { color: themeColors.text, font: { family: 'Outfit', size: 11 } }
         },
         y: {
-          grid: { color: 'rgba(255, 255, 255, 0.05)' },
+          grid: { color: themeColors.grid },
           ticks: { 
-            color: '#a0a5c0', 
+            color: themeColors.text, 
             font: { family: 'Outfit', size: 11 },
             callback: function(value) {
               return value.toLocaleString('vi-VN') + ' ₫';
@@ -230,7 +275,7 @@ function renderTable() {
   tbody.innerHTML = '';
   
   if (flightDatabase.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="no-data">No database records found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="no-data">Không tìm thấy dữ liệu chuyến bay nào.</td></tr>`;
     return;
   }
   
@@ -241,19 +286,19 @@ function renderTable() {
     const tr = document.createElement('tr');
     
     // Format flights summary
-    let flightsSummary = 'None';
+    let flightsSummary = 'Không có';
     if (r.allFlights && r.allFlights.length > 0) {
       flightsSummary = r.allFlights.slice(0, 3).map(f => `${f.departureTime} (${formatVND(f.price)})`).join(', ');
-      if (r.allFlights.length > 3) flightsSummary += ` (+${r.allFlights.length - 3} more)`;
+      if (r.allFlights.length > 3) flightsSummary += ` (+${r.allFlights.length - 3} chuyến khác)`;
     }
     
     tr.innerHTML = `
       <td>${formatDateTime(r.crawlTimestamp)}</td>
       <td><strong>${r.route}</strong></td>
       <td>${r.departureDate}</td>
-      <td>${r.leadDays} days</td>
-      <td style="color: #fff; font-weight: 600;">${r.lowestPrice ? formatVND(r.lowestPrice) : 'N/A'}</td>
-      <td style="color: #a0a5c0; font-size: 0.85rem;">${flightsSummary}</td>
+      <td>Mua trước ${r.leadDays} ngày</td>
+      <td style="color: var(--text-primary); font-weight: 600;">${r.lowestPrice ? formatVND(r.lowestPrice) : 'N/A'}</td>
+      <td style="color: var(--text-secondary); font-size: 0.85rem;">${flightsSummary}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -261,7 +306,7 @@ function renderTable() {
 
 // Mock Data Generator for presentation when database is empty
 function generateMockData() {
-  console.log("Generating mock data history...");
+  console.log("Đang sinh dữ liệu mô phỏng...");
   const data = [];
   const routes = ['HAN-SGN', 'SGN-HAN', 'HAN-PXU', 'PXU-HAN'];
   const leadTimes = [7, 14, 30];

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="VietJet Air flight price analytics and tracking dashboard. Find the best times to buy flight tickets.">
-  <title>VietJet Flight Price Tracker & Analytics</title>
+  <meta name="description" content="Hệ thống phân tích và theo dõi giá vé máy bay VietJet Air thời gian thực.">
+  <title>Theo dõi & Phân tích Giá vé Máy bay VietJet</title>
   <!-- Google Fonts: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,13 +21,18 @@
       <div class="logo-area">
         <i class="fa-solid fa-plane-departure logo-icon"></i>
         <div>
-          <h1 id="main-title">VietJet Flight Price Tracker</h1>
-          <p class="subtitle">Real-time pricing analytics and recommendations for HAN-SGN & HAN-PXU routes</p>
+          <h1 id="main-title">Theo dõi Giá vé Máy bay VietJet</h1>
+          <p class="subtitle">Phân tích giá vé và gợi ý thời điểm mua trực quan cho các chặng HAN-SGN & HAN-PXU</p>
         </div>
       </div>
-      <div class="last-updated-badge" id="last-updated">
-        <i class="fa-solid fa-rotate"></i>
-        <span>Last Crawled: Loading...</span>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <div class="last-updated-badge" id="last-updated">
+          <i class="fa-solid fa-rotate"></i>
+          <span>Lần quét cuối: Đang tải...</span>
+        </div>
       </div>
     </header>
 
@@ -38,10 +43,10 @@
           <span class="route-badge">HAN &rarr; SGN</span>
           <i class="fa-solid fa-arrow-trend-down trend-icon green"></i>
         </div>
-        <div class="price-val">Loading...</div>
+        <div class="price-val">Đang tải...</div>
         <div class="card-footer">
-          <span class="recommendation-badge buy">BUY NOW</span>
-          <span class="trend-desc">Lowest in 7 days</span>
+          <span class="recommendation-badge buy">MUA NGAY</span>
+          <span class="trend-desc">Đang tính toán...</span>
         </div>
       </div>
       <div class="stat-card glass" id="card-SGN-HAN">
@@ -49,10 +54,10 @@
           <span class="route-badge">SGN &rarr; HAN</span>
           <i class="fa-solid fa-arrow-trend-up trend-icon red"></i>
         </div>
-        <div class="price-val">Loading...</div>
+        <div class="price-val">Đang tải...</div>
         <div class="card-footer">
-          <span class="recommendation-badge wait">WAIT</span>
-          <span class="trend-desc">Above average</span>
+          <span class="recommendation-badge wait">CHỜ THÊM</span>
+          <span class="trend-desc">Đang tính toán...</span>
         </div>
       </div>
       <div class="stat-card glass" id="card-HAN-PXU">
@@ -60,10 +65,10 @@
           <span class="route-badge">HAN &rarr; PXU</span>
           <i class="fa-solid fa-equals trend-icon yellow"></i>
         </div>
-        <div class="price-val">Loading...</div>
+        <div class="price-val">Đang tải...</div>
         <div class="card-footer">
-          <span class="recommendation-badge buy">BUY NOW</span>
-          <span class="trend-desc">Stable price</span>
+          <span class="recommendation-badge buy">MUA NGAY</span>
+          <span class="trend-desc">Đang tính toán...</span>
         </div>
       </div>
       <div class="stat-card glass" id="card-PXU-HAN">
@@ -71,10 +76,10 @@
           <span class="route-badge">PXU &rarr; HAN</span>
           <i class="fa-solid fa-arrow-trend-down trend-icon green"></i>
         </div>
-        <div class="price-val">Loading...</div>
+        <div class="price-val">Đang tải...</div>
         <div class="card-footer">
-          <span class="recommendation-badge buy">BUY NOW</span>
-          <span class="trend-desc">Lowest in 7 days</span>
+          <span class="recommendation-badge buy">MUA NGAY</span>
+          <span class="trend-desc">Đang tính toán...</span>
         </div>
       </div>
     </section>
@@ -90,10 +95,10 @@
         </div>
         <div class="control-group">
           <select id="lead-time-select" class="dropdown" onchange="setLeadTime(this.value)">
-            <option value="all">All Lead Times</option>
-            <option value="7" selected>7 Days Lead Time</option>
-            <option value="14">14 Days Lead Time</option>
-            <option value="30">30 Days Lead Time</option>
+            <option value="all">Tất cả khoảng thời gian</option>
+            <option value="7" selected>Mua trước 7 ngày</option>
+            <option value="14">Mua trước 14 ngày</option>
+            <option value="30">Mua trước 30 ngày</option>
           </select>
         </div>
       </div>
@@ -105,12 +110,12 @@
 
     <!-- FAQ & Detailed Logs Section -->
     <section class="faq-section glass">
-      <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> FAQs & Diagnostics</h2>
+      <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> Hỏi đáp & Chẩn đoán</h2>
       
       <div class="faq-accordion">
         <details class="faq-item" open>
           <summary class="faq-question">
-            <span><i class="fa-solid fa-list-ul"></i> Where can I view the raw detailed flight logs?</span>
+            <span><i class="fa-solid fa-list-ul"></i> Xem nhật ký chi tiết các chuyến bay ở đâu?</span>
             <i class="fa-solid fa-chevron-down faq-arrow"></i>
           </summary>
           <div class="faq-answer">
@@ -118,17 +123,17 @@
               <table id="flights-table">
                 <thead>
                   <tr>
-                    <th>Crawl Time</th>
-                    <th>Route</th>
-                    <th>Departure Date</th>
-                    <th>Lead Days</th>
-                    <th>Price (VND)</th>
-                    <th>Available Flights</th>
+                    <th>Thời gian quét</th>
+                    <th>Chặng bay</th>
+                    <th>Ngày khởi hành</th>
+                    <th>Mua trước</th>
+                    <th>Giá (VND)</th>
+                    <th>Chuyến bay có sẵn</th>
                   </tr>
                 </thead>
                 <tbody id="table-body">
                   <tr>
-                    <td colspan="6" class="no-data">Loading database records...</td>
+                    <td colspan="6" class="no-data">Đang tải cơ sở dữ liệu...</td>
                   </tr>
                 </tbody>
               </table>
@@ -138,40 +143,40 @@
 
         <details class="faq-item">
           <summary class="faq-question">
-            <span><i class="fa-solid fa-clock"></i> How often is the flight price data crawled?</span>
+            <span><i class="fa-solid fa-clock"></i> Tần suất quét dữ liệu giá vé là bao lâu?</span>
             <i class="fa-solid fa-chevron-down faq-arrow"></i>
           </summary>
           <div class="faq-answer">
-            <p>The pricing engine crawls Google Flights automatically <strong>thrice a day</strong> at <strong>8:00 AM, 2:00 PM, and 8:00 PM local time</strong> using Windows Task Scheduler (or via GitHub Actions in the cloud repository).</p>
+            <p>Dữ liệu được cập nhật tự động <strong>3 lần mỗi ngày</strong> vào lúc <strong>8:00 Sáng, 2:00 Chiều và 8:00 Tối giờ địa phương</strong> sử dụng Windows Task Scheduler (hoặc thông qua GitHub Actions trên kho lưu trữ đám mây).</p>
           </div>
         </details>
 
         <details class="faq-item">
           <summary class="faq-question">
-            <span><i class="fa-solid fa-chart-line"></i> How do the price recommendations (BUY NOW vs WAIT) work?</span>
+            <span><i class="fa-solid fa-chart-line"></i> Gợi ý thời điểm mua (MUA NGAY vs CHỜ THÊM) hoạt động thế nào?</span>
             <i class="fa-solid fa-chevron-down faq-arrow"></i>
           </summary>
           <div class="faq-answer">
-            <p>Recommendations are calculated by comparing the latest crawl price with the running average for that specific route and lead-time:</p>
+            <p>Gợi ý được tính toán bằng cách so sánh giá quét mới nhất với mức trung bình lịch sử của chặng bay và khoảng thời gian mua trước đó:</p>
             <ul>
-              <li><strong>BUY NOW (Green Trend)</strong>: Current price is at least 3% below the historical average.</li>
-              <li><strong>WAIT (Red Trend)</strong>: Current price is at least 3% above the historical average.</li>
-              <li><strong>BUY NOW (Stable Price)</strong>: Current price is within 3% of the average, indicating stable booking conditions.</li>
+              <li><strong>MUA NGAY (Xu hướng Xanh)</strong>: Giá hiện tại thấp hơn giá trung bình lịch sử ít nhất 3%.</li>
+              <li><strong>CHỜ THÊM (Xu hướng Đỏ)</strong>: Giá hiện tại cao hơn giá trung bình lịch sử ít nhất 3%.</li>
+              <li><strong>MUA NGAY (Giá ổn định)</strong>: Giá hiện tại nằm trong khoảng 3% so với giá trung bình, cho thấy điều kiện đặt vé ổn định.</li>
             </ul>
           </div>
         </details>
 
         <details class="faq-item">
           <summary class="faq-question">
-            <span><i class="fa-solid fa-cloud-arrow-up"></i> How do I sync my local price database with GitHub Pages?</span>
+            <span><i class="fa-solid fa-cloud-arrow-up"></i> Làm thế nào để đồng bộ cơ sở dữ liệu cục bộ với GitHub Pages?</span>
             <i class="fa-solid fa-chevron-down faq-arrow"></i>
           </summary>
           <div class="faq-answer">
-            <p>If you run the scraper locally, you can easily sync your database and update the online dashboard by pushing the updated JSON to GitHub:</p>
+            <p>Nếu bạn đang chạy công cụ quét cục bộ, bạn có thể dễ dàng đồng bộ cơ sở dữ liệu và cập nhật giao diện trực tuyến bằng cách đẩy tệp JSON mới lên GitHub:</p>
             <pre><code>git add flights_db.json
-git commit -m "Update flight prices database"
+git commit -m "Cập nhật cơ sở dữ liệu giá vé"
 git push origin main</code></pre>
-            <p>This automatically triggers a GitHub Pages deployment and updates your online tracker site.</p>
+            <p>Việc này sẽ tự động kích hoạt tiến trình triển khai GitHub Pages để cập nhật trang web hiển thị của bạn.</p>
           </div>
         </details>
       </div>
