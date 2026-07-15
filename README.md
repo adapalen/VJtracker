@@ -6,13 +6,13 @@ A flight price tracking system that crawls flight prices for VietJet Air routes,
 
 ## 1. Project Directory Structure
 Key files:
-1. **`scraper.js`**: Puppeteer script that scrapes VietJet prices from Google Flights.
-2. **`flights_db.json`**: Local database containing captured price history (over 1,000 runs spanning the last 30 days).
+1. **`scraper.js`**: Puppeteer script that scrapes VietJet prices from Google Flights. Upgraded with 42 popular domestic routes and a concurrent worker pool (2 workers) that scrapes pages in parallel.
+2. **`flights_db.json`**: Local database containing captured price history (over 11,000 runs spanning the last 30 days for all routes).
 3. **`run-scraper.bat`**: Batch file to run the scraper and log console outputs.
 4. **`setup-schedule.ps1`**: PowerShell script that registers the background task in Windows Task Scheduler.
 5. **`server.js`**: Zero-dependency local web server to host the dashboard.
 6. **`run-dashboard.bat`**: Batch file that launches the server and opens the dashboard in your default browser.
-7. **`index.html`, `style.css`, `app.js`**: The premium dark-mode visual dashboard layout and interactive analytics charting.
+7. **`index.html`, `style.css`, `app.js`**: The premium dark-mode visual dashboard layout and interactive analytics charting. Supports Vietnamese translation, light/dark mode toggling, and dynamic stats card rendering based on the selected route.
 8. **`.github/workflows/scrape.yml`**: GitHub Actions workflow that runs the scraper 3x/day automatically in the cloud.
 
 ---
@@ -21,6 +21,7 @@ Key files:
 
 ### Dashboard Overview
 - **Visual Excellence**: Deep purple radial gradient background with glassmorphism card overlays, custom HSL styling, and Outfit typography.
+- **Dynamic Stats Cards**: Updates average prices, historic minimums, latest price, and buying recommendations dynamically based on the selected route.
 - **Interactive Analytics**: Interactive line charts using Chart.js to track price changes over the past 30 days.
 - **Diagnostics FAQs**: Drop-down accordion menus containing raw flight log data and helpful configuration information.
 
