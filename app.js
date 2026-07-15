@@ -234,8 +234,8 @@ function renderTable() {
     return;
   }
   
-  // Sort by crawlTimestamp descending
-  const sorted = [...flightDatabase].sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp));
+  // Sort by crawlTimestamp descending and limit to latest 100 entries for performance
+  const sorted = [...flightDatabase].sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp)).slice(0, 100);
   
   sorted.forEach(r => {
     const tr = document.createElement('tr');

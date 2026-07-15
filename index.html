@@ -103,27 +103,77 @@
       </div>
     </main>
 
-    <!-- Detailed Flight Results -->
-    <section class="details-section glass">
-      <h2 class="section-title"><i class="fa-solid fa-list-ul"></i> Detailed Flight Log</h2>
-      <div class="table-container">
-        <table id="flights-table">
-          <thead>
-            <tr>
-              <th>Crawl Time</th>
-              <th>Route</th>
-              <th>Departure Date</th>
-              <th>Lead Days</th>
-              <th>Price (VND)</th>
-              <th>Available Flights</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <tr>
-              <td colspan="6" class="no-data">Loading database records...</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- FAQ & Detailed Logs Section -->
+    <section class="faq-section glass">
+      <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> FAQs & Diagnostics</h2>
+      
+      <div class="faq-accordion">
+        <details class="faq-item" open>
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-list-ul"></i> Where can I view the raw detailed flight logs?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <div class="table-container">
+              <table id="flights-table">
+                <thead>
+                  <tr>
+                    <th>Crawl Time</th>
+                    <th>Route</th>
+                    <th>Departure Date</th>
+                    <th>Lead Days</th>
+                    <th>Price (VND)</th>
+                    <th>Available Flights</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body">
+                  <tr>
+                    <td colspan="6" class="no-data">Loading database records...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-clock"></i> How often is the flight price data crawled?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>The pricing engine crawls Google Flights automatically <strong>thrice a day</strong> at <strong>8:00 AM, 2:00 PM, and 8:00 PM local time</strong> using Windows Task Scheduler (or via GitHub Actions in the cloud repository).</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-chart-line"></i> How do the price recommendations (BUY NOW vs WAIT) work?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Recommendations are calculated by comparing the latest crawl price with the running average for that specific route and lead-time:</p>
+            <ul>
+              <li><strong>BUY NOW (Green Trend)</strong>: Current price is at least 3% below the historical average.</li>
+              <li><strong>WAIT (Red Trend)</strong>: Current price is at least 3% above the historical average.</li>
+              <li><strong>BUY NOW (Stable Price)</strong>: Current price is within 3% of the average, indicating stable booking conditions.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-cloud-arrow-up"></i> How do I sync my local price database with GitHub Pages?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>If you run the scraper locally, you can easily sync your database and update the online dashboard by pushing the updated JSON to GitHub:</p>
+            <pre><code>git add flights_db.json
+git commit -m "Update flight prices database"
+git push origin main</code></pre>
+            <p>This automatically triggers a GitHub Pages deployment and updates your online tracker site.</p>
+          </div>
+        </details>
       </div>
     </section>
   </div>
