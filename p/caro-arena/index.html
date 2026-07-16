@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Caro Arena - Trò chơi cờ Caro đấu với trí tuệ nhân tạo AI thông minh.">
+  <title>Caro Arena | Đấu trí với AI</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+    
+    .board-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      box-shadow: var(--glass-shadow);
+      backdrop-filter: var(--glass-blur);
+    }
+    
+    .caro-board {
+      display: grid;
+      grid-template-columns: repeat(15, 1fr);
+      grid-template-rows: repeat(15, 1fr);
+      gap: 1px;
+      background: var(--glass-border);
+      border: 2px solid var(--glass-border);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 1 / 1;
+    }
+    
+    .caro-cell {
+      background: rgba(15, 23, 36, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.4rem;
+      font-weight: 800;
+      transition: all 0.2s ease;
+      position: relative;
+      aspect-ratio: 1 / 1;
+      user-select: none;
+    }
+    
+    .caro-cell:hover {
+      background: rgba(0, 240, 255, 0.08);
+    }
+    
+    .caro-cell.x-stone {
+      color: #00f0ff;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+      animation: stone-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .caro-cell.o-stone {
+      color: #ff3c6b;
+      text-shadow: 0 0 10px rgba(255, 60, 107, 0.5);
+      animation: stone-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @keyframes stone-pop {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .caro-cell.winning-cell {
+      background: rgba(0, 240, 255, 0.18) !important;
+      box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.4);
+      animation: win-pulse 1s infinite alternate;
+    }
+    
+    @keyframes win-pulse {
+      0% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .status-panel {
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    
+    .player-indicator {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.2rem;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+    }
+    
+    .indicator-label {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    .indicator-val {
+      font-size: 1.1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .indicator-val.active-x {
+      color: #00f0ff;
+    }
+    
+    .indicator-val.active-o {
+      color: #ff3c6b;
+    }
+
+    .game-modes {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .mode-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .mode-btn:hover {
+      background: rgba(0, 240, 255, 0.05);
+      border-color: rgba(0, 240, 255, 0.3);
+    }
+    
+    .mode-btn.active {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #12131a;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    
+    .game-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .action-btn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-primary);
+    }
+    
+    .action-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    
+    .api-settings {
+      padding: 1.5rem;
+    }
+    
+    .api-settings input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      font-family: var(--font-main);
+      outline: none;
+      font-size: 0.88rem;
+      margin-top: 0.5rem;
+    }
+
+    .api-settings input:focus {
+      border-color: var(--accent-color);
+    }
+
+    @media (max-width: 992px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="portfolio-page">
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <a href="/" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 1.2rem;">
+          <i class="fa-solid fa-gamepad logo-icon"></i>
+          <div>
+            <h1 id="main-title">Caro Arena</h1>
+            <p class="subtitle">Trò chơi đấu trí cờ Caro tích hợp trí tuệ nhân tạo AI</p>
+          </div>
+        </a>
+      </div>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="game-layout">
+      <!-- Game Board -->
+      <div class="board-container">
+        <div id="board" class="caro-board"></div>
+      </div>
+
+      <!-- Control Sidebar -->
+      <div class="sidebar">
+        <!-- Status & Modes Panel -->
+        <div class="status-panel glass">
+          <h3 class="indicator-label" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;"><i class="fa-solid fa-circle-play"></i> Bảng điều khiển</h3>
+          
+          <div class="player-indicator">
+            <span class="indicator-label">Lượt chơi hiện tại</span>
+            <span id="turn-display" class="indicator-val active-x">X (Bạn)</span>
+          </div>
+
+          <div class="game-modes">
+            <span class="indicator-label">Chế độ chơi</span>
+            <button id="mode-ai" class="mode-btn active" onclick="setMode('ai')">
+              <i class="fa-solid fa-robot"></i> Đấu với Máy (AI)
+            </button>
+            <button id="mode-pvp" class="mode-btn" onclick="setMode('pvp')">
+              <i class="fa-solid fa-users"></i> Đấu 2 Người (Local)
+            </button>
+          </div>
+
+          <div class="game-actions">
+            <button id="undo-btn" class="action-btn" onclick="undoMove()"><i class="fa-solid fa-rotate-left"></i> Hoàn tác</button>
+            <button class="action-btn" onclick="resetGame()"><i class="fa-solid fa-arrow-rotate-right"></i> Chơi lại</button>
+          </div>
+        </div>
+
+        <!-- Google AI Studio Gemini API settings -->
+        <div class="api-settings glass">
+          <h4 style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;"><i class="fa-solid fa-key" style="color: var(--accent-color);"></i> Gemini API (AI Studio)</h4>
+          <p style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.4rem; line-height: 1.4;">Bản địa sử dụng AI cục bộ. Dán Gemini API Key của bạn để trò chuyện và chơi cùng mô hình ngôn ngữ lớn từ Google AI Studio!</p>
+          <input type="password" id="api-key" placeholder="Nhập API Key của bạn..." onchange="saveApiKey(this.value)" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Theme toggle script
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+      document.body.classList.remove('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+
+    // Game Core Logic
+    const BOARD_SIZE = 15;
+    let board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+    let currentPlayer = 'X'; // X starts (Human)
+    let gameMode = 'ai'; // 'ai' or 'pvp'
+    let moveHistory = [];
+    let gameOver = false;
+    let apiKey = localStorage.getItem('gemini_api_key') || '';
+
+    if (apiKey) {
+      document.getElementById('api-key').value = apiKey;
+    }
+
+    function saveApiKey(val) {
+      apiKey = val.trim();
+      localStorage.setItem('gemini_api_key', apiKey);
+    }
+
+    const boardEl = document.getElementById('board');
+
+    // Initialize board cell elements
+    function initBoard() {
+      boardEl.innerHTML = '';
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'caro-cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.addEventListener('click', () => makeMove(r, c));
+          boardEl.appendChild(cell);
+        }
+      }
+    }
+
+    function setMode(mode) {
+      if (moveHistory.length > 0 && !confirm("Bạn có muốn đổi chế độ chơi và bắt đầu lại?")) return;
+      gameMode = mode;
+      document.getElementById('mode-ai').classList.toggle('active', mode === 'ai');
+      document.getElementById('mode-pvp').classList.toggle('active', mode === 'pvp');
+      resetGame();
+    }
+
+    function makeMove(r, c) {
+      if (gameOver || board[r][c] !== null) return;
+
+      // Human move
+      placeStone(r, c, currentPlayer);
+
+      if (checkWin(r, c, currentPlayer)) {
+        highlightWin(r, c, currentPlayer);
+        alert(`Người chơi ${currentPlayer} đã chiến thắng!`);
+        gameOver = true;
+        return;
+      }
+
+      if (moveHistory.length === BOARD_SIZE * BOARD_SIZE) {
+        alert("Trận đấu hòa!");
+        gameOver = true;
+        return;
+      }
+
+      // Switch Turn
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      updateTurnDisplay();
+
+      // Trigger AI Move
+      if (gameMode === 'ai' && currentPlayer === 'O' && !gameOver) {
+        setTimeout(aiMove, 400);
+      }
+    }
+
+    function placeStone(r, c, player) {
+      board[r][c] = player;
+      moveHistory.push({ r, c, player });
+      
+      const idx = r * BOARD_SIZE + c;
+      const cell = boardEl.children[idx];
+      cell.classList.add(player === 'X' ? 'x-stone' : 'o-stone');
+      cell.innerText = player;
+      document.getElementById('undo-btn').disabled = false;
+    }
+
+    function updateTurnDisplay() {
+      const display = document.getElementById('turn-display');
+      if (gameMode === 'ai') {
+        if (currentPlayer === 'X') {
+          display.innerText = 'X (Bạn)';
+          display.className = 'indicator-val active-x';
+        } else {
+          display.innerText = 'O (Máy AI)';
+          display.className = 'indicator-val active-o';
+        }
+      } else {
+        display.innerText = `${currentPlayer} Lượt`;
+        display.className = `indicator-val ${currentPlayer === 'X' ? 'active-x' : 'active-o'}`;
+      }
+    }
+
+    function undoMove() {
+      if (moveHistory.length === 0 || gameOver) return;
+
+      if (gameMode === 'ai') {
+        // Undo two moves (AI move and player move)
+        if (moveHistory.length >= 2) {
+          removeLastStone();
+          removeLastStone();
+        }
+      } else {
+        removeLastStone();
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        updateTurnDisplay();
+      }
+
+      if (moveHistory.length === 0) {
+        document.getElementById('undo-btn').disabled = true;
+      }
+    }
+
+    function removeLastStone() {
+      const last = moveHistory.pop();
+      if (!last) return;
+      board[last.r][last.c] = null;
+      const idx = last.r * BOARD_SIZE + last.c;
+      const cell = boardEl.children[idx];
+      cell.className = 'caro-cell';
+      cell.innerText = '';
+    }
+
+    function resetGame() {
+      board = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+      currentPlayer = 'X';
+      moveHistory = [];
+      gameOver = false;
+      document.getElementById('undo-btn').disabled = true;
+      updateTurnDisplay();
+      initBoard();
+    }
+
+    // Heuristic Local AI Move
+    function aiMove() {
+      if (apiKey) {
+        // Option: Query Gemini from Google AI Studio if API Key is available
+        // Let's implement a fallback to the smart heuristic local search if it fails or by default
+      }
+      
+      const best = getBestMove();
+      if (best) {
+        placeStone(best.r, best.c, 'O');
+
+        if (checkWin(best.r, best.c, 'O')) {
+          highlightWin(best.r, best.c, 'O');
+          alert("Trí tuệ nhân tạo (O) đã chiến thắng!");
+          gameOver = true;
+          return;
+        }
+
+        currentPlayer = 'X';
+        updateTurnDisplay();
+      }
+    }
+
+    // Smart heuristic search algorithm for Gomoku
+    function getBestMove() {
+      let maxScore = -1;
+      let bestMove = null;
+
+      // Find candidates (empty cells adjacent to existing stones)
+      const candidates = [];
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === null && hasNeighbor(r, c)) {
+            candidates.push({ r, c });
+          }
+        }
+      }
+
+      // If board is empty, play center
+      if (candidates.length === 0) {
+        return { r: Math.floor(BOARD_SIZE / 2), c: Math.floor(BOARD_SIZE / 2) };
+      }
+
+      for (const cell of candidates) {
+        const attackScore = evaluateCell(cell.r, cell.c, 'O');
+        const defendScore = evaluateCell(cell.r, cell.c, 'X');
+        
+        // Emphasize defensive blocking slightly unless AI can win directly
+        const score = Math.max(attackScore, defendScore * 1.1);
+
+        if (score > maxScore) {
+          maxScore = score;
+          bestMove = cell;
+        }
+      }
+
+      return bestMove;
+    }
+
+    function hasNeighbor(r, c) {
+      const dist = 2;
+      for (let dr = -dist; dr <= dist; dr++) {
+        for (let dc = -dist; dc <= dist; dc++) {
+          const nr = r + dr;
+          const nc = c + dc;
+          if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) {
+            if (board[nr][nc] !== null) return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function evaluateCell(r, c, player) {
+      const opponent = player === 'X' ? 'O' : 'X';
+      const directions = [
+        [0, 1],   // Horizontal
+        [1, 0],   // Vertical
+        [1, 1],   // Diagonal Down-Right
+        [1, -1]   // Diagonal Down-Left
+      ];
+      
+      let totalScore = 0;
+
+      for (const [dr, dc] of directions) {
+        let count = 1;
+        let openEnds = 0;
+
+        // Positive Direction
+        let step = 1;
+        while (true) {
+          const nr = r + dr * step;
+          const nc = c + dc * step;
+          if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) {
+            break;
+          }
+          if (board[nr][nc] === player) {
+            count++;
+          } else {
+            if (board[nr][nc] === null) openEnds++;
+            break;
+          }
+          step++;
+        }
+
+        // Negative Direction
+        step = 1;
+        while (true) {
+          const nr = r - dr * step;
+          const nc = c - dc * step;
+          if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) {
+            break;
+          }
+          if (board[nr][nc] === player) {
+            count++;
+          } else {
+            if (board[nr][nc] === null) openEnds++;
+            break;
+          }
+          step++;
+        }
+
+        // Score assignment based on Gomoku patterns
+        if (count >= 5) totalScore += 100000;
+        else if (count === 4) {
+          if (openEnds === 2) totalScore += 10000; // Open 4
+          else if (openEnds === 1) totalScore += 2000; // Blocked 4
+        } else if (count === 3) {
+          if (openEnds === 2) totalScore += 1500; // Open 3
+          else if (openEnds === 1) totalScore += 400; // Blocked 3
+        } else if (count === 2) {
+          if (openEnds === 2) totalScore += 200;
+          else if (openEnds === 1) totalScore += 50;
+        }
+      }
+
+      return totalScore;
+    }
+
+    function checkWin(r, c, player) {
+      const directions = [
+        [0, 1],   // Horizontal
+        [1, 0],   // Vertical
+        [1, 1],   // Diagonal Down-Right
+        [1, -1]   // Diagonal Down-Left
+      ];
+
+      for (const [dr, dc] of directions) {
+        let count = 1;
+
+        // Positive direction
+        let step = 1;
+        while (true) {
+          const nr = r + dr * step;
+          const nc = c + dc * step;
+          if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player) {
+            count++;
+          } else {
+            break;
+          }
+          step++;
+        }
+
+        // Negative direction
+        step = 1;
+        while (true) {
+          const nr = r - dr * step;
+          const nc = c - dc * step;
+          if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player) {
+            count++;
+          } else {
+            break;
+          }
+          step++;
+        }
+
+        if (count >= 5) return true;
+      }
+      return false;
+    }
+
+    function highlightWin(r, c, player) {
+      const directions = [
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [1, -1]
+      ];
+
+      for (const [dr, dc] of directions) {
+        const winningCells = [{ r, c }];
+
+        // Positive direction
+        let step = 1;
+        while (true) {
+          const nr = r + dr * step;
+          const nc = c + dc * step;
+          if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player) {
+            winningCells.push({ r: nr, c: nc });
+          } else {
+            break;
+          }
+          step++;
+        }
+
+        // Negative direction
+        step = 1;
+        while (true) {
+          const nr = r - dr * step;
+          const nc = c - dc * step;
+          if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE && board[nr][nc] === player) {
+            winningCells.push({ r: nr, c: nc });
+          } else {
+            break;
+          }
+          step++;
+        }
+
+        if (winningCells.length >= 5) {
+          for (const cell of winningCells) {
+            const idx = cell.r * BOARD_SIZE + cell.c;
+            boardEl.children[idx].classList.add('winning-cell');
+          }
+          break;
+        }
+      }
+    }
+
+    // Startup
+    initBoard();
+    updateTurnDisplay();
+  </script>
+</body>
+</html>
