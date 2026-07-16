@@ -1,0 +1,8 @@
+{
+  "name": "Caro Arena",
+  "description": "A modern five-in-a-row Caro game on an infinite grid with single-player computer match ups, pass & play mode, real-time live global leaderboard with country flag representations, turn countdown forfeiture, and an SSO player sign-in gateway.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
