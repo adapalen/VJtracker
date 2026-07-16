@@ -446,14 +446,100 @@
       initBoard();
     }
 
-    // Heuristic Local AI Move
-    function aiMove() {
+    function getGeminiPrompt() {
+      // Translate board to coordinates
+      let boardStr = "";
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        let rowStr = "";
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (board[r][c] === null) rowStr += ". ";
+          else rowStr += board[r][c] + " ";
+        }
+        boardStr += `Hàng ${r}: ${rowStr}\n`;
+      }
+
+      // Format move history
+      let historyStr = moveHistory.map((m, i) => `${i+1}. Cột ${m.c}, Hàng ${m.r} (Quân ${m.player})`).join("\n");
+
+      return `Bạn là đại kiện tướng cờ Caro (Gomoku) chơi trên bảng cờ 15x15. Bạn đang cầm quân 'O'. Đối thủ của bạn cầm quân 'X'.
+Nhiệm vụ của bạn là thắng trò chơi bằng cách tạo ra 5 quân liên tiếp hàng ngang, hàng dọc hoặc chéo trước đối thủ, hoặc chặn đối thủ nếu họ có 3 hoặc 4 quân liên tiếp.
+
+Lịch sử các nước đi trước đó:
+${historyStr || 'Chưa có nước đi nào.'}
+
+Trạng thái bảng cờ hiện tại (. là ô trống, X là đối thủ, O là bạn):
+${boardStr}
+
+Hãy phân tích kỹ các ô trống xung quanh nước đi gần nhất của đối thủ để chặn hoặc tạo thế tấn công. Hãy quyết định nước đi tiếp theo của quân 'O'.
+Chỉ trả về một đối tượng JSON duy nhất đại diện cho nước đi của bạn tại một ô trống (.):
+{
+  "row": <số từ 0 đến 14>,
+  "col": <số từ 0 đến 14>
+}
+Không thêm bất kỳ văn bản giải thích nào khác ngoài JSON này.`;
+    }
+
+    async function queryGeminiAI() {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const prompt = getGeminiPrompt();
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Gemini API Error: Status ${response.status}`);
+      }
+
+      const data = await response.json();
+      const text = data.candidates[0].content.parts[0].text;
+      const moveObj = JSON.parse(text);
+      
+      const r = parseInt(moveObj.row, 10);
+      const c = parseInt(moveObj.col, 10);
+      
+      if (isNaN(r) || isNaN(c) || r < 0 || r >= BOARD_SIZE || c < 0 || c >= BOARD_SIZE || board[r][c] !== null) {
+        throw new Error("Invalid move suggested by Gemini");
+      }
+
+      return { r, c };
+    }
+
+    // Heuristic or Gemini AI Move
+    async function aiMove() {
+      // Show thinking status
+      const display = document.getElementById('turn-display');
+      display.innerText = 'O (Máy đang nghĩ...)';
+      display.className = 'indicator-val active-o';
+
+      let best = null;
+
       if (apiKey) {
-        // Option: Query Gemini from Google AI Studio if API Key is available
-        // Let's implement a fallback to the smart heuristic local search if it fails or by default
+        try {
+          console.log("Querying Gemini via Google AI Studio...");
+          best = await queryGeminiAI();
+          console.log(`Gemini moved to Row ${best.r}, Col ${best.c}`);
+        } catch (err) {
+          console.warn("Gemini API failed, falling back to local heuristic search:", err.message);
+          best = getBestMove();
+        }
+      } else {
+        best = getBestMove();
       }
       
-      const best = getBestMove();
       if (best) {
         placeStone(best.r, best.c, 'O');
 
