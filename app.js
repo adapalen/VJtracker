@@ -112,10 +112,14 @@ function formatVND(num) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
 }
 
-// Format ISO string to readable local time
+// Format ISO string to readable local time (GMT+7)
 function formatDateTime(isoStr) {
   const d = new Date(isoStr);
-  return d.toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
+  return d.toLocaleString('vi-VN', { 
+    dateStyle: 'short', 
+    timeStyle: 'short', 
+    timeZone: 'Asia/Ho_Chi_Minh' 
+  });
 }
 
 function initDashboard() {
