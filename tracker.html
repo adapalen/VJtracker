@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Hệ thống phân tích và theo dõi giá vé máy bay VietJet Air thời gian thực.">
+  <title>Theo dõi & Phân tích Giá vé Máy bay VietJet</title>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <a href="index.html" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 1.2rem;">
+          <i class="fa-solid fa-plane-departure logo-icon"></i>
+          <div>
+            <h1 id="main-title">Theo dõi Giá vé Máy bay VietJet</h1>
+            <p class="subtitle">Phân tích giá vé và gợi ý thời điểm mua trực quan cho các chặng HAN-SGN & HAN-PXU</p>
+          </div>
+        </a>
+      </div>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <div class="last-updated-badge" id="last-updated">
+          <i class="fa-solid fa-rotate"></i>
+          <span>Lần quét cuối: Đang tải...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dynamic Stats Cards based on selected route -->
+    <section class="stats-grid" id="stats-container">
+      <div class="stat-card glass" id="card-latest-price">
+        <div class="card-header">
+          <span class="route-badge"><i class="fa-solid fa-plane-arrival"></i> Giá vé mới nhất</span>
+          <i class="fa-solid fa-tag trend-icon text-secondary" style="color: var(--accent-color);"></i>
+        </div>
+        <div class="price-val" id="val-latest-price">Đang tải...</div>
+        <div class="card-footer">
+          <span class="trend-desc" id="desc-latest-price">Khoảng thời gian: Mua trước 7 ngày</span>
+        </div>
+      </div>
+      
+      <div class="stat-card glass" id="card-avg-price">
+        <div class="card-header">
+          <span class="route-badge"><i class="fa-solid fa-chart-simple"></i> Giá trung bình</span>
+          <i class="fa-solid fa-calculator trend-icon text-secondary"></i>
+        </div>
+        <div class="price-val" id="val-avg-price">Đang tải...</div>
+        <div class="card-footer">
+          <span class="trend-desc" id="desc-avg-price">Tính trên toàn bộ lịch sử quét</span>
+        </div>
+      </div>
+      
+      <div class="stat-card glass" id="card-min-price">
+        <div class="card-header">
+          <span class="route-badge"><i class="fa-solid fa-award"></i> Thấp nhất lịch sử</span>
+          <i class="fa-solid fa-circle-arrow-down trend-icon green"></i>
+        </div>
+        <div class="price-val" id="val-min-price">Đang tải...</div>
+        <div class="card-footer">
+          <span class="trend-desc" id="desc-min-price">Thời điểm ghi nhận tốt nhất</span>
+        </div>
+      </div>
+      
+      <div class="stat-card glass" id="card-recommendation">
+        <div class="card-header">
+          <span class="route-badge"><i class="fa-solid fa-circle-info"></i> Gợi ý mua vé</span>
+          <i class="fa-solid fa-arrow-trend-down trend-icon green" id="icon-rec"></i>
+        </div>
+        <div class="price-val" id="val-recommendation" style="font-size: 1.5rem; line-height: 1.8rem;">Đang tính toán...</div>
+        <div class="card-footer">
+          <span class="recommendation-badge buy" id="badge-rec">MUA NGAY</span>
+          <span class="trend-desc" id="desc-recommendation">Giá đang ở mức ổn định</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Chart Section -->
+    <main class="main-content glass">
+      <div class="chart-header">
+        <div class="control-group" style="align-items: center; gap: 0.8rem;">
+          <select id="origin-select" class="dropdown" onchange="onOriginChange(this.value)" style="min-width: 180px;">
+            <option value="HAN" selected>Hà Nội (HAN)</option>
+            <option value="SGN">TP. HCM (SGN)</option>
+            <option value="DAD">Đà Nẵng (DAD)</option>
+            <option value="CXR">Nha Trang (CXR)</option>
+            <option value="PQC">Phú Quốc (PQC)</option>
+            <option value="PXU">Pleiku (PXU)</option>
+            <option value="DLI">Đà Lạt (DLI)</option>
+            <option value="UIH">Quy Nhơn (UIH)</option>
+            <option value="HUI">Huế (HUI)</option>
+            <option value="VII">Vinh (VII)</option>
+            <option value="BMV">Buôn Ma Thuột (BMV)</option>
+            <option value="VCS">Côn Đảo (VCS)</option>
+          </select>
+          <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-arrow-right"></i></span>
+          <select id="dest-select" class="dropdown" onchange="onDestChange(this.value)" style="min-width: 180px;">
+            <!-- populated dynamically -->
+          </select>
+        </div>
+        <div class="control-group">
+          <select id="lead-time-select" class="dropdown" onchange="setLeadTime(this.value)">
+            <option value="all">Tất cả khoảng thời gian</option>
+            <option value="7" selected>Mua trước 7 ngày</option>
+            <option value="14">Mua trước 14 ngày</option>
+            <option value="30">Mua trước 30 ngày</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </main>
+
+    <!-- FAQ & Detailed Logs Section -->
+    <section class="faq-section glass">
+      <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> Hỏi đáp & Chẩn đoán</h2>
+      
+      <div class="faq-accordion">
+        <details class="faq-item" open>
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-list-ul"></i> Xem nhật ký chi tiết các chuyến bay ở đâu?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <div class="table-container">
+              <table id="flights-table">
+                <thead>
+                  <tr>
+                    <th>Thời gian quét</th>
+                    <th>Chặng bay</th>
+                    <th>Ngày khởi hành</th>
+                    <th>Mua trước</th>
+                    <th>Giá (VND)</th>
+                    <th>Chuyến bay có sẵn</th>
+                  </tr>
+                </thead>
+                <tbody id="table-body">
+                  <tr>
+                    <td colspan="6" class="no-data">Đang tải cơ sở dữ liệu...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-clock"></i> Tần suất quét dữ liệu giá vé là bao lâu?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Dữ liệu được cập nhật tự động <strong>3 lần mỗi ngày</strong> vào lúc <strong>8:00 Sáng, 2:00 Chiều và 8:00 Tối giờ địa phương</strong> sử dụng Windows Task Scheduler (hoặc thông qua GitHub Actions trên kho lưu trữ đám mây).</p>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-chart-line"></i> Gợi ý thời điểm mua (MUA NGAY vs CHỜ THÊM) hoạt động thế nào?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Gợi ý được tính toán bằng cách so sánh giá quét mới nhất với mức trung bình lịch sử của chặng bay và khoảng thời gian mua trước đó:</p>
+            <ul>
+              <li><strong>MUA NGAY (Xu hướng Xanh)</strong>: Giá hiện tại thấp hơn giá trung bình lịch sử ít nhất 3%.</li>
+              <li><strong>CHỜ THÊM (Xu hướng Đỏ)</strong>: Giá hiện tại cao hơn giá trung bình lịch sử ít nhất 3%.</li>
+              <li><strong>MUA NGAY (Giá ổn định)</strong>: Giá hiện tại nằm trong khoảng 3% so với giá trung bình, cho thấy điều kiện đặt vé ổn định.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span><i class="fa-solid fa-cloud-arrow-up"></i> Làm thế nào để đồng bộ cơ sở dữ liệu cục bộ với GitHub Pages?</span>
+            <i class="fa-solid fa-chevron-down faq-arrow"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Nếu bạn đang chạy công cụ quét cục bộ, bạn có thể dễ dàng đồng bộ cơ sở dữ liệu và cập nhật giao diện trực tuyến bằng cách đẩy tệp JSON mới lên GitHub:</p>
+            <pre><code>git add flights_db.json
+git commit -m "Cập nhật cơ sở dữ liệu giá vé"
+git push origin main</code></pre>
+            <p>Việc này sẽ tự động kích hoạt tiến trình triển khai GitHub Pages để cập nhật trang web hiển thị của bạn.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

@@ -3,200 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hệ thống phân tích và theo dõi giá vé máy bay VietJet Air thời gian thực.">
-  <title>Theo dõi & Phân tích Giá vé Máy bay VietJet</title>
+  <meta name="description" content="Portfolio của adapalen - Kỹ sư phần mềm & Nhà phát triển Web.">
+  <title>adapalen | Portfolio</title>
   <!-- Google Fonts: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- FontAwesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app-container">
+    <!-- Header -->
     <header class="app-header">
       <div class="logo-area">
-        <i class="fa-solid fa-plane-departure logo-icon"></i>
+        <i class="fa-solid fa-code logo-icon"></i>
         <div>
-          <h1 id="main-title">Theo dõi Giá vé Máy bay VietJet</h1>
-          <p class="subtitle">Phân tích giá vé và gợi ý thời điểm mua trực quan cho các chặng HAN-SGN & HAN-PXU</p>
+          <h1 id="main-title">adapalen</h1>
+          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
         </div>
       </div>
       <div class="header-controls">
         <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
           <i class="fa-solid fa-moon"></i>
         </button>
-        <div class="last-updated-badge" id="last-updated">
-          <i class="fa-solid fa-rotate"></i>
-          <span>Lần quét cuối: Đang tải...</span>
-        </div>
       </div>
     </header>
 
-    <!-- Dynamic Stats Cards based on selected route -->
-    <section class="stats-grid" id="stats-container">
-      <div class="stat-card glass" id="card-latest-price">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-plane-arrival"></i> Giá vé mới nhất</span>
-          <i class="fa-solid fa-tag trend-icon text-secondary" style="color: var(--accent-color);"></i>
-        </div>
-        <div class="price-val" id="val-latest-price">Đang tải...</div>
-        <div class="card-footer">
-          <span class="trend-desc" id="desc-latest-price">Khoảng thời gian: Mua trước 7 ngày</span>
-        </div>
-      </div>
-      
-      <div class="stat-card glass" id="card-avg-price">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-chart-simple"></i> Giá trung bình</span>
-          <i class="fa-solid fa-calculator trend-icon text-secondary"></i>
-        </div>
-        <div class="price-val" id="val-avg-price">Đang tải...</div>
-        <div class="card-footer">
-          <span class="trend-desc" id="desc-avg-price">Tính trên toàn bộ lịch sử quét</span>
-        </div>
-      </div>
-      
-      <div class="stat-card glass" id="card-min-price">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-award"></i> Thấp nhất lịch sử</span>
-          <i class="fa-solid fa-circle-arrow-down trend-icon green"></i>
-        </div>
-        <div class="price-val" id="val-min-price">Đang tải...</div>
-        <div class="card-footer">
-          <span class="trend-desc" id="desc-min-price">Thời điểm ghi nhận tốt nhất</span>
-        </div>
-      </div>
-      
-      <div class="stat-card glass" id="card-recommendation">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-circle-info"></i> Gợi ý mua vé</span>
-          <i class="fa-solid fa-arrow-trend-down trend-icon green" id="icon-rec"></i>
-        </div>
-        <div class="price-val" id="val-recommendation" style="font-size: 1.5rem; line-height: 1.8rem;">Đang tính toán...</div>
-        <div class="card-footer">
-          <span class="recommendation-badge buy" id="badge-rec">MUA NGAY</span>
-          <span class="trend-desc" id="desc-recommendation">Giá đang ở mức ổn định</span>
+    <!-- Hero Section -->
+    <section class="hero-section glass">
+      <div class="hero-content">
+        <span class="hero-badge">Chào mừng đến với không gian của tôi</span>
+        <h2>Xây dựng các giải pháp số sáng tạo và trực quan hóa dữ liệu hiệu quả</h2>
+        <p>Tôi là một nhà phát triển phần mềm chuyên nghiệp, đam mê tạo ra các ứng dụng web tối ưu, các công cụ thu thập thông tin tự động và các bảng phân tích dữ liệu trực quan chất lượng cao.</p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn-primary">Xem dự án của tôi</a>
+          <a href="#contact" class="btn-secondary">Liên hệ</a>
         </div>
       </div>
     </section>
 
-    <!-- Main Chart Section -->
-    <main class="main-content glass">
-      <div class="chart-header">
-        <div class="control-group" style="align-items: center; gap: 0.8rem;">
-          <select id="origin-select" class="dropdown" onchange="onOriginChange(this.value)" style="min-width: 180px;">
-            <option value="HAN" selected>Hà Nội (HAN)</option>
-            <option value="SGN">TP. HCM (SGN)</option>
-            <option value="DAD">Đà Nẵng (DAD)</option>
-            <option value="CXR">Nha Trang (CXR)</option>
-            <option value="PQC">Phú Quốc (PQC)</option>
-            <option value="PXU">Pleiku (PXU)</option>
-            <option value="DLI">Đà Lạt (DLI)</option>
-            <option value="UIH">Quy Nhơn (UIH)</option>
-            <option value="HUI">Huế (HUI)</option>
-            <option value="VII">Vinh (VII)</option>
-            <option value="BMV">Buôn Ma Thuột (BMV)</option>
-            <option value="VCS">Côn Đảo (VCS)</option>
-          </select>
-          <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-arrow-right"></i></span>
-          <select id="dest-select" class="dropdown" onchange="onDestChange(this.value)" style="min-width: 180px;">
-            <!-- populated dynamically -->
-          </select>
-        </div>
-        <div class="control-group">
-          <select id="lead-time-select" class="dropdown" onchange="setLeadTime(this.value)">
-            <option value="all">Tất cả khoảng thời gian</option>
-            <option value="7" selected>Mua trước 7 ngày</option>
-            <option value="14">Mua trước 14 ngày</option>
-            <option value="30">Mua trước 30 ngày</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="chart-container">
-        <canvas id="priceChart"></canvas>
-      </div>
-    </main>
-
-    <!-- FAQ & Detailed Logs Section -->
-    <section class="faq-section glass">
-      <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> Hỏi đáp & Chẩn đoán</h2>
-      
-      <div class="faq-accordion">
-        <details class="faq-item" open>
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-list-ul"></i> Xem nhật ký chi tiết các chuyến bay ở đâu?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <div class="table-container">
-              <table id="flights-table">
-                <thead>
-                  <tr>
-                    <th>Thời gian quét</th>
-                    <th>Chặng bay</th>
-                    <th>Ngày khởi hành</th>
-                    <th>Mua trước</th>
-                    <th>Giá (VND)</th>
-                    <th>Chuyến bay có sẵn</th>
-                  </tr>
-                </thead>
-                <tbody id="table-body">
-                  <tr>
-                    <td colspan="6" class="no-data">Đang tải cơ sở dữ liệu...</td>
-                  </tr>
-                </tbody>
-              </table>
+    <!-- Projects Section -->
+    <section id="projects" class="portfolio-section">
+      <h2 class="section-title"><i class="fa-solid fa-folder-open"></i> Dự án nổi bật</h2>
+      <div class="projects-grid">
+        <!-- Live Project: Flight Tracker -->
+        <div class="project-card glass">
+          <div class="project-icon-wrapper">
+            <i class="fa-solid fa-plane-departure"></i>
+          </div>
+          <div class="project-details">
+            <h3>Bộ theo dõi & Phân tích giá vé VietJet</h3>
+            <p>Hệ thống tự động theo dõi biến động giá vé máy bay VietJet Air thời gian thực trên 42 chặng bay nội địa Việt Nam. Quét dữ liệu 3x/ngày hoàn toàn trên đám mây bằng GitHub Actions.</p>
+            <div class="project-tags">
+              <span class="tag">Node.js</span>
+              <span class="tag">Puppeteer</span>
+              <span class="tag">Chart.js</span>
+              <span class="tag">GitHub Actions</span>
             </div>
+            <a href="tracker.html" class="project-link">Xem Trực Tiếp <i class="fa-solid fa-arrow-right"></i></a>
           </div>
-        </details>
+        </div>
 
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-clock"></i> Tần suất quét dữ liệu giá vé là bao lâu?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <p>Dữ liệu được cập nhật tự động <strong>3 lần mỗi ngày</strong> vào lúc <strong>8:00 Sáng, 2:00 Chiều và 8:00 Tối giờ địa phương</strong> sử dụng Windows Task Scheduler (hoặc thông qua GitHub Actions trên kho lưu trữ đám mây).</p>
+        <!-- Placeholder 2 -->
+        <div class="project-card glass">
+          <div class="project-icon-wrapper">
+            <i class="fa-solid fa-wallet"></i>
           </div>
-        </details>
+          <div class="project-details">
+            <h3>Sàn giao dịch tài chính phi tập trung (Concept)</h3>
+            <p>Một giao diện mẫu Web3 tương tác trực quan cho các giao dịch hoán đổi mã thông báo (Token Swap) và phân tích hồ bơi thanh khoản dựa trên các chỉ số chuỗi thời gian thực.</p>
+            <div class="project-tags">
+              <span class="tag">React</span>
+              <span class="tag">TailwindCSS</span>
+              <span class="tag">Web3.js</span>
+              <span class="tag">Ethers</span>
+            </div>
+            <a href="#" class="project-link disabled">Sắp ra mắt <i class="fa-solid fa-lock"></i></a>
+          </div>
+        </div>
 
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-chart-line"></i> Gợi ý thời điểm mua (MUA NGAY vs CHỜ THÊM) hoạt động thế nào?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <p>Gợi ý được tính toán bằng cách so sánh giá quét mới nhất với mức trung bình lịch sử của chặng bay và khoảng thời gian mua trước đó:</p>
-            <ul>
-              <li><strong>MUA NGAY (Xu hướng Xanh)</strong>: Giá hiện tại thấp hơn giá trung bình lịch sử ít nhất 3%.</li>
-              <li><strong>CHỜ THÊM (Xu hướng Đỏ)</strong>: Giá hiện tại cao hơn giá trung bình lịch sử ít nhất 3%.</li>
-              <li><strong>MUA NGAY (Giá ổn định)</strong>: Giá hiện tại nằm trong khoảng 3% so với giá trung bình, cho thấy điều kiện đặt vé ổn định.</li>
-            </ul>
+        <!-- Placeholder 3 -->
+        <div class="project-card glass">
+          <div class="project-icon-wrapper">
+            <i class="fa-solid fa-brain"></i>
           </div>
-        </details>
+          <div class="project-details">
+            <h3>Hệ thống Quản lý Nhiệm vụ thông minh AI</h3>
+            <p>Trình quản lý công việc và thời gian thông minh, tự động sắp xếp độ ưu tiên của lịch trình dựa trên mức năng lượng và thói quen làm việc hàng ngày của người sử dụng.</p>
+            <div class="project-tags">
+              <span class="tag">Next.js</span>
+              <span class="tag">FastAPI</span>
+              <span class="tag">PostgreSQL</span>
+              <span class="tag">AI Engine</span>
+            </div>
+            <a href="#" class="project-link disabled">Sắp ra mắt <i class="fa-solid fa-lock"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-cloud-arrow-up"></i> Làm thế nào để đồng bộ cơ sở dữ liệu cục bộ với GitHub Pages?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <p>Nếu bạn đang chạy công cụ quét cục bộ, bạn có thể dễ dàng đồng bộ cơ sở dữ liệu và cập nhật giao diện trực tuyến bằng cách đẩy tệp JSON mới lên GitHub:</p>
-            <pre><code>git add flights_db.json
-git commit -m "Cập nhật cơ sở dữ liệu giá vé"
-git push origin main</code></pre>
-            <p>Việc này sẽ tự động kích hoạt tiến trình triển khai GitHub Pages để cập nhật trang web hiển thị của bạn.</p>
-          </div>
-        </details>
+    <!-- Contact Section -->
+    <section id="contact" class="portfolio-section glass" style="padding: 2rem;">
+      <h2 class="section-title" style="margin-bottom: 1rem;"><i class="fa-solid fa-envelope"></i> Kết nối với tôi</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 600px;">Bạn đang có dự án cần thực hiện hoặc chỉ muốn trò chuyện chia sẻ kiến thức? Hãy liên hệ với tôi qua các kênh dưới đây!</p>
+      <div class="contact-links">
+        <a href="mailto:adapalen@sincostan.id.vn" class="contact-btn"><i class="fa-solid fa-envelope"></i> Email</a>
+        <a href="https://github.com/adapalen" target="_blank" class="contact-btn"><i class="fa-brands fa-github"></i> GitHub</a>
+        <a href="#" class="contact-btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
       </div>
     </section>
   </div>
-  
-  <script src="app.js"></script>
+
+  <script>
+    // Theme toggle script for portfolio page
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+      document.body.classList.remove('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+  </script>
 </body>
 </html>
