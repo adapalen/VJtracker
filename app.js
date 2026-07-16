@@ -4,6 +4,39 @@ let currentRoute = 'HAN-SGN';
 let currentLeadTime = '7'; // 'all', '7', '14', '30'
 let priceChart = null;
 
+let selectedCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines', 'SunPhuquoc Airways'];
+
+const carrierColors = {
+  'Vietjet': { border: '#ff3c6b', bg: 'rgba(255, 60, 107, 0.05)' },
+  'Bamboo Airways': { border: '#00e676', bg: 'rgba(0, 230, 118, 0.05)' },
+  'Vietravel Airlines': { border: '#ffd600', bg: 'rgba(255, 214, 0, 0.05)' },
+  'Vietnam Airlines': { border: '#00b0ff', bg: 'rgba(0, 176, 255, 0.05)' },
+  'SunPhuquoc Airways': { border: '#e040fb', bg: 'rgba(224, 64, 251, 0.05)' }
+};
+
+function toggleCarrier(carrier) {
+  const idx = selectedCarriers.indexOf(carrier);
+  if (idx > -1) {
+    if (selectedCarriers.length === 1) {
+      document.getElementById('carrier-' + getCarrierId(carrier)).checked = true;
+      return;
+    }
+    selectedCarriers.splice(idx, 1);
+  } else {
+    selectedCarriers.push(carrier);
+  }
+  renderChart();
+}
+
+function getCarrierId(carrier) {
+  if (carrier === 'Vietjet') return 'vietjet';
+  if (carrier === 'Bamboo Airways') return 'bamboo';
+  if (carrier === 'Vietravel Airlines') return 'vietravel';
+  if (carrier === 'Vietnam Airlines') return 'vietnam';
+  if (carrier === 'SunPhuquoc Airways') return 'sunphuquoc';
+  return '';
+}
+
 // Airport translation lookups
 const airportNames = {
   'HAN': 'Hà Nội (HAN)',
@@ -145,7 +178,7 @@ function updateLastUpdated() {
 
 // Calculate recommendations and update stat cards dynamically based on currentRoute
 function updateStatsCards() {
-  const routeRecords = flightDatabase.filter(r => r.route === currentRoute && r.lowestPrice !== null);
+  const routeRecords = flightDatabase.filter(r => r.route === currentRoute && r.lowestPrice !== null && r.carrier === 'Vietjet');
   
   const valLatest = document.getElementById('val-latest-price');
   const descLatest = document.getElementById('desc-latest-price');
@@ -284,44 +317,60 @@ function renderChart() {
   const ctx = document.getElementById('priceChart').getContext('2d');
   
   // Filter data for active route and lead time
-  let filtered = flightDatabase.filter(r => r.route === currentRoute && r.lowestPrice !== null);
+  let routeRecords = flightDatabase.filter(r => r.route === currentRoute && r.lowestPrice !== null);
   if (currentLeadTime !== 'all') {
     const days = parseInt(currentLeadTime, 10);
-    filtered = filtered.filter(r => r.leadDays === days);
+    routeRecords = routeRecords.filter(r => r.leadDays === days);
   }
   
-  // Sort by crawlTimestamp ascending
-  filtered.sort((a, b) => new Date(a.crawlTimestamp) - new Date(b.crawlTimestamp));
+  // Get sorted unique crawl timestamps
+  const uniqueTimestamps = [...new Set(routeRecords.map(r => r.crawlTimestamp))];
+  uniqueTimestamps.sort((a, b) => new Date(a) - new Date(b));
   
-  const labels = filtered.map(r => formatDateTime(r.crawlTimestamp));
-  const prices = filtered.map(r => r.lowestPrice);
+  const labels = uniqueTimestamps.map(t => formatDateTime(t));
+  
+  // Construct datasets for each selected carrier
+  const datasets = selectedCarriers.map(carrier => {
+    const carrierRecords = routeRecords.filter(r => r.carrier === carrier);
+    
+    // Create map of timestamp -> lowestPrice
+    const priceMap = {};
+    carrierRecords.forEach(r => {
+      priceMap[r.crawlTimestamp] = r.lowestPrice;
+    });
+    
+    const data = uniqueTimestamps.map(t => priceMap[t] || null);
+    const colors = carrierColors[carrier] || { border: '#a0a5c0', bg: 'rgba(160, 165, 192, 0.05)' };
+    
+    return {
+      label: carrier,
+      data: data,
+      borderColor: colors.border,
+      backgroundColor: colors.bg,
+      borderWidth: 2.5,
+      pointBackgroundColor: colors.border,
+      pointBorderColor: '#ffffff',
+      pointBorderWidth: 1.5,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+      fill: false,
+      tension: 0.15,
+      spanGaps: true
+    };
+  });
   
   // Destroy old chart instance if exists
   if (priceChart) {
     priceChart.destroy();
   }
   
-  const colors = routeColors[currentRoute] || routeColors['HAN-SGN'];
   const themeColors = getChartColors();
   
   priceChart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [{
-        label: `Giá thấp nhất chặng ${currentRoute} (VND)`,
-        data: prices,
-        borderColor: colors.border,
-        backgroundColor: colors.bg,
-        borderWidth: 3,
-        pointBackgroundColor: colors.border,
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 1.5,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        fill: true,
-        tension: 0.2
-      }]
+      datasets: datasets
     },
     options: {
       responsive: true,
@@ -370,8 +419,11 @@ function renderTable() {
     return;
   }
   
-  // Sort by crawlTimestamp descending and limit to latest 100 entries for performance
-  const sorted = [...flightDatabase].sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp)).slice(0, 100);
+  // Filter for selected carriers, sort by crawlTimestamp descending, limit to latest 100
+  const sorted = [...flightDatabase]
+    .filter(r => selectedCarriers.includes(r.carrier))
+    .sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp))
+    .slice(0, 100);
   
   sorted.forEach(r => {
     const tr = document.createElement('tr');
@@ -386,6 +438,7 @@ function renderTable() {
     tr.innerHTML = `
       <td>${formatDateTime(r.crawlTimestamp)}</td>
       <td><strong>${r.route}</strong></td>
+      <td><span style="font-weight: 600; color: ${carrierColors[r.carrier]?.border || 'inherit'}">${r.carrier}</span></td>
       <td>${r.departureDate}</td>
       <td>Mua trước ${r.leadDays} ngày</td>
       <td style="color: var(--text-primary); font-weight: 600;">${r.lowestPrice ? formatVND(r.lowestPrice) : 'N/A'}</td>
@@ -402,6 +455,14 @@ function generateMockData() {
   const routes = ['HAN-SGN', 'SGN-HAN', 'HAN-PXU', 'PXU-HAN'];
   const leadTimes = [7, 14, 30];
   const now = new Date();
+  const targetCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines', 'SunPhuquoc Airways'];
+  const carrierModifiers = {
+    'Vietjet': 1.0,
+    'Vietravel Airlines': 1.02,
+    'Bamboo Airways': 1.18,
+    'Vietnam Airlines': 1.42,
+    'SunPhuquoc Airways': 1.68
+  };
   
   // Generate 15 runs over the past 5 days (3 runs/day)
   for (let i = 14; i >= 0; i--) {
@@ -409,35 +470,38 @@ function generateMockData() {
     
     routes.forEach(route => {
       leadTimes.forEach(lead => {
-        // Base price calculation
-        let basePrice = route.includes('PXU') ? 1200000 : 1800000;
-        // Fluctuations based on lead time and random factors
-        let leadModifier = lead === 7 ? 1.2 : lead === 14 ? 1.0 : 0.85;
-        let randomFactor = 1 + (Math.sin(i / 2) * 0.08) + (Math.random() * 0.03);
-        let finalPrice = Math.round(basePrice * leadModifier * randomFactor);
-        
-        // Generate mock flights list
-        const flights = [];
-        const times = ['06:00 AM', '10:20 AM', '03:05 PM', '08:45 PM'];
-        times.forEach((time, index) => {
-          flights.push({
-            carrier: 'Vietjet',
-            departureTime: time,
-            duration: route.includes('PXU') ? '1 hr 35 min' : '2 hr 10 min',
-            price: Math.round(finalPrice * (1 + index * 0.03))
+        targetCarriers.forEach(carrier => {
+          // Base price calculation
+          let basePrice = route.includes('PXU') ? 1200000 : 1800000;
+          // Fluctuations based on lead time and random factors
+          let leadModifier = lead === 7 ? 1.2 : lead === 14 ? 1.0 : 0.85;
+          let carrierModifier = carrierModifiers[carrier];
+          let randomFactor = 1 + (Math.sin(i / 2) * 0.08) + (Math.random() * 0.03);
+          let finalPrice = Math.round(basePrice * leadModifier * carrierModifier * randomFactor);
+          
+          // Generate mock flights list
+          const flights = [];
+          const times = ['06:00 AM', '10:20 AM', '03:05 PM', '08:45 PM'];
+          times.forEach((time, index) => {
+            flights.push({
+              carrier: carrier,
+              departureTime: time,
+              duration: route.includes('PXU') ? '1 hr 35 min' : '2 hr 10 min',
+              price: Math.round(finalPrice * (1 + index * 0.03))
+            });
           });
-        });
-        
-        flights.sort((a,b) => a.price - b.price);
-        
-        data.push({
-          crawlTimestamp: crawlTime.toISOString(),
-          route: route,
-          departureDate: new Date(crawlTime.getTime() + lead * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          leadDays: lead,
-          carrier: 'Vietjet',
-          lowestPrice: flights[0].price,
-          allFlights: flights
+          
+          flights.sort((a,b) => a.price - b.price);
+          
+          data.push({
+            crawlTimestamp: crawlTime.toISOString(),
+            route: route,
+            departureDate: new Date(crawlTime.getTime() + lead * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            leadDays: lead,
+            carrier: carrier,
+            lowestPrice: flights[0].price,
+            allFlights: flights
+          });
         });
       });
     });

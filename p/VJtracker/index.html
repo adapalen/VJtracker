@@ -95,34 +95,58 @@
 
     <!-- Main Chart Section -->
     <main class="main-content glass">
-      <div class="chart-header">
-        <div class="control-group" style="align-items: center; gap: 0.8rem;">
-          <select id="origin-select" class="dropdown" onchange="onOriginChange(this.value)" style="min-width: 180px;">
-            <option value="HAN" selected>Hà Nội (HAN)</option>
-            <option value="SGN">TP. HCM (SGN)</option>
-            <option value="DAD">Đà Nẵng (DAD)</option>
-            <option value="CXR">Nha Trang (CXR)</option>
-            <option value="PQC">Phú Quốc (PQC)</option>
-            <option value="PXU">Pleiku (PXU)</option>
-            <option value="DLI">Đà Lạt (DLI)</option>
-            <option value="UIH">Quy Nhơn (UIH)</option>
-            <option value="HUI">Huế (HUI)</option>
-            <option value="VII">Vinh (VII)</option>
-            <option value="BMV">Buôn Ma Thuột (BMV)</option>
-            <option value="VCS">Côn Đảo (VCS)</option>
-          </select>
-          <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-arrow-right"></i></span>
-          <select id="dest-select" class="dropdown" onchange="onDestChange(this.value)" style="min-width: 180px;">
-            <!-- populated dynamically -->
-          </select>
+      <div class="chart-header" style="flex-direction: column; align-items: stretch; gap: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div class="control-group" style="align-items: center; gap: 0.8rem;">
+            <select id="origin-select" class="dropdown" onchange="onOriginChange(this.value)" style="min-width: 180px;">
+              <option value="HAN" selected>Hà Nội (HAN)</option>
+              <option value="SGN">TP. HCM (SGN)</option>
+              <option value="DAD">Đà Nẵng (DAD)</option>
+              <option value="CXR">Nha Trang (CXR)</option>
+              <option value="PQC">Phú Quốc (PQC)</option>
+              <option value="PXU">Pleiku (PXU)</option>
+              <option value="DLI">Đà Lạt (DLI)</option>
+              <option value="UIH">Quy Nhơn (UIH)</option>
+              <option value="HUI">Huế (HUI)</option>
+              <option value="VII">Vinh (VII)</option>
+              <option value="BMV">Buôn Ma Thuột (BMV)</option>
+              <option value="VCS">Côn Đảo (VCS)</option>
+            </select>
+            <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-arrow-right"></i></span>
+            <select id="dest-select" class="dropdown" onchange="onDestChange(this.value)" style="min-width: 180px;">
+              <!-- populated dynamically -->
+            </select>
+          </div>
+          <div class="control-group">
+            <select id="lead-time-select" class="dropdown" onchange="setLeadTime(this.value)">
+              <option value="all">Tất cả khoảng thời gian</option>
+              <option value="7" selected>Mua trước 7 ngày</option>
+              <option value="14">Mua trước 14 ngày</option>
+              <option value="30">Mua trước 30 ngày</option>
+            </select>
+          </div>
         </div>
-        <div class="control-group">
-          <select id="lead-time-select" class="dropdown" onchange="setLeadTime(this.value)">
-            <option value="all">Tất cả khoảng thời gian</option>
-            <option value="7" selected>Mua trước 7 ngày</option>
-            <option value="14">Mua trước 14 ngày</option>
-            <option value="30">Mua trước 30 ngày</option>
-          </select>
+
+        <!-- Airline Multiple Choice Selector -->
+        <div class="airline-selector-group" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 0.6rem 1rem; border-radius: 8px;">
+          <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);"><i class="fa-solid fa-plane"></i> Chọn hãng bay so sánh:</span>
+          <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-vietjet" value="Vietjet" checked onchange="toggleCarrier('Vietjet')"> Vietjet
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-bamboo" value="Bamboo Airways" checked onchange="toggleCarrier('Bamboo Airways')"> Bamboo Airways
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-vietravel" value="Vietravel Airlines" checked onchange="toggleCarrier('Vietravel Airlines')"> Vietravel Airlines
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-vietnam" value="Vietnam Airlines" checked onchange="toggleCarrier('Vietnam Airlines')"> Vietnam Airlines
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-sunphuquoc" value="SunPhuquoc Airways" checked onchange="toggleCarrier('SunPhuquoc Airways')"> SunPhuquoc Airways
+            </label>
+          </div>
         </div>
       </div>
       
@@ -148,6 +172,7 @@
                   <tr>
                     <th>Thời gian quét</th>
                     <th>Chặng bay</th>
+                    <th>Hãng bay</th>
                     <th>Ngày khởi hành</th>
                     <th>Mua trước</th>
                     <th>Giá (VND)</th>
@@ -156,7 +181,7 @@
                 </thead>
                 <tbody id="table-body">
                   <tr>
-                    <td colspan="6" class="no-data">Đang tải cơ sở dữ liệu...</td>
+                    <td colspan="7" class="no-data">Đang tải cơ sở dữ liệu...</td>
                   </tr>
                 </tbody>
               </table>
