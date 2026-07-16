@@ -1,15 +1,13 @@
 {
-  "version": 2,
-  "builds": [
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "api/index.ts", 
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
+      "source": "/p/caro-arena/:match*",
+      "destination": "/p/caro-arena/index.html"
+    },
     {
-      "src": "/(.*)",
-      "dest": "api/index.ts"
+      "source": "/p/VJtracker/:match*",
+      "destination": "/p/VJtracker/index.html"
     }
   ]
 }
