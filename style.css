@@ -17,7 +17,7 @@
   --red: #ff3d00;
   --yellow: #ffd600;
   
-  --font-main: 'Outfit', sans-serif;
+  --font-main: 'Inter', sans-serif;
   --btn-bg-rgb: 255, 255, 255;
   --text-white-force: #ffffff;
   --title-gradient: linear-gradient(135deg, #ffffff 0%, #dfdfef 100%);
@@ -39,6 +39,35 @@ body.light-theme {
   --text-white-force: #1f2029;
   --title-gradient: linear-gradient(135deg, #1f2029 0%, #4a4d5c 100%);
   --dropdown-opt-bg: #ffffff;
+}
+
+/* Portfolio Theme Overrides (Teal/Obsidian Theme) */
+body.portfolio-page {
+  --bg-primary: #090e14;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #0d2030 0%, #090e14 100%);
+  --glass-bg: rgba(15, 25, 35, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --accent-color: #00f0ff;
+  --accent-hover: #00d8e6;
+  --accent-glow: rgba(0, 240, 255, 0.25);
+  --btn-bg-rgb: 0, 240, 255;
+  --title-gradient: linear-gradient(135deg, #ffffff 0%, #aadaff 100%);
+}
+
+body.portfolio-page.light-theme {
+  --bg-primary: #f0f4f8;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #e1e9f0 0%, #f0f4f8 100%);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 136, 204, 0.06);
+  --text-primary: #1e2530;
+  --text-secondary: #58667a;
+  --accent-color: #0088cc;
+  --accent-hover: #0077b3;
+  --accent-glow: rgba(0, 136, 204, 0.12);
+  --btn-bg-rgb: 0, 136, 204;
+  --text-white-force: #1e2530;
+  --title-gradient: linear-gradient(135deg, #1e2530 0%, #3a4b60 100%);
 }
 
 * {
