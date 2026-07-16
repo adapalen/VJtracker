@@ -19,7 +19,16 @@ const server = http.createServer((req, res) => {
   console.log(`[Request] ${req.method} ${req.url}`);
   
   // Resolve path
-  let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  let filePath = path.join(__dirname, req.url);
+  
+  try {
+    const stats = fs.statSync(filePath);
+    if (stats.isDirectory()) {
+      filePath = path.join(filePath, 'index.html');
+    }
+  } catch (e) {
+    // Let fs.readFile handle non-existent paths later
+  }
   
   // Prevent directory traversal
   if (!filePath.startsWith(__dirname)) {
