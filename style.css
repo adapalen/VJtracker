@@ -21,6 +21,7 @@
   --btn-bg-rgb: 255, 255, 255;
   --text-white-force: #ffffff;
   --title-gradient: linear-gradient(135deg, #ffffff 0%, #dfdfef 100%);
+  --dropdown-opt-bg: #12131a;
 }
 
 body.light-theme {
@@ -37,6 +38,7 @@ body.light-theme {
   --btn-bg-rgb: 0, 0, 0;
   --text-white-force: #1f2029;
   --title-gradient: linear-gradient(135deg, #1f2029 0%, #4a4d5c 100%);
+  --dropdown-opt-bg: #ffffff;
 }
 
 * {
@@ -289,7 +291,7 @@ body {
 }
 
 .dropdown {
-  background: rgba(20, 20, 35, 0.75);
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--text-primary);
   padding: 0.6rem 1.2rem;
@@ -298,10 +300,11 @@ body {
   outline: none;
   cursor: pointer;
   font-size: 0.9rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .dropdown option {
-  background: #0f1016;
+  background: var(--dropdown-opt-bg);
   color: var(--text-primary);
 }
 

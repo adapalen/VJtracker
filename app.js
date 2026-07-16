@@ -4,6 +4,38 @@ let currentRoute = 'HAN-SGN';
 let currentLeadTime = '7'; // 'all', '7', '14', '30'
 let priceChart = null;
 
+// Airport translation lookups
+const airportNames = {
+  'HAN': 'Hà Nội (HAN)',
+  'SGN': 'TP. HCM (SGN)',
+  'DAD': 'Đà Nẵng (DAD)',
+  'CXR': 'Nha Trang (CXR)',
+  'PQC': 'Phú Quốc (PQC)',
+  'PXU': 'Pleiku (PXU)',
+  'DLI': 'Đà Lạt (DLI)',
+  'UIH': 'Quy Nhơn (UIH)',
+  'HUI': 'Huế (HUI)',
+  'VII': 'Vinh (VII)',
+  'BMV': 'Buôn Ma Thuột (BMV)',
+  'VCS': 'Côn Đảo (VCS)'
+};
+
+// Route connections matching scraper.js
+const routeMap = {
+  'HAN': ['SGN', 'DAD', 'CXR', 'PQC', 'PXU', 'DLI', 'UIH', 'HUI', 'VII', 'BMV', 'VCS'],
+  'SGN': ['HAN', 'DAD', 'CXR', 'PQC', 'PXU', 'DLI', 'UIH', 'HUI', 'VII', 'BMV', 'VCS'],
+  'DAD': ['HAN', 'SGN'],
+  'CXR': ['HAN', 'SGN'],
+  'PQC': ['HAN', 'SGN'],
+  'PXU': ['HAN', 'SGN'],
+  'DLI': ['HAN', 'SGN'],
+  'UIH': ['HAN', 'SGN'],
+  'HUI': ['HAN', 'SGN'],
+  'VII': ['HAN', 'SGN'],
+  'BMV': ['HAN', 'SGN'],
+  'VCS': ['HAN', 'SGN']
+};
+
 // HSL color configurations for lines
 const routeColors = {
   'HAN-SGN': { border: '#ff3c6b', bg: 'rgba(255, 60, 107, 0.1)' },
@@ -87,6 +119,7 @@ function formatDateTime(isoStr) {
 }
 
 function initDashboard() {
+  populateDestinations('HAN');
   updateLastUpdated();
   updateStatsCards();
   renderChart();
@@ -187,15 +220,54 @@ function updateStatsCards() {
 
 function setRoute(route) {
   currentRoute = route;
-  
-  // Update select select dropdown if changed externally
-  const select = document.getElementById('route-select');
-  if (select && select.value !== route) {
-    select.value = route;
+  const [origin, dest] = route.split('-');
+
+  // Sync origin dropdown if changed externally
+  const originSelect = document.getElementById('origin-select');
+  if (originSelect && originSelect.value !== origin) {
+    originSelect.value = origin;
+    populateDestinations(origin);
   }
-  
+
+  // Sync destination dropdown if changed externally
+  const destSelect = document.getElementById('dest-select');
+  if (destSelect && destSelect.value !== dest) {
+    destSelect.value = dest;
+  }
+
   updateStatsCards();
   renderChart();
+}
+
+function populateDestinations(origin) {
+  const destSelect = document.getElementById('dest-select');
+  if (!destSelect) return;
+  destSelect.innerHTML = '';
+  
+  const allowedDests = routeMap[origin] || [];
+  allowedDests.forEach(dest => {
+    const opt = document.createElement('option');
+    opt.value = dest;
+    opt.innerText = airportNames[dest] || dest;
+    destSelect.appendChild(opt);
+  });
+}
+
+function onOriginChange(origin) {
+  populateDestinations(origin);
+  const destSelect = document.getElementById('dest-select');
+  if (destSelect) {
+    const dest = destSelect.value;
+    setRoute(`${origin}-${dest}`);
+  }
+}
+
+function onDestChange(dest) {
+  const originSelect = document.getElementById('origin-select');
+  if (originSelect) {
+    const origin = originSelect.value;
+    setRoute(`${origin}-${dest}`);
+  }
 }
 
 function setLeadTime(val) {

@@ -87,50 +87,24 @@
     <!-- Main Chart Section -->
     <main class="main-content glass">
       <div class="chart-header">
-        <div class="control-group">
-          <select id="route-select" class="dropdown" onchange="setRoute(this.value)" style="min-width: 280px;">
-            <option value="HAN-SGN" selected>Hà Nội (HAN) &rarr; TP. HCM (SGN)</option>
-            <option value="SGN-HAN">TP. HCM (SGN) &rarr; Hà Nội (HAN)</option>
-            <option value="HAN-DAD">Hà Nội (HAN) &rarr; Đà Nẵng (DAD)</option>
-            <option value="DAD-HAN">Đà Nẵng (DAD) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-DAD">TP. HCM (SGN) &rarr; Đà Nẵng (DAD)</option>
-            <option value="DAD-SGN">Đà Nẵng (DAD) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-CXR">Hà Nội (HAN) &rarr; Nha Trang (CXR)</option>
-            <option value="CXR-HAN">Nha Trang (CXR) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-CXR">TP. HCM (SGN) &rarr; Nha Trang (CXR)</option>
-            <option value="CXR-SGN">Nha Trang (CXR) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-PQC">Hà Nội (HAN) &rarr; Phú Quốc (PQC)</option>
-            <option value="PQC-HAN">Phú Quốc (PQC) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-PQC">TP. HCM (SGN) &rarr; Phú Quốc (PQC)</option>
-            <option value="PQC-SGN">Phú Quốc (PQC) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-PXU">Hà Nội (HAN) &rarr; Pleiku (PXU)</option>
-            <option value="PXU-HAN">Pleiku (PXU) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-PXU">TP. HCM (SGN) &rarr; Pleiku (PXU)</option>
-            <option value="PXU-SGN">Pleiku (PXU) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-DLI">Hà Nội (HAN) &rarr; Đà Lạt (DLI)</option>
-            <option value="DLI-HAN">Đà Lạt (DLI) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-DLI">TP. HCM (SGN) &rarr; Đà Lạt (DLI)</option>
-            <option value="DLI-SGN">Đà Lạt (DLI) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-UIH">Hà Nội (HAN) &rarr; Quy Nhơn (UIH)</option>
-            <option value="UIH-HAN">Quy Nhơn (UIH) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-UIH">TP. HCM (SGN) &rarr; Quy Nhơn (UIH)</option>
-            <option value="UIH-SGN">Quy Nhơn (UIH) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-HUI">Hà Nội (HAN) &rarr; Huế (HUI)</option>
-            <option value="HUI-HAN">Huế (HUI) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-HUI">TP. HCM (SGN) &rarr; Huế (HUI)</option>
-            <option value="HUI-SGN">Huế (HUI) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-VII">Hà Nội (HAN) &rarr; Vinh (VII)</option>
-            <option value="VII-HAN">Vinh (VII) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-VII">TP. HCM (SGN) &rarr; Vinh (VII)</option>
-            <option value="VII-SGN">Vinh (VII) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-BMV">Hà Nội (HAN) &rarr; Buôn Ma Thuột (BMV)</option>
-            <option value="BMV-HAN">Buôn Ma Thuột (BMV) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-BMV">TP. HCM (SGN) &rarr; Buôn Ma Thuột (BMV)</option>
-            <option value="BMV-SGN">Buôn Ma Thuột (BMV) &rarr; TP. HCM (SGN)</option>
-            <option value="HAN-VCS">Hà Nội (HAN) &rarr; Côn Đảo (VCS)</option>
-            <option value="VCS-HAN">Côn Đảo (VCS) &rarr; Hà Nội (HAN)</option>
-            <option value="SGN-VCS">TP. HCM (SGN) &rarr; Côn Đảo (VCS)</option>
-            <option value="VCS-SGN">Côn Đảo (VCS) &rarr; TP. HCM (SGN)</option>
+        <div class="control-group" style="align-items: center; gap: 0.8rem;">
+          <select id="origin-select" class="dropdown" onchange="onOriginChange(this.value)" style="min-width: 180px;">
+            <option value="HAN" selected>Hà Nội (HAN)</option>
+            <option value="SGN">TP. HCM (SGN)</option>
+            <option value="DAD">Đà Nẵng (DAD)</option>
+            <option value="CXR">Nha Trang (CXR)</option>
+            <option value="PQC">Phú Quốc (PQC)</option>
+            <option value="PXU">Pleiku (PXU)</option>
+            <option value="DLI">Đà Lạt (DLI)</option>
+            <option value="UIH">Quy Nhơn (UIH)</option>
+            <option value="HUI">Huế (HUI)</option>
+            <option value="VII">Vinh (VII)</option>
+            <option value="BMV">Buôn Ma Thuột (BMV)</option>
+            <option value="VCS">Côn Đảo (VCS)</option>
+          </select>
+          <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-arrow-right"></i></span>
+          <select id="dest-select" class="dropdown" onchange="onDestChange(this.value)" style="min-width: 180px;">
+            <!-- populated dynamically -->
           </select>
         </div>
         <div class="control-group">
