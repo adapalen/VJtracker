@@ -8,8 +8,8 @@ export default defineConfig(() => {
     base: './',
     plugins: [react(), tailwindcss()],
     build: {
-      outDir: '../p/caro-arena',
-      emptyOutDir: true,
+      outDir: '../',
+      emptyOutDir: false,
     },
     resolve: {
       alias: {
