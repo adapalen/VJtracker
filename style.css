@@ -712,13 +712,14 @@ tbody tr:last-child td {
   background: rgba(var(--btn-bg-rgb), 0.04);
   border: 1px solid var(--glass-border);
   color: var(--text-primary);
-  padding: 0.7rem 1.4rem;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   text-decoration: none;
-  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  justify-content: center;
+  font-size: 1.25rem;
   transition: all 0.3s ease;
 }
 
@@ -726,6 +727,8 @@ tbody tr:last-child td {
   background: rgba(var(--btn-bg-rgb), 0.08);
   border-color: var(--accent-color);
   color: var(--accent-color);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 /* CV Layout & Timeline Styles */
