@@ -27,9 +27,19 @@ import synth from "./utils/audio";
 import { 
   doc, 
   getDoc, 
-  setDoc 
+  setDoc,
+  collection,
+  addDoc,
+  updateDoc,
+  query,
+  where,
+  limit,
+  getDocs,
+  onSnapshot,
+  serverTimestamp
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { signInAnonymously } from "firebase/auth";
+import { db, auth } from "./firebase";
 import InfiniteBoard from "./components/InfiniteBoard";
 import Leaderboard from "./components/Leaderboard";
 import MatchHistory from "./components/MatchHistory";
@@ -259,13 +269,15 @@ export default function App() {
   const [hasGameStarted, setHasGameStarted] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Online Matchmaking Simulation states
+  // Online Matchmaking states
   const [matchmakingState, setMatchmakingState] = useState<"IDLE" | "SEARCHING" | "CONNECTED">("IDLE");
   const [matchmakingProgress, setMatchmakingProgress] = useState(0);
   const [matchmakingLogs, setMatchmakingLogs] = useState<string[]>([]);
   const [onlineOpponent, setOnlineOpponent] = useState<LeaderboardEntry | null>(null);
   const [onlineChats, setOnlineChats] = useState<Array<{ sender: string; text: string; time: string }>>([]);
   const [chatMessageInput, setChatMessageInput] = useState("");
+  const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
+  const [userSymbol, setUserSymbol] = useState<"X" | "O">("X");
 
   // ELO System pop-up modal state
   const [isEloModalOpen, setIsEloModalOpen] = useState(false);
@@ -298,12 +310,21 @@ export default function App() {
 
   // --- SAVE PROFILE TO CLOUD ---
   const saveProfileToCloud = async (updatedProfile: PlayerProfile) => {
-    const trimmedUsername = ssoUsername.trim();
-    if (trimmedUsername) {
+    const authUser = auth.currentUser;
+    if (authUser) {
       try {
-        await setDoc(doc(db, "users", trimmedUsername.toLowerCase()), updatedProfile);
+        await setDoc(doc(db, "users", authUser.uid), updatedProfile);
       } catch (e) {
         console.error("Failed to save profile to cloud:", e);
+      }
+    } else {
+      const trimmedUsername = ssoUsername.trim();
+      if (trimmedUsername) {
+        try {
+          await setDoc(doc(db, "users", trimmedUsername.toLowerCase()), updatedProfile);
+        } catch (e) {
+          console.error("Failed to save profile to cloud:", e);
+        }
       }
     }
   };
@@ -339,88 +360,95 @@ export default function App() {
 
     // Load SSO authentication state and profile
     const loadProfileAndCredentials = async () => {
-      const savedLoggedIn = localStorage.getItem("infinite_ttt_is_logged_in") === "true";
-      const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
-
-      if (savedLoggedIn && savedSsoUsername) {
-        setIsLoggedIn(true);
-        setSsoUsername(savedSsoUsername);
-        setTempCallsign(savedSsoUsername);
-
-        try {
-          let loadedProfile: PlayerProfile | null = null;
-          
+      auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          setIsLoggedIn(true);
           try {
-            // Attempt to sync from Cloud Firestore
-            const docRef = doc(db, "users", savedSsoUsername.toLowerCase());
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              loadedProfile = docSnap.data() as PlayerProfile;
-            }
-          } catch (firestoreErr) {
-            console.warn("Firestore offline or inaccessible. Resorting to local profiles.", firestoreErr);
-          }
-
-          // Fallback to local storage profile if exists
-          if (!loadedProfile) {
-            const localRaw = localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername.toLowerCase()}`) || 
-                             localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername}`) || 
-                             localStorage.getItem(STORAGE_KEYS.PROFILE);
-            if (localRaw) {
-              try {
-                loadedProfile = JSON.parse(localRaw);
-              } catch (err) {}
-            }
-          }
-
-          if (loadedProfile) {
-            setProfile(loadedProfile);
-            setTempCallsign(loadedProfile.name);
-            setSsoUsername(loadedProfile.name);
-
-            // Merge user to leaderboard
-            const playerWins = loadedProfile.matches.filter(m => m.result === "WIN").length;
-            const playerLosses = loadedProfile.matches.filter(m => m.result === "LOSS").length;
+            let loadedProfile: PlayerProfile | null = null;
             
-            const updatedLeaderboard = currentLeaderboard.map(e => {
-              if (e.name.toLowerCase() === loadedProfile!.name.toLowerCase() || e.isPlayer) {
-                return {
-                  ...e,
-                  name: loadedProfile!.name,
-                  elo: loadedProfile!.elo,
+            try {
+              // Attempt to sync from Cloud Firestore by UID
+              const docRef = doc(db, "users", user.uid);
+              const docSnap = await getDoc(docRef);
+              if (docSnap.exists()) {
+                loadedProfile = docSnap.data() as PlayerProfile;
+              }
+            } catch (firestoreErr) {
+              console.warn("Firestore offline or inaccessible. Resorting to local profiles.", firestoreErr);
+            }
+
+            // Fallback to local storage profile if exists
+            if (!loadedProfile) {
+              const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
+              const localRaw = localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername.toLowerCase()}`) || 
+                               localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername}`) || 
+                               localStorage.getItem(STORAGE_KEYS.PROFILE);
+              if (localRaw) {
+                try {
+                  loadedProfile = JSON.parse(localRaw);
+                } catch (err) {}
+              }
+            }
+
+            if (loadedProfile) {
+              setProfile(loadedProfile);
+              setTempCallsign(loadedProfile.name);
+              setSsoUsername(loadedProfile.name);
+
+              // Merge user to leaderboard
+              const playerWins = loadedProfile.matches.filter(m => m.result === "WIN").length;
+              const playerLosses = loadedProfile.matches.filter(m => m.result === "LOSS").length;
+              
+              const updatedLeaderboard = currentLeaderboard.map(e => {
+                if (e.name.toLowerCase() === loadedProfile!.name.toLowerCase() || e.isPlayer) {
+                  return {
+                    ...e,
+                    name: loadedProfile!.name,
+                    elo: loadedProfile!.elo,
+                    wins: playerWins,
+                    losses: playerLosses,
+                    isPlayer: true,
+                    countryCode: loadedProfile!.countryCode || "VN",
+                    countryName: loadedProfile!.countryName || "Vietnam",
+                    countryFlag: loadedProfile!.countryFlag || "🇻🇳"
+                  };
+                }
+                return e;
+              });
+
+              if (!updatedLeaderboard.some(e => e.name.toLowerCase() === loadedProfile!.name.toLowerCase())) {
+                updatedLeaderboard.push({
+                  name: loadedProfile.name,
+                  elo: loadedProfile.elo,
                   wins: playerWins,
                   losses: playerLosses,
                   isPlayer: true,
-                  countryCode: loadedProfile!.countryCode || "VN",
-                  countryName: loadedProfile!.countryName || "Vietnam",
-                  countryFlag: loadedProfile!.countryFlag || "🇻🇳"
-                };
+                  status: "ONLINE",
+                  avatarSeed: loadedProfile.name,
+                  countryCode: loadedProfile.countryCode || "VN",
+                  countryName: loadedProfile.countryName || "Vietnam",
+                  countryFlag: loadedProfile.countryFlag || "🇻🇳"
+                });
               }
-              return { ...e, isPlayer: false };
-            });
 
-            if (!updatedLeaderboard.some(e => e.name.toLowerCase() === loadedProfile!.name.toLowerCase())) {
-              updatedLeaderboard.push({
-                name: loadedProfile.name,
-                elo: loadedProfile.elo,
-                wins: playerWins,
-                losses: playerLosses,
-                isPlayer: true,
-                status: "ONLINE",
-                avatarSeed: loadedProfile.name,
-                countryCode: loadedProfile.countryCode || "VN",
-                countryName: loadedProfile.countryName || "Vietnam",
-                countryFlag: loadedProfile.countryFlag || "🇻🇳"
-              });
+              setLeaderboard(updatedLeaderboard);
+              localStorage.setItem(STORAGE_KEYS.LEADERBOARD, JSON.stringify(updatedLeaderboard));
             }
-
-            setLeaderboard(updatedLeaderboard);
-            localStorage.setItem(STORAGE_KEYS.LEADERBOARD, JSON.stringify(updatedLeaderboard));
+          } catch (e) {
+            console.error("Error loading profile:", e);
           }
-        } catch (e) {
-          console.error("Error loading profile:", e);
+        } else {
+          const savedLoggedIn = localStorage.getItem("infinite_ttt_is_logged_in") === "true";
+          const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
+          if (savedLoggedIn && savedSsoUsername) {
+            try {
+              await signInAnonymously(auth);
+            } catch (err) {
+              console.error("Anonymous authentication fallback failed:", err);
+            }
+          }
         }
-      }
+      });
     };
 
     loadProfileAndCredentials();
@@ -468,6 +496,83 @@ export default function App() {
 
     return () => clearInterval(interval);
   }, [gameStatus, hasGameStarted, currentPlayer]);
+
+  // --- FIRESTORE REAL-TIME MULTIPLAYER SYNC ---
+  useEffect(() => {
+    if (!activeMatchId || gameMode !== "ONLINE") return;
+
+    const matchDocRef = doc(db, "caro_matches", activeMatchId);
+    
+    const unsubscribe = onSnapshot(matchDocRef, (docSnap) => {
+      if (!docSnap.exists()) return;
+      const data = docSnap.data();
+
+      // 1. Peer joining resolution
+      if (matchmakingState === "SEARCHING" && data.status === "playing" && data.playerO) {
+        setOnlineOpponent({
+          name: data.playerO.name,
+          elo: data.playerO.elo,
+          wins: 0,
+          losses: 0,
+          status: "ONLINE",
+          avatarSeed: data.playerO.name,
+          countryCode: data.playerO.countryCode,
+          countryFlag: data.playerO.flag
+        });
+        setMatchmakingProgress(100);
+        setMatchmakingState("CONNECTED");
+        setBoard({});
+        setWinningCells(null);
+        setBoardLastMove(null);
+        setGameStatus("PLAYING");
+        setCurrentPlayer("X");
+        setPlayerXTime(data.playerXTime || 300);
+        setPlayerOTime(data.playerOTime || 300);
+        setHasGameStarted(true);
+        setIsMatchStarted(true);
+        synth.playWin();
+        setOnlineChats(data.chats || []);
+        setActiveTab("QUANTUM_CHAT");
+      }
+
+      // 2. Synchronize gameplay turns
+      if (data.status === "playing") {
+        setBoard(data.board || {});
+        setCurrentPlayer(data.currentTurn);
+        setBoardLastMove(data.lastMove);
+        setPlayerXTime(data.playerXTime || 300);
+        setPlayerOTime(data.playerOTime || 300);
+        setOnlineChats(data.chats || []);
+        
+        if (data.lastMove) {
+          synth.playPlace();
+        }
+      }
+
+      // 3. Synchronize match completions
+      if (data.status === "finished") {
+        setBoard(data.board || {});
+        setBoardLastMove(data.lastMove);
+        setWinningCells(data.winningCells);
+        setOnlineChats(data.chats || []);
+
+        if (gameStatus === "PLAYING") {
+          const isWinner = data.winnerUid === auth.currentUser?.uid;
+          const result = isWinner ? "WIN" : (data.winnerUid === null ? "DRAW" : "LOSS");
+          const opponent = userSymbol === "X" ? data.playerO : data.playerX;
+          
+          if (isWinner) {
+            synth.playWin();
+          } else {
+            synth.playDefeat();
+          }
+          resolveMatch(result, opponent.name, opponent.elo, data.isTimeout || false);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [activeMatchId, matchmakingState, gameMode, userSymbol, gameStatus]);
 
   // Handle Turn Expiry Forfeit (Chess clock runout)
   const handleChessTimeout = (losingPlayer: "X" | "O") => {
@@ -532,15 +637,18 @@ export default function App() {
       log("Contacting authentication server...");
       await dummyDelay(400);
 
-      log(`Verifying single sign-on profile: "${trimmed}"...`);
+      log("Authenticating anonymously with Firebase Auth...");
+      const userCredential = await signInAnonymously(auth);
+      const authUser = userCredential.user;
+      log(`Authenticated session UID: ${authUser.uid}`);
       await dummyDelay(400);
 
-      log("Querying Cloud Firestore database...");
+      log("Querying Cloud Firestore database for pilot records...");
       let finalProfile: PlayerProfile | null = null;
       let hasCloudAccess = false;
 
       try {
-        const docRef = doc(db, "users", trimmed.toLowerCase());
+        const docRef = doc(db, "users", authUser.uid);
         const docSnap = await getDoc(docRef);
         hasCloudAccess = true;
         await dummyDelay(400);
@@ -594,11 +702,21 @@ export default function App() {
 
         if (hasCloudAccess) {
           try {
-            const docRef = doc(db, "users", trimmed.toLowerCase());
+            const docRef = doc(db, "users", authUser.uid);
             await setDoc(docRef, finalProfile);
             log("New profile registered on Cloud Firestore.");
           } catch (writeErr) {
             log("[WARNING] Cloud save unsuccessful. Saved locally.");
+          }
+        }
+      } else {
+        if (finalProfile.name !== trimmed) {
+          finalProfile = { ...finalProfile, name: trimmed };
+          if (hasCloudAccess) {
+            try {
+              const docRef = doc(db, "users", authUser.uid);
+              await setDoc(docRef, finalProfile);
+            } catch (err) {}
           }
         }
       }
@@ -620,23 +738,23 @@ export default function App() {
       const playerWins = finalProfile.matches.filter(m => m.result === "WIN").length;
       const playerLosses = finalProfile.matches.filter(m => m.result === "LOSS").length;
       const updatedLeaderboard = leaderboard.map(e => {
-        if (e.name.toLowerCase() === finalProfile.name.toLowerCase() || e.isPlayer) {
+        if (e.name.toLowerCase() === finalProfile!.name.toLowerCase() || e.isPlayer) {
           return {
             ...e,
-            name: finalProfile.name,
-            elo: finalProfile.elo,
+            name: finalProfile!.name,
+            elo: finalProfile!.elo,
             wins: playerWins,
             losses: playerLosses,
             isPlayer: true,
-            countryCode: finalProfile.countryCode || "VN",
-            countryName: finalProfile.countryName || "Vietnam",
-            countryFlag: finalProfile.countryFlag || "🇻🇳"
+            countryCode: finalProfile!.countryCode || "VN",
+            countryName: finalProfile!.countryName || "Vietnam",
+            countryFlag: finalProfile!.countryFlag || "🇻🇳"
           };
         }
-        return { ...e, isPlayer: false };
+        return e;
       });
 
-      if (!updatedLeaderboard.some(e => e.name.toLowerCase() === finalProfile.name.toLowerCase())) {
+      if (!updatedLeaderboard.some(e => e.name.toLowerCase() === finalProfile!.name.toLowerCase())) {
         updatedLeaderboard.push({
           name: finalProfile.name,
           elo: finalProfile.elo,
@@ -675,103 +793,186 @@ export default function App() {
     synth.playDefeat();
   };
 
-  // --- ONLINE SIMULATED MATCHMAKING ---
-  const handleStartMatchmaking = () => {
+  // --- ONLINE MATCHMAKING VIA FIRESTORE ---
+  const handleStartMatchmaking = async () => {
     if (matchmakingState !== "IDLE") return;
     
     synth.playTick();
     setMatchmakingState("SEARCHING");
     setMatchmakingProgress(0);
-    setMatchmakingLogs([]);
+    setMatchmakingLogs(["Initiating secure corridor..."]);
 
-    const matchLogs = [
-      "Opening matchmaking channel...",
-      "Searching for ready players...",
-      "Pinging servers (Singapore, Oregon, Frankfurt)...",
-      "Opponent found! Establishing connection...",
-      "Synchronizing board state..."
-    ];
+    const currentUid = auth.currentUser?.uid || "guest";
+    const currentName = profile.name || "Anonymous Pilot";
+    const currentElo = profile.elo || 1200;
+    const currentCountry = profile.countryCode || "VN";
+    const currentFlag = profile.countryFlag || "🇻🇳";
 
-    // Pick a random online opponent from the leaderboard
-    const potentialOpponents = leaderboard.filter(e => !e.isPlayer && e.status !== "OFFLINE");
-    const matched = potentialOpponents[Math.floor(Math.random() * potentialOpponents.length)] || leaderboard[0];
-    setOnlineOpponent(matched);
+    setMatchmakingProgress(20);
+    setMatchmakingLogs(prev => [...prev, "Contacting Cloud Firestore matchmaking database..."]);
 
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
-      setMatchmakingProgress(progress);
+    try {
+      const dummyDelay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+      await dummyDelay(400);
 
-      const logIndex = Math.floor(progress / 20);
-      if (matchLogs[logIndex] && progress % 20 === 0) {
-        setMatchmakingLogs((prev) => [...prev, `[SYS] ${matchLogs[logIndex]}`]);
-        synth.playTick();
+      // Search for any active waiting lobbies
+      const q = query(
+        collection(db, "caro_matches"),
+        where("status", "==", "waiting"),
+        limit(5)
+      );
+      
+      const snap = await getDocs(q);
+      let foundDoc = null;
+      
+      if (!snap.empty) {
+        // Find other player's lobby first, but fallback to own lobby to allow self-testing across tabs
+        const otherMatches = snap.docs.filter(d => d.data().playerX.uid !== currentUid);
+        if (otherMatches.length > 0) {
+          foundDoc = otherMatches[0];
+        } else {
+          foundDoc = snap.docs[0];
+        }
       }
 
-      if (progress >= 100) {
-        clearInterval(interval);
+      if (foundDoc) {
+        // Join existing lobby as Player O
+        const matchId = foundDoc.id;
+        const matchData = foundDoc.data();
+        
+        setUserSymbol("O");
+        setOnlineOpponent({
+          name: matchData.playerX.name,
+          elo: matchData.playerX.elo,
+          wins: 0,
+          losses: 0,
+          status: "ONLINE",
+          avatarSeed: matchData.playerX.name,
+          countryCode: matchData.playerX.countryCode,
+          countryFlag: matchData.playerX.flag
+        });
+
+        setMatchmakingProgress(80);
+        setMatchmakingLogs(prev => [...prev, `Found opponent: ${matchData.playerX.name} (${matchData.playerX.elo} ELO)`]);
+        setMatchmakingLogs(prev => [...prev, "Synchronizing board state and starting battle clock..."]);
+        await dummyDelay(300);
+
+        const initialTime = timeControl === "BULLET" ? 60 : timeControl === "FLASH" ? 300 : 600;
+
+        await updateDoc(doc(db, "caro_matches", matchId), {
+          playerO: {
+            uid: currentUid,
+            name: currentName,
+            elo: currentElo,
+            countryCode: currentCountry,
+            flag: currentFlag
+          },
+          status: "playing",
+          currentTurn: "X",
+          playerXTime: initialTime,
+          playerOTime: initialTime,
+          lastMoveTime: Date.now()
+        });
+
+        setActiveMatchId(matchId);
+        setMatchmakingProgress(100);
         setMatchmakingState("CONNECTED");
         setBoard({});
         setWinningCells(null);
         setBoardLastMove(null);
         setGameStatus("PLAYING");
         setCurrentPlayer("X");
-        startMatchSetup();
+        setPlayerXTime(initialTime);
+        setPlayerOTime(initialTime);
+        setHasGameStarted(true);
+        setIsMatchStarted(true);
         synth.playWin();
 
-        // Seed initial greeting chat
-        const greetings = [
-          "Hello! Good luck with the match.",
-          "Good luck! Let's have a great game.",
-          "Hope you're ready for some good placements.",
-          "Let's begin!",
-          "Good luck. Let's see who wins."
-        ];
-        const seedGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-        
         setOnlineChats([
           {
-            sender: matched.name,
-            text: seedGreeting,
+            sender: "System",
+            text: "Connection established. Battle grid active! Player X moves first.",
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
           }
         ]);
         setActiveTab("QUANTUM_CHAT");
+
+      } else {
+        // Create a new lobby as Player X
+        setUserSymbol("X");
+        setMatchmakingProgress(50);
+        setMatchmakingLogs(prev => [...prev, "No active waiting lobbies found. Provisioning new session..."]);
+        await dummyDelay(300);
+
+        const initialTime = timeControl === "BULLET" ? 60 : timeControl === "FLASH" ? 300 : 600;
+        
+        const newMatchRef = await addDoc(collection(db, "caro_matches"), {
+          playerX: {
+            uid: currentUid,
+            name: currentName,
+            elo: currentElo,
+            countryCode: currentCountry,
+            flag: currentFlag
+          },
+          playerO: null,
+          status: "waiting",
+          board: {},
+          lastMove: null,
+          currentTurn: "X",
+          playerXTime: initialTime,
+          playerOTime: initialTime,
+          lastMoveTime: Date.now(),
+          timeControl: timeControl,
+          chats: [
+            {
+              sender: "System",
+              text: "Lobby registered. Awaiting opponent connection beacon...",
+              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+          ],
+          createdAt: serverTimestamp()
+        });
+
+        setActiveMatchId(newMatchRef.id);
+        setMatchmakingLogs(prev => [...prev, "Lobby generated. Listening for connection beacons..."]);
       }
-    }, 150);
+
+    } catch (err: any) {
+      setMatchmakingState("IDLE");
+      setMatchmakingLogs(prev => [...prev, `[ERROR] Lobby failed: ${err.message}`]);
+      console.error("Matchmaking error:", err);
+    }
   };
 
-  // Chat presend message responses
-  const sendPresetChat = (text: string) => {
-    if (!onlineOpponent) return;
+  // Real-time Chat message handlers
+  const sendPresetChat = async (text: string) => {
+    if (gameMode !== "ONLINE" || !activeMatchId) return;
     synth.playTick();
 
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const nextChats = [...onlineChats, { sender: profile.name, text, time: timestamp }];
-    setOnlineChats(nextChats);
+    const newChat = { sender: profile.name, text, time: timestamp };
 
-    // AI Opponent dynamic reply
-    setTimeout(() => {
-      let reply = "Good game so far!";
-      if (text.includes("luck") || text.includes("Good luck")) {
-        reply = `Thank you! Good luck to you too.`;
-      } else if (text.includes("Nice") || text.includes("move")) {
-        reply = `Thanks! Just planning my next move.`;
-      } else if (text.includes("lag") || text.includes("Lag")) {
-        reply = `My connection seems stable. Hope it's okay on your end.`;
-      } else if (text.includes("Checkmate") || text.includes("win")) {
-        reply = `It's not over yet. Let's keep playing!`;
-      } else {
-        reply = `Thanks, your turn now!`;
+    try {
+      const matchDocRef = doc(db, "caro_matches", activeMatchId);
+      const matchSnap = await getDoc(matchDocRef);
+      if (matchSnap.exists()) {
+        const chats = matchSnap.data().chats || [];
+        await updateDoc(matchDocRef, {
+          chats: [...chats, newChat]
+        });
       }
+    } catch (err) {
+      console.error("Failed to send chat message:", err);
+    }
+  };
 
-      setOnlineChats((prev) => [...prev, {
-        sender: onlineOpponent.name,
-        text: reply,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      }]);
-      synth.playTick();
-    }, 1200);
+  const handleSendCustomChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = chatMessageInput.trim();
+    if (!trimmed || !activeMatchId) return;
+    
+    setChatMessageInput("");
+    await sendPresetChat(trimmed);
   };
 
   // Toggle Theme
@@ -820,7 +1021,7 @@ export default function App() {
   // --- GAME LIFECYCLE ---
   
   // Surrender / Forfeit current active match
-  const handleSurrender = () => {
+  const handleSurrender = async () => {
     if (gameStatus !== "PLAYING" || isAiThinking) return;
     
     synth.playPlace();
@@ -843,13 +1044,34 @@ export default function App() {
         isPvpUnchanged: true,
         analysis: generateMatchAnalysis("LOSS", movesCnt),
       });
+    } else if (gameMode === "ONLINE") {
+      if (activeMatchId) {
+        try {
+          const winningUid = userSymbol === "X" ? "O" : "X"; // the other player wins
+          await updateDoc(doc(db, "caro_matches", activeMatchId), {
+            status: "finished",
+            winnerUid: winningUid === "O" ? (onlineOpponent?.name || "opponent") : auth.currentUser?.uid,
+            isForfeit: true
+          });
+        } catch (err) {}
+      }
     } else {
       resolveMatch("LOSS", opponentName, opponentElo);
     }
   };
 
   // Reset the grid board for a new skirmish
-  const handleResetBoard = () => {
+  const handleResetBoard = async () => {
+    if (gameMode === "ONLINE" && activeMatchId && gameStatus === "PLAYING") {
+      try {
+        await updateDoc(doc(db, "caro_matches", activeMatchId), {
+          status: "finished",
+          winnerUid: "opponent_forfeit"
+        });
+      } catch (err) {}
+    }
+    setActiveMatchId(null);
+
     setBoard({});
     setWinningCells(null);
     setBoardLastMove(null);
@@ -886,6 +1108,8 @@ export default function App() {
       ? { eloChange: 0, newElo: profile.elo, expectedScore: 0.5 }
       : calculateEloChange(profile.elo, opponentElo, result, profile.matches.length);
 
+    const analysis = generateMatchAnalysis(result, movesCount);
+
     // Create Match Log
     const newRecord: MatchRecord = {
       id: Math.random().toString(36).substr(2, 9),
@@ -895,6 +1119,13 @@ export default function App() {
       eloChange: eloCalc.eloChange,
       date: new Date().toISOString(),
       movesCount,
+      playerAccuracy: analysis.playerAccuracy,
+      opponentAccuracy: analysis.opponentAccuracy,
+      criticalTurn: analysis.criticalTurn,
+      criticalTurnReason: analysis.criticalTurnReason,
+      isTimeout,
+      oldElo,
+      newElo: eloCalc.newElo
     };
 
     const updatedMatches = [newRecord, ...profile.matches];
@@ -944,7 +1175,35 @@ export default function App() {
       movesCount,
       isPvpUnchanged: isPvp,
       isTimeout,
-      analysis: generateMatchAnalysis(result, movesCount),
+      analysis,
+    });
+  };
+
+  const handleViewPastReport = (record: MatchRecord) => {
+    const analysis = {
+      playerAccuracy: record.playerAccuracy || (record.result === "WIN" ? 85.5 : record.result === "LOSS" ? 64.2 : 75.8),
+      opponentAccuracy: record.opponentAccuracy || (record.result === "WIN" ? 62.4 : record.result === "LOSS" ? 88.1 : 74.5),
+      criticalTurn: record.criticalTurn || null,
+      criticalTurnReason: record.criticalTurnReason || null,
+      playerStats: generateMatchAnalysis(record.result, record.movesCount).playerStats,
+      opponentStats: generateMatchAnalysis(record.result, record.movesCount).opponentStats
+    };
+
+    const recordOldElo = record.oldElo || (record.newElo ? record.newElo - record.eloChange : profile.elo - record.eloChange);
+    const recordNewElo = record.newElo || (record.oldElo ? record.oldElo + record.eloChange : profile.elo);
+
+    setPostGameReport({
+      show: true,
+      result: record.result,
+      opponentName: record.opponentName,
+      opponentElo: record.opponentElo,
+      oldElo: recordOldElo,
+      newElo: recordNewElo,
+      deltaElo: record.eloChange,
+      movesCount: record.movesCount,
+      isPvpUnchanged: record.eloChange === 0,
+      isTimeout: !!record.isTimeout,
+      analysis,
     });
   };
 
@@ -976,118 +1235,108 @@ export default function App() {
   };
 
   // Click handler on specific cell position
-  const handleCellClick = (x: number, y: number) => {
+  const handleCellClick = async (x: number, y: number) => {
     // Ignore input if game completed, cell occupied, AI currently executing, or match has not started yet
     if (gameStatus !== "PLAYING" || !hasGameStarted || board[`${x},${y}`] || isAiThinking) return;
 
     const key = `${x},${y}`;
-    const updatedBoard = { ...board, [key]: currentPlayer };
-    setBoard(updatedBoard);
-    setBoardLastMove({ x, y });
-    synth.playPlace();
 
-    // Check Win Condition
-    const winSequence = checkWin(updatedBoard, x, y, currentPlayer);
-    if (winSequence) {
-      setWinningCells(winSequence);
-      synth.playWin();
+    if (gameMode === "ONLINE") {
+      if (currentPlayer !== userSymbol) return;
 
-      const opponentName = gameMode === "AI" ? getAiDetails(difficulty).name : (gameMode === "ONLINE" ? (onlineOpponent?.name || "Online Pilot") : "Guest Player");
-      const opponentElo = gameMode === "AI" ? getAiDetails(difficulty).elo : (gameMode === "ONLINE" ? (onlineOpponent?.elo || 1200) : 1200);
-      resolveMatch("WIN", opponentName, opponentElo);
-      return;
-    }
+      const updatedBoard = { ...board, [key]: userSymbol };
+      setBoard(updatedBoard);
+      setBoardLastMove({ x, y });
+      synth.playPlace();
 
-    // Toggle turn or trigger AI / simulated online competitor
-    if (gameMode === "PVP") {
-      setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
-    } else if (gameMode === "ONLINE") {
-      // simulated online mode
-      setIsAiThinking(true);
-      setCurrentPlayer("O");
+      const winSequence = checkWin(updatedBoard, x, y, userSymbol);
+      const isWinner = !!winSequence;
 
-      // Random delay to simulate internet latency (1.2s to 2.5s)
-      const latency = 1200 + Math.random() * 1300;
-      setTimeout(() => {
-        // Map online player difficulty based on their ELO tier
-        let diffLevel: AIDifficulty = "SENTINEL";
-        const opElo = onlineOpponent?.elo || 1200;
-        if (opElo >= 2400) diffLevel = "SINGULARITY";
-        else if (opElo >= 1800) diffLevel = "OVERLORD";
-        else if (opElo < 1000) diffLevel = "NOVICE";
+      const currentUid = auth.currentUser?.uid || "guest";
+      const updates: any = {
+        board: updatedBoard,
+        lastMove: { x, y, timestamp: Date.now() },
+        currentTurn: userSymbol === "X" ? "O" : "X",
+        playerXTime: userSymbol === "X" ? Math.max(0, playerXTime) : playerXTime,
+        playerOTime: userSymbol === "O" ? Math.max(0, playerOTime) : playerOTime,
+        lastMoveTime: Date.now()
+      };
 
-        const opponentMove = getBestMove(updatedBoard, "O", diffLevel);
-        const opKey = `${opponentMove.x},${opponentMove.y}`;
-        const boardWithOp = { ...updatedBoard, [opKey]: "O" };
+      if (isWinner) {
+        updates.status = "finished";
+        updates.winnerUid = currentUid;
+        updates.winningCells = winSequence;
+      }
 
-        setBoard(boardWithOp);
-        setBoardLastMove(opponentMove);
-        synth.playPlace();
-
-        // Check if online opponent won
-        const opWinSequence = checkWin(boardWithOp, opponentMove.x, opponentMove.y, "O");
-        if (opWinSequence) {
-          setWinningCells(opWinSequence);
-          synth.playDefeat();
-          resolveMatch("LOSS", onlineOpponent?.name || "Online Rival", onlineOpponent?.elo || 1200);
-          setIsAiThinking(false);
-          return;
-        }
-
-        // Return turn to player X
-        setCurrentPlayer("X");
-        setIsAiThinking(false);
-
-        // Check if AI setup an immediate threat (an open 4 or immediate winning spot)
-        const hasThreat = getCandidates(boardWithOp, 1).some(c => {
-          return evaluateMove(boardWithOp, c.x, c.y, "O") >= 100000;
-        });
-        if (hasThreat) {
-          synth.playWarning();
-        }
-      }, latency);
+      try {
+        await updateDoc(doc(db, "caro_matches", activeMatchId!), updates);
+      } catch (err) {
+        console.error("Failed to write online move:", err);
+      }
 
     } else {
-      // AI Mode turn
-      setIsAiThinking(true);
-      setCurrentPlayer("O");
+      const updatedBoard = { ...board, [key]: currentPlayer };
+      setBoard(updatedBoard);
+      setBoardLastMove({ x, y });
+      synth.playPlace();
 
-      const aiDelay = difficulty === "NOVICE" ? 500 : difficulty === "SENTINEL" ? 800 : difficulty === "OVERLORD" ? 1150 : 1300;
+      // Check Win Condition
+      const winSequence = checkWin(updatedBoard, x, y, currentPlayer);
+      if (winSequence) {
+        setWinningCells(winSequence);
+        synth.playWin();
 
-      setTimeout(() => {
-        const aiMove = getBestMove(updatedBoard, "O", difficulty);
-        const aiKey = `${aiMove.x},${aiMove.y}`;
-        const boardWithAi = { ...updatedBoard, [aiKey]: "O" };
-        
-        setBoard(boardWithAi);
-        setBoardLastMove(aiMove);
-        synth.playPlace();
+        const opponentName = gameMode === "AI" ? getAiDetails(difficulty).name : "Guest Player";
+        const opponentElo = gameMode === "AI" ? getAiDetails(difficulty).elo : 1200;
+        resolveMatch("WIN", opponentName, opponentElo);
+        return;
+      }
 
-        // Check AI win
-        const aiWinSequence = checkWin(boardWithAi, aiMove.x, aiMove.y, "O");
-        if (aiWinSequence) {
-          setWinningCells(aiWinSequence);
-          synth.playDefeat();
+      // Toggle turn or trigger AI / simulated online competitor
+      if (gameMode === "PVP") {
+        setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+      } else {
+        // AI Mode turn
+        setIsAiThinking(true);
+        setCurrentPlayer("O");
+
+        const aiDelay = difficulty === "NOVICE" ? 500 : difficulty === "SENTINEL" ? 800 : difficulty === "OVERLORD" ? 1150 : 1300;
+
+        setTimeout(() => {
+          const aiMove = getBestMove(updatedBoard, "O", difficulty);
+          const aiKey = `${aiMove.x},${aiMove.y}`;
+          const boardWithAi = { ...updatedBoard, [aiKey]: "O" };
           
-          const opponentName = getAiDetails(difficulty).name;
-          const opponentElo = getAiDetails(difficulty).elo;
-          resolveMatch("LOSS", opponentName, opponentElo);
+          setBoard(boardWithAi);
+          setBoardLastMove(aiMove);
+          synth.playPlace();
+
+          // Check AI win
+          const aiWinSequence = checkWin(boardWithAi, aiMove.x, aiMove.y, "O");
+          if (aiWinSequence) {
+            setWinningCells(aiWinSequence);
+            synth.playDefeat();
+            
+            const opponentName = getAiDetails(difficulty).name;
+            const opponentElo = getAiDetails(difficulty).elo;
+            resolveMatch("LOSS", opponentName, opponentElo);
+            setIsAiThinking(false);
+            return;
+          }
+
+          // Toggle back to player X
+          setCurrentPlayer("X");
           setIsAiThinking(false);
-          return;
-        }
 
-        // Toggle back to player X
-        setCurrentPlayer("X");
-        setIsAiThinking(false);
-
-        // Check if the AI's move set up an immediate threat (an open 4 or immediate winning spot)
-        const hasImmediateAiThreat = getCandidates(boardWithAi, 1).some(c => {
-          return evaluateMove(boardWithAi, c.x, c.y, "O") >= 100000;
-        });
-        if (hasImmediateAiThreat) {
-          synth.playWarning();
-        }
-      }, aiDelay);
+          // Check if the AI's move set up an immediate threat (an open 4 or immediate winning spot)
+          const hasImmediateAiThreat = getCandidates(boardWithAi, 1).some(c => {
+            return evaluateMove(boardWithAi, c.x, c.y, "O") >= 100000;
+          });
+          if (hasImmediateAiThreat) {
+            synth.playWarning();
+          }
+        }, aiDelay);
+      }
     }
   };
 
@@ -1447,7 +1696,7 @@ export default function App() {
           {/* Render Board or Matchmaking Lobby depending on online status */}
           <div className="relative">
             {!isMatchStarted ? (
-              <div className={`w-full min-h-[550px] md:min-h-[620px] rounded-xl border flex flex-col justify-center items-center p-6 transition-all duration-300 relative overflow-hidden ${
+              <div className={`w-full min-h-[400px] sm:min-h-[500px] md:min-h-[600px] lg:min-h-[620px] rounded-xl border flex flex-col justify-center items-center p-6 transition-all duration-300 relative overflow-hidden ${
                 isDark 
                   ? "bg-slate-950 border-cyan-500/20 shadow-[inset_0_0_30px_rgba(6,182,212,0.15)]" 
                   : "bg-white border-slate-200 shadow-sm"
@@ -1639,7 +1888,7 @@ export default function App() {
                 </motion.div>
               </div>
             ) : gameMode === "ONLINE" && matchmakingState !== "CONNECTED" ? (
-              <div className={`w-full h-[550px] md:h-[620px] rounded-xl border flex flex-col justify-center items-center p-6 transition-all duration-300 ${
+              <div className={`w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[620px] rounded-xl border flex flex-col justify-center items-center p-6 transition-all duration-300 ${
                 isDark 
                   ? "bg-slate-950 border-cyan-500/20 shadow-[inset_0_0_30px_rgba(6,182,212,0.15)]" 
                   : "bg-white border-slate-200 shadow-sm"
@@ -2115,6 +2364,27 @@ export default function App() {
                     ))}
                   </div>
                 </div>
+
+                {/* Custom Message Input */}
+                <form onSubmit={handleSendCustomChat} className="mt-3 flex gap-2">
+                  <input
+                    type="text"
+                    value={chatMessageInput}
+                    onChange={(e) => setChatMessageInput(e.target.value)}
+                    placeholder="Type a message..."
+                    className={`flex-grow px-3 py-2 rounded-lg border text-xs outline-none ${
+                      isDark
+                        ? "bg-slate-950 border-cyan-500/20 text-cyan-300 placeholder-slate-600 focus:border-cyan-400"
+                        : "bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 focus:border-cyan-500"
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    className="px-3.5 py-2 bg-cyan-600 text-white rounded-lg text-xs font-bold hover:bg-cyan-500 transition cursor-pointer"
+                  >
+                    Send
+                  </button>
+                </form>
               </div>
             )}
 
@@ -2130,6 +2400,7 @@ export default function App() {
               <MatchHistory 
                 history={profile.matches} 
                 theme={theme}
+                onViewAnalysis={handleViewPastReport}
               />
             )}
             {activeTab === "SHOP" && (

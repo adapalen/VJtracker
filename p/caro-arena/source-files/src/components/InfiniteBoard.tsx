@@ -388,7 +388,7 @@ export default function InfiniteBoard({
   const activeMarkingObj = markingStyles[currentMarkingId];
 
   return (
-    <div className={`relative w-full h-[550px] md:h-[620px] rounded-xl border overflow-hidden flex flex-col justify-end transition-all duration-300 ${boardStyle.containerClass}`}>
+    <div className={`relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[620px] rounded-xl border overflow-hidden flex flex-col justify-end transition-all duration-300 ${boardStyle.containerClass}`}>
       
       {/* Draggable Active Sandbox Viewport */}
       <div

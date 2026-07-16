@@ -24,6 +24,13 @@ export interface MatchRecord {
   eloChange: number;
   date: string;
   movesCount: number;
+  playerAccuracy?: number;
+  opponentAccuracy?: number;
+  criticalTurn?: number | null;
+  criticalTurnReason?: string | null;
+  isTimeout?: boolean;
+  oldElo?: number;
+  newElo?: number;
 }
 
 export interface PlayerProfile {

@@ -10,9 +10,10 @@ import { ListOrdered, TrendingUp, TrendingDown, Clock } from "lucide-react";
 interface MatchHistoryProps {
   history: MatchRecord[];
   theme?: "light" | "dark";
+  onViewAnalysis?: (record: MatchRecord) => void;
 }
 
-export default function MatchHistory({ history, theme = "dark" }: MatchHistoryProps) {
+export default function MatchHistory({ history, theme = "dark", onViewAnalysis }: MatchHistoryProps) {
   // Sort history newest first
   const sortedHistory = [...history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const isDark = theme === "dark";
@@ -91,9 +92,9 @@ export default function MatchHistory({ history, theme = "dark" }: MatchHistoryPr
                 </div>
               </div>
 
-              {/* Right Side: Rating change & timestamp */}
-              <div className="flex items-center gap-4 text-right">
-                <div className="flex flex-col">
+              {/* Right Side: Rating change, timestamp, and analysis launch trigger */}
+              <div className="flex items-center gap-4">
+                <div className="text-right">
                   {/* rating Delta */}
                   <div
                     className={`flex items-center justify-end gap-1 text-xs font-mono font-bold ${
@@ -119,7 +120,7 @@ export default function MatchHistory({ history, theme = "dark" }: MatchHistoryPr
                     )}
                   </div>
                   {/* Timestamp */}
-                  <span className={`text-[9px] font-mono ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                  <span className={`text-[9px] font-mono block ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                     {new Date(log.date).toLocaleDateString(undefined, {
                       month: "short",
                       day: "numeric",
@@ -128,6 +129,19 @@ export default function MatchHistory({ history, theme = "dark" }: MatchHistoryPr
                     })}
                   </span>
                 </div>
+                {onViewAnalysis && (
+                  <button
+                    onClick={() => onViewAnalysis(log)}
+                    className={`px-2.5 py-1.5 rounded-lg border text-[10px] font-sans font-bold uppercase tracking-wider transition cursor-pointer ${
+                      isDark
+                        ? "border-cyan-500/20 bg-cyan-950/20 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400/60"
+                        : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
+                    }`}
+                    title="View post-game analysis report"
+                  >
+                    Analysis
+                  </button>
+                )}
               </div>
             </div>
           );
