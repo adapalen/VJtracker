@@ -131,20 +131,20 @@
         <div class="airline-selector-group" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 0.6rem 1rem; border-radius: 8px;">
           <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);"><i class="fa-solid fa-plane"></i> Chọn hãng bay so sánh:</span>
           <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
               <input type="checkbox" id="carrier-vietjet" value="Vietjet" checked onchange="toggleCarrier('Vietjet')"> Vietjet
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-bamboo" value="Bamboo Airways" checked onchange="toggleCarrier('Bamboo Airways')"> Bamboo Airways
+            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-bamboo" value="Bamboo Airways" onchange="toggleCarrier('Bamboo Airways')"> Bamboo Airways
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-vietravel" value="Vietravel Airlines" checked onchange="toggleCarrier('Vietravel Airlines')"> Vietravel Airlines
+            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-vietravel" value="Vietravel Airlines" onchange="toggleCarrier('Vietravel Airlines')"> Vietravel Airlines
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-vietnam" value="Vietnam Airlines" checked onchange="toggleCarrier('Vietnam Airlines')"> Vietnam Airlines
+            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-vietnam" value="Vietnam Airlines" onchange="toggleCarrier('Vietnam Airlines')"> Vietnam Airlines
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-sunphuquoc" value="SunPhuquoc Airways" checked onchange="toggleCarrier('SunPhuquoc Airways')"> SunPhuquoc Airways
+            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
+              <input type="checkbox" id="carrier-sunphuquoc" value="SunPhuquoc Airways" onchange="toggleCarrier('SunPhuquoc Airways')"> SunPhuquoc Airways
             </label>
           </div>
         </div>

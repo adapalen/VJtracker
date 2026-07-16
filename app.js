@@ -4,7 +4,7 @@ let currentRoute = 'HAN-SGN';
 let currentLeadTime = '7'; // 'all', '7', '14', '30'
 let priceChart = null;
 
-let selectedCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines', 'SunPhuquoc Airways'];
+let selectedCarriers = ['Vietjet'];
 
 const carrierColors = {
   'Vietjet': { border: '#ff3c6b', bg: 'rgba(255, 60, 107, 0.05)' },
@@ -35,6 +35,47 @@ function getCarrierId(carrier) {
   if (carrier === 'Vietnam Airlines') return 'vietnam';
   if (carrier === 'SunPhuquoc Airways') return 'sunphuquoc';
   return '';
+}
+
+function updateCarrierSelectors() {
+  const allCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines', 'SunPhuquoc Airways'];
+  
+  // Filter database for current route and leadTime
+  let routeRecords = flightDatabase.filter(r => r.route === currentRoute && r.lowestPrice !== null);
+  if (currentLeadTime !== 'all') {
+    const days = parseInt(currentLeadTime, 10);
+    routeRecords = routeRecords.filter(r => r.leadDays === days);
+  }
+  
+  allCarriers.forEach(carrier => {
+    const carrierId = getCarrierId(carrier);
+    const checkbox = document.getElementById('carrier-' + carrierId);
+    if (!checkbox) return;
+    
+    const parentLabel = checkbox.parentElement;
+    const hasData = routeRecords.some(r => r.carrier === carrier);
+    
+    if (hasData) {
+      checkbox.disabled = false;
+      checkbox.checked = selectedCarriers.includes(carrier);
+      if (parentLabel) {
+        parentLabel.style.opacity = '1';
+        parentLabel.style.cursor = 'pointer';
+      }
+    } else {
+      checkbox.disabled = true;
+      checkbox.checked = false;
+      if (parentLabel) {
+        parentLabel.style.opacity = '0.35';
+        parentLabel.style.cursor = 'not-allowed';
+      }
+      // Remove from selected list if it got disabled
+      const idx = selectedCarriers.indexOf(carrier);
+      if (idx > -1) {
+        selectedCarriers.splice(idx, 1);
+      }
+    }
+  });
 }
 
 // Airport translation lookups
@@ -159,6 +200,7 @@ function initDashboard() {
   populateDestinations('HAN');
   updateLastUpdated();
   updateStatsCards();
+  updateCarrierSelectors();
   renderChart();
   renderTable();
 }
@@ -273,6 +315,7 @@ function setRoute(route) {
   }
 
   updateStatsCards();
+  updateCarrierSelectors();
   renderChart();
 }
 
@@ -309,6 +352,7 @@ function onDestChange(dest) {
 
 function setLeadTime(val) {
   currentLeadTime = val;
+  updateCarrierSelectors();
   renderChart();
 }
 
