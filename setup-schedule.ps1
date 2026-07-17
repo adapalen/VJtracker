@@ -2,7 +2,7 @@
 # It runs thrice daily: 8:00 AM, 2:00 PM, and 8:00 PM.
 
 $TaskName = "VietJetFlightTracker"
-$BatchPath = "C:\Users\adapalen\.gemini\antigravity\scratch\vietjet-flight-tracker\run-scraper.bat"
+$BatchPath = Join-Path $PSScriptRoot "run-scraper.bat"
 
 Write-Host "Registering scheduled task '$TaskName' via schtasks..."
 

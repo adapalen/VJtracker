@@ -88,7 +88,7 @@ function formatDate(date) {
       const routeStr = `${route.from}-${route.to}`;
       console.log(`[Worker ${workerId}] Querying ${routeStr} for date ${target.dateStr}... (${queue.length} tasks remaining)`);
       
-      const url = `https://www.google.com/travel/flights?q=Flights%20from%20${route.from}%20to%20${route.to}%20on%20${target.dateStr}%20oneway`;
+      const url = `https://www.google.com/travel/flights?q=Flights%20from%20${route.from}%20to%20${route.to}%20on%20${target.dateStr}%20oneway&hl=vi&gl=VN&curr=VND`;
       
       try {
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -105,7 +105,7 @@ function formatDate(date) {
             else if (text.includes('Bamboo')) carrier = 'Bamboo Airways';
             else if (text.includes('Sun') || text.includes('SunPhuquoc') || text.includes('Sun Air')) carrier = 'SunPhuquoc Airways';
             
-            const priceMatch = text.match(/₫\s*([0-9,.]+)/) || text.match(/([0-9,.]+)\s*₫/);
+            const priceMatch = text.match(/([0-9,.]+)\s*₫/) || text.match(/₫\s*([0-9,.]+)/);
             let priceVal = null;
             if (priceMatch) {
               priceVal = parseInt(priceMatch[1].replace(/[,.]/g, ''), 10);
