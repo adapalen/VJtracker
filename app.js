@@ -122,6 +122,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   await loadDatabase();
   initDashboard();
+
+  // Periodic polling check every 5 minutes (300,000 ms)
+  setInterval(async () => {
+    console.log("Đang kiểm tra cập nhật dữ liệu tự động...");
+    try {
+      const res = await fetch('/flights_db.json');
+      if (!res.ok) return;
+      const newData = await res.json();
+      
+      // Compare length to determine if new logs exist
+      if (newData.length !== flightDatabase.length) {
+        console.log("Phát hiện dữ liệu mới! Đang tự động cập nhật biểu đồ...");
+        flightDatabase = newData;
+        initDashboard();
+      }
+    } catch (err) {
+      console.warn("Lỗi kiểm tra cập nhật tự động:", err);
+    }
+  }, 5 * 60 * 1000);
 });
 
 // Theme Management (Light/Dark Mode)
@@ -194,6 +213,41 @@ function formatDateTime(isoStr) {
     timeStyle: 'short', 
     timeZone: 'Asia/Ho_Chi_Minh' 
   });
+}
+
+// Concise format (HH:mm DD/MM) for the line chart X-axis labels in GMT+7
+function formatChartLabel(isoStr) {
+  const d = new Date(isoStr);
+  const options = { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    day: '2-digit', 
+    month: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Ho_Chi_Minh'
+  };
+  const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(d);
+  const p = {};
+  parts.forEach(part => { p[part.type] = part.value; });
+  return `${p.hour}:${p.minute} ${p.day}/${p.month}`;
+}
+
+// Detailed tooltip datetime format for GMT+7
+function formatChartTooltipTitle(isoStr) {
+  const d = new Date(isoStr);
+  const options = { 
+    hour: '2-digit', 
+    minute: '2-digit', 
+    day: '2-digit', 
+    month: '2-digit',
+    year: 'numeric',
+    hour12: false,
+    timeZone: 'Asia/Ho_Chi_Minh'
+  };
+  const parts = new Intl.DateTimeFormat('en-US', options).formatToParts(d);
+  const p = {};
+  parts.forEach(part => { p[part.type] = part.value; });
+  return `${p.hour}:${p.minute} ngày ${p.day}/${p.month}/${p.year} (GMT+7)`;
 }
 
 function initDashboard() {
@@ -371,7 +425,7 @@ function renderChart() {
   const uniqueTimestamps = [...new Set(routeRecords.map(r => r.crawlTimestamp))];
   uniqueTimestamps.sort((a, b) => new Date(a) - new Date(b));
   
-  const labels = uniqueTimestamps.map(t => formatDateTime(t));
+  const labels = uniqueTimestamps.map(t => formatChartLabel(t));
   
   // Construct datasets for each selected carrier
   const datasets = selectedCarriers.map(carrier => {
@@ -430,7 +484,13 @@ function renderChart() {
           mode: 'index',
           intersect: false,
           titleFont: { family: 'Outfit', size: 13 },
-          bodyFont: { family: 'Outfit', size: 13 }
+          bodyFont: { family: 'Outfit', size: 13 },
+          callbacks: {
+            title: function(context) {
+              const idx = context[0].dataIndex;
+              return formatChartTooltipTitle(uniqueTimestamps[idx]);
+            }
+          }
         }
       },
       scales: {
