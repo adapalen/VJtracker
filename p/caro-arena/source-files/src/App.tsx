@@ -569,6 +569,8 @@ export default function App() {
           resolveMatch(result, opponent.name, opponent.elo, data.isTimeout || false);
         }
       }
+    }, (err) => {
+      console.error("Match synchronization error:", err);
     });
 
     return () => unsubscribe();
@@ -637,30 +639,40 @@ export default function App() {
       log("Contacting authentication server...");
       await dummyDelay(400);
 
-      log("Authenticating anonymously with Firebase Auth...");
-      const userCredential = await signInAnonymously(auth);
-      const authUser = userCredential.user;
-      log(`Authenticated session UID: ${authUser.uid}`);
-      await dummyDelay(400);
-
-      log("Querying Cloud Firestore database for pilot records...");
-      let finalProfile: PlayerProfile | null = null;
+      let authUser: any = null;
       let hasCloudAccess = false;
 
       try {
-        const docRef = doc(db, "users", authUser.uid);
-        const docSnap = await getDoc(docRef);
-        hasCloudAccess = true;
+        log("Authenticating anonymously with Firebase Auth...");
+        const userCredential = await signInAnonymously(auth);
+        authUser = userCredential.user;
+        log(`Authenticated session UID: ${authUser.uid}`);
         await dummyDelay(400);
+      } catch (authErr: any) {
+        log(`[WARNING] Auth handshake failed: ${authErr.message || authErr}`);
+        log("Activating robust offline guest mode...");
+        await dummyDelay(400);
+      }
 
-        if (docSnap.exists()) {
-          finalProfile = docSnap.data() as PlayerProfile;
-          log("Cloud profile synced successfully.");
+      log("Querying Cloud Firestore database for pilot records...");
+      let finalProfile: PlayerProfile | null = null;
+
+      if (authUser) {
+        try {
+          const docRef = doc(db, "users", authUser.uid);
+          const docSnap = await getDoc(docRef);
+          hasCloudAccess = true;
+          await dummyDelay(400);
+
+          if (docSnap.exists()) {
+            finalProfile = docSnap.data() as PlayerProfile;
+            log("Cloud profile synced successfully.");
+          }
+        } catch (firestoreErr: any) {
+          log(`[WARNING] Cloud sync database is offline or restricted.`);
+          log("Activating robust offline-first pilot protocol...");
+          await dummyDelay(400);
         }
-      } catch (firestoreErr: any) {
-        log(`[WARNING] Cloud sync database is offline or restricted.`);
-        log("Activating robust offline-first pilot protocol...");
-        await dummyDelay(400);
       }
 
       if (!finalProfile) {
@@ -802,7 +814,14 @@ export default function App() {
     setMatchmakingProgress(0);
     setMatchmakingLogs(["Initiating secure corridor..."]);
 
-    const currentUid = auth.currentUser?.uid || "guest";
+    const authUser = auth.currentUser;
+    if (!authUser) {
+      setMatchmakingState("IDLE");
+      setMatchmakingLogs(["[ERROR] Offline mode. Online matchmaking requires an active authenticated session."]);
+      return;
+    }
+
+    const currentUid = authUser.uid;
     const currentName = profile.name || "Anonymous Pilot";
     const currentElo = profile.elo || 1200;
     const currentCountry = profile.countryCode || "VN";
