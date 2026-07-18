@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Các bài viết chia sẻ kiến thức, kinh nghiệm phát triển phần mềm và công nghệ của adapalen.">
+  <title>adapalen | Blog Cá Nhân</title>
+  <!-- Google Fonts: Inter (with full Vietnamese subset support) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="portfolio-page">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <i class="fa-solid fa-code logo-icon"></i>
+        <div>
+          <h1 id="main-title">adapalen</h1>
+          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a href="../../index.html#about" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
+        <a href="../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-book"></i> Blog</a>
+        <a href="../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
+      </nav>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Blogs List Section -->
+    <section class="portfolio-section glass" style="padding: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="section-title" style="margin-bottom: 0;"><i class="fa-solid fa-feather-pointed"></i> Bài viết công nghệ</h2>
+        <a href="../../index.html" class="blog-back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+      </div>
+      
+      <div class="blogs-grid">
+        <!-- Blog 1: Scraper -->
+        <article class="blog-card glass">
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span><i class="fa-regular fa-calendar"></i> 18/07/2026</span>
+              <span><i class="fa-regular fa-clock"></i> 10 phút đọc</span>
+            </div>
+            <h3 class="blog-title">Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions</h3>
+            <p class="blog-desc">Chia sẻ chi tiết về cách xây dựng hệ thống cào dữ liệu giá vé máy bay tự động từ Google Flights, khắc phục cơ chế chặn và triển khai chạy định kỳ hoàn toàn miễn phí trên Cloud GitHub Actions.</p>
+            <div class="project-tags" style="margin-top: auto;">
+              <span class="tag">Puppeteer</span>
+              <span class="tag">Automation</span>
+              <span class="tag">Node.js</span>
+            </div>
+            <div class="blog-footer">
+              <span>Đọc thêm</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </div>
+          </div>
+        </article>
+
+        <!-- Blog 2: AI Caro Game -->
+        <article class="blog-card glass">
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span><i class="fa-regular fa-calendar"></i> 16/07/2026</span>
+              <span><i class="fa-regular fa-clock"></i> 8 phút đọc</span>
+            </div>
+            <h3 class="blog-title">Tích hợp Generative AI vào trò chơi Multiplayer: Trường hợp Caro Arena</h3>
+            <p class="blog-desc">Làm thế nào để kết hợp mô hình ngôn ngữ lớn Gemini API thông qua Google AI Studio làm đối thủ cờ Caro thông minh? Thiết kế luồng xử lý nước đi thời gian thực và quản lý phòng đấu Firestore.</p>
+            <div class="project-tags" style="margin-top: auto;">
+              <span class="tag">Gemini API</span>
+              <span class="tag">Firestore</span>
+              <span class="tag">WebSockets</span>
+            </div>
+            <div class="blog-footer">
+              <span>Đọc thêm</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </div>
+          </div>
+        </article>
+
+        <!-- Blog 3: Web Aesthetics -->
+        <article class="blog-card glass">
+          <div class="blog-content">
+            <div class="blog-meta">
+              <span><i class="fa-regular fa-calendar"></i> 12/07/2026</span>
+              <span><i class="fa-regular fa-clock"></i> 6 phút đọc</span>
+            </div>
+            <h3 class="blog-title">Aesthetics in Frontend: Xu hướng Glassmorphic và Neon Glow</h3>
+            <p class="blog-desc">Khám phá phong cách thiết kế giao diện kính mờ kết hợp hiệu ứng phát sáng neon hiện đại. Cách sử dụng custom CSS variables để tạo ra trải nghiệm người dùng ấn tượng và phản hồi mượt mà.</p>
+            <div class="project-tags" style="margin-top: auto;">
+              <span class="tag">CSS3</span>
+              <span class="tag">UI/UX</span>
+              <span class="tag">Design Tokens</span>
+            </div>
+            <div class="blog-footer">
+              <span>Đọc thêm</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Theme toggle script for blogs page
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+      document.body.classList.remove('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+  </script>
+</body>
+</html>
