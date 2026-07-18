@@ -5,7 +5,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 
 puppeteer.use(StealthPlugin());
 
-const DB_PATH = path.join(__dirname, 'flights_db.json');
+const DB_PATH = path.resolve(__dirname, '..', 'p', 'VJtracker', 'flights_db.json');
 
 // Helper to format date as YYYY-MM-DD
 function formatDate(date) {

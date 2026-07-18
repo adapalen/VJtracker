@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setInterval(async () => {
     console.log("Đang kiểm tra cập nhật dữ liệu tự động...");
     try {
-      const res = await fetch('/flights_db.json');
+      const res = await fetch('flights_db.json');
       if (!res.ok) return;
       const newData = await res.json();
       
@@ -189,7 +189,7 @@ function updateChartTheme() {
 // Fetch database json file
 async function loadDatabase() {
   try {
-    const res = await fetch('/flights_db.json');
+    const res = await fetch('flights_db.json');
     if (!res.ok) throw new Error('Không tìm thấy tệp cơ sở dữ liệu');
     flightDatabase = await res.json();
     console.log(`Đã tải thành công ${flightDatabase.length} bản ghi.`);
