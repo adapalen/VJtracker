@@ -152,7 +152,7 @@ function formatDate(date) {
         }
 
         const targetCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines'];
-        if (routeStr.includes('PQC')) {
+        if (routeStr.includes('PQC') || routeStr === 'HAN-SGN' || routeStr === 'SGN-HAN') {
           targetCarriers.push('SunPhuquoc Airways');
         }
         
