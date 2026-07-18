@@ -103,7 +103,20 @@ function formatDate(date) {
             else if (text.includes('Vietnam Airlines')) carrier = 'Vietnam Airlines';
             else if (text.includes('Vietravel')) carrier = 'Vietravel Airlines';
             else if (text.includes('Bamboo')) carrier = 'Bamboo Airways';
-            else if (text.includes('Sun') || text.includes('SunPhuquoc') || text.includes('Sun Air')) carrier = 'SunPhuquoc Airways';
+            else if (text.includes('SunPhuquoc') || text.includes('Sun Air')) carrier = 'SunPhuquoc Airways';
+            
+            // Check if this is a non-economy class flight (e.g. Business, Premium Economy, First Class)
+            const lowerText = text.toLowerCase();
+            const isNonEconomy = lowerText.includes('thương gia') || 
+                                 lowerText.includes('đặc biệt') || 
+                                 lowerText.includes('business') || 
+                                 lowerText.includes('premium') || 
+                                 lowerText.includes('first class') || 
+                                 lowerText.includes('hạng nhất');
+            
+            if (isNonEconomy) {
+              carrier = 'Unknown'; // Skip non-economy class flights
+            }
             
             const priceMatch = text.match(/([0-9,.]+)\s*₫/) || text.match(/₫\s*([0-9,.]+)/);
             let priceVal = null;
@@ -138,7 +151,10 @@ function formatDate(date) {
           }
         }
 
-        const targetCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines', 'SunPhuquoc Airways'];
+        const targetCarriers = ['Vietjet', 'Bamboo Airways', 'Vietravel Airlines', 'Vietnam Airlines'];
+        if (routeStr.includes('PQC')) {
+          targetCarriers.push('SunPhuquoc Airways');
+        }
         
         targetCarriers.forEach(carrier => {
           let carrierFlights = uniqueFlights.filter(f => f.carrier === carrier && f.price !== null);
