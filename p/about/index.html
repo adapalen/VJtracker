@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Thông tin cá nhân, kinh nghiệm làm việc, học vấn và kỹ năng của adapalen.">
+  <title>adapalen | Giới Thiệu Bản Thân</title>
+  <!-- Google Fonts: Inter (with full Vietnamese subset support) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="portfolio-page">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <i class="fa-solid fa-code logo-icon"></i>
+        <div>
+          <h1 id="main-title">adapalen</h1>
+          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-user"></i> Giới thiệu</a>
+        <a href="../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
+        <a href="../blogs/index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
+        <a href="../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
+      </nav>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- CV & Showcases Section -->
+    <section class="portfolio-section glass" style="padding: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="section-title" style="margin-bottom: 0;"><i class="fa-solid fa-file-invoice"></i> Hồ sơ cá nhân & Kinh nghiệm (CV)</h2>
+        <a href="../../index.html" class="blog-back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+      </div>
+      
+      <div class="cv-grid">
+        <!-- Experience Column -->
+        <div class="cv-column">
+          <h3 class="cv-subtitle"><i class="fa-solid fa-briefcase"></i> Kinh nghiệm làm việc</h3>
+          <div class="cv-timeline">
+            <div class="timeline-item">
+              <span class="timeline-date">2024 - Hiện tại</span>
+              <h4>Kỹ sư phát triển phần mềm (Software Engineer)</h4>
+              <p class="timeline-subtitle">Dự án Cá nhân & Tự do</p>
+              <ul>
+                <li>Xây dựng và tối ưu các công cụ tự động thu thập thông tin giá vé máy bay (crawlers) bằng Puppeteer hoạt động ổn định trên cloud (GitHub Actions).</li>
+                <li>Thiết kế các giao diện dashboard tương tác trực quan hóa dữ liệu theo thời gian thực sử dụng Chart.js và CSS.</li>
+              </ul>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-date">2025 - Hiện tại</span>
+              <h4>Nhà phát triển Ứng dụng & AI Games</h4>
+              <p class="timeline-subtitle">Dự án Đổi mới sáng tạo</p>
+              <ul>
+                <li>Tích hợp các mô hình Generative AI (Gemini API) thông qua Google AI Studio vào các ứng dụng tương tác như Caro Arena.</li>
+                <li>Xây dựng các API serverless hiệu năng cao triển khai trên nền tảng Vercel.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education & Skills Column -->
+        <div class="cv-column">
+          <h3 class="cv-subtitle"><i class="fa-solid fa-graduation-cap"></i> Học vấn & Kỹ năng</h3>
+          
+          <div class="cv-timeline" style="margin-bottom: 2rem;">
+            <div class="timeline-item">
+              <span class="timeline-date">2021 - 2025</span>
+              <h4>Cử nhân Công nghệ Thông tin / Khoa học Máy tính</h4>
+              <p class="timeline-subtitle">Trường Đại học Công nghệ (Placeholder)</p>
+              <p>Chuyên ngành Kỹ thuật phần mềm, nghiên cứu chuyên sâu về thiết kế hệ thống phần mềm, lập trình web và tương tác người - máy.</p>
+            </div>
+          </div>
+
+          <h3 class="cv-subtitle"><i class="fa-solid fa-gears"></i> Kỹ năng chuyên môn</h3>
+          <div class="skills-showcase">
+            <div class="skill-category">
+              <h5>Lập trình</h5>
+              <div class="skill-tags">
+                <span class="tag">JavaScript (ES6+)</span>
+                <span class="tag">TypeScript</span>
+                <span class="tag">Node.js</span>
+                <span class="tag">Python</span>
+                <span class="tag">HTML5 / CSS3</span>
+              </div>
+            </div>
+            <div class="skill-category" style="margin-top: 1.2rem;">
+              <h5>Công cụ & Cloud</h5>
+              <div class="skill-tags">
+                <span class="tag">Puppeteer</span>
+                <span class="tag">Chart.js</span>
+                <span class="tag">Vercel</span>
+                <span class="tag">GitHub Actions</span>
+                <span class="tag">Google AI Studio</span>
+                <span class="tag">Git / GitHub</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Theme toggle script for about page
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+      document.body.classList.remove('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+  </script>
+</body>
+</html>
