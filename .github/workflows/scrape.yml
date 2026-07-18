@@ -1,4 +1,4 @@
-name: Scrape Flights Daily
+name: Scrape Flights Daily (Node 24)
 
 on:
   schedule:
