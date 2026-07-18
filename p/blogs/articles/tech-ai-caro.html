@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Khám phá quy trình tích hợp mô hình ngôn ngữ lớn Gemini API làm đối thủ AI Caro thông minh và quản lý Firestore.">
+  <title>Tích hợp Generative AI vào trò chơi Multiplayer: Trường hợp Caro Arena</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../../style.css">
+</head>
+<body class="portfolio-page">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <i class="fa-solid fa-code logo-icon"></i>
+        <div>
+          <h1 id="main-title">adapalen</h1>
+          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="../../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a href="../../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
+        <a href="../../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
+        <a href="../index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
+        <a href="../../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
+        <a href="../../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
+      </nav>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Article Content -->
+    <article class="portfolio-section glass" style="padding: 2.5rem; line-height: 1.8;">
+      <a href="../index.html" class="blog-back-btn" style="margin-bottom: 1.5rem;"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài viết</a>
+      
+      <div class="blog-meta" style="margin-bottom: 1rem; gap: 1.5rem; font-size: 0.9rem;">
+        <span><i class="fa-regular fa-calendar"></i> 16/07/2026</span>
+        <span><i class="fa-regular fa-clock"></i> 8 phút đọc</span>
+        <span><i class="fa-solid fa-tags"></i> Công nghệ</span>
+      </div>
+      
+      <h2 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Tích hợp Generative AI vào trò chơi Multiplayer: Trường hợp Caro Arena
+      </h2>
+
+      <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
+        Đưa các tác nhân trí tuệ nhân tạo (AI Agents) tương tác trực quan vào game Caro không chỉ đòi hỏi thuật toán Minimax truyền thống mà còn mở ra cơ hội ứng dụng các mô hình ngôn ngữ lớn (LLM) để tạo cá tính độc đáo cho đối thủ máy.
+      </p>
+
+      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-brain"></i> 1. Tận dụng Gemini API cho AI Caro</h3>
+      <p style="margin-bottom: 1rem;">
+        Trong Caro Arena, chúng tôi sử dụng mô hình <code>gemini-1.5-flash</code> từ Google AI Studio. AI không chỉ đóng vai trò tính toán nước đi tốt nhất trên bàn cờ $15 \times 15$ dựa vào biểu diễn dạng ma trận được gửi kèm trong prompt, mà còn liên tục phản hồi tin nhắn chat châm chọc, bình luận hóm hỉnh về thế cờ hiện tại.
+      </p>
+      <p style="margin-bottom: 1rem;">
+        Hệ thống prompt được tinh chỉnh kỹ lưỡng (System instruction) để ép mô hình trả về định dạng JSON nghiêm ngặt chứa cặp tọa độ nước đi $[x, y]$ và nội dung tin nhắn thoại tương ứng.
+      </p>
+
+      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-fire"></i> 2. Đồng bộ thời gian thực qua Firestore</h3>
+      <p style="margin-bottom: 1rem;">
+        Đối với chế độ multiplayer, Firestore đóng vai trò là một broker tin nhắn thời gian thực.
+      </p>
+      <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
+        <li>Nước đi của người chơi ghi thẳng vào Firestore match document.</li>
+        <li>Hàm trigger function (hoặc listeners trực tiếp ở phía client) nhận diện thay đổi trạng thái lượt đấu, ngay lập tức gửi tín hiệu kích hoạt tính toán đến AI.</li>
+        <li>Khi AI đưa ra tọa độ nước đi mới, match document cập nhật trạng thái, đồng bộ ngay lập tức đến đối thủ cờ Caro.</li>
+      </ul>
+    </article>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+      document.body.classList.remove('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+  </script>
+</body>
+</html>

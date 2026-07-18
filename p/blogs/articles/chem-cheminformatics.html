@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Nghiên cứu ứng dụng hóa tin học trong khai thác dữ liệu hoạt tính sinh học phân tử qua cơ sở dữ liệu ChEMBL.">
+  <title>Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="../../../style.css">
+</head>
+<body class="portfolio-page">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <i class="fa-solid fa-code logo-icon"></i>
+        <div>
+          <h1 id="main-title">adapalen</h1>
+          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="../../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a href="../../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
+        <a href="../../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
+        <a href="../index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
+        <a href="../../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
+        <a href="../../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
+      </nav>
+      <div class="header-controls">
+        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Article Content -->
+    <article class="portfolio-section glass" style="padding: 2.5rem; line-height: 1.8;">
+      <a href="../index.html" class="blog-back-btn" style="margin-bottom: 1.5rem;"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài viết</a>
+      
+      <div class="blog-meta" style="margin-bottom: 1rem; gap: 1.5rem; font-size: 0.9rem;">
+        <span><i class="fa-regular fa-calendar"></i> 10/07/2026</span>
+        <span><i class="fa-regular fa-clock"></i> 9 phút đọc</span>
+        <span><i class="fa-solid fa-tags"></i> Hóa học</span>
+      </div>
+      
+      <h2 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL
+      </h2>
+
+      <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
+        Hóa tin học (Cheminformatics) đóng vai trò then chốt trong sàng lọc thuốc ảo (Virtual screening). Làm thế nào để khai thác và lập mô hình dữ liệu hoạt tính sinh học từ thư viện ChEMBL khổng lồ? Dưới đây là quy trình thực hành chi tiết.
+      </p>
+
+      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-database"></i> 1. Cơ sở dữ liệu hoạt tính sinh học ChEMBL</h3>
+      <p style="margin-bottom: 1rem;">
+        ChEMBL là cơ sở dữ liệu mở lớn nhất thế giới về các phân tử nhỏ có hoạt tính sinh học giống thuốc. Nó lưu trữ thông tin chi tiết về ái lực liên kết, liều lượng phản hồi hiệu quả ($IC_{50}$, $EC_{50}$, $K_i$) thu thập từ hàng vạn bài báo nghiên cứu khoa học y sinh quốc tế.
+      </p>
+
+      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-brands fa-python"></i> 2. Quy trình cào lọc dữ liệu bằng Python</h3>
+      <p style="margin-bottom: 1rem;">
+        Chúng tôi sử dụng gói thư viện chính thức <code>chembl_webresource_client</code> để kết nối và truy xuất dữ liệu từ các máy chủ ChEMBL thông qua Python API:
+      </p>
+      <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
+        <li>Truy vấn protein đích đích thực bằng ký hiệu gen (Target Gene Symbol) để lấy mã ID đích ChEMBL (e.g. <code>CHEMBL203</code> cho protein EGFR liên quan đến ung thư).</li>
+        <li>Tải danh sách các phân tử hóa học (Bioactivity compounds) liên kết EGFR có số liệu hoạt tính sinh học cụ thể.</li>
+        <li>Chuẩn hóa giá trị hoạt tính sinh học $IC_{50}$ về đơn vị chuẩn nano-mol ($nM$) và áp dụng hàm logarith nghịch đảo $pIC_{50} = -\log_{10}(IC_{50})$ nhằm phân bố dữ liệu đồng nhất.</li>
+        <li>Lọc bỏ các phân tử vi phạm các nguyên tắc thiết kế thuốc (Lipinski Rule of Five).</li>
+      </ul>
+
+      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-chart-line"></i> 3. Ứng dụng mô hình học máy QSAR</h3>
+      <p style="margin-bottom: 1.5rem;">
+        Dữ liệu đã được làm sạch sau đó sẽ được tính toán các vân tay hóa học (Molecular fingerprints - MACCS, Morgan fingerprints) để biểu diễn cấu trúc hóa học dưới dạng vector nhị phân. Các mô hình Random Forest hoặc XGBoost sẽ được huấn luyện trên tập dữ liệu này để dự đoán hoạt tính sinh học của các hợp chất mới chưa từng thử nghiệm lâm sàng.
+      </p>
+    </article>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+    } else {
+      document.body.classList.remove('light-theme');
+      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+  </script>
+</body>
+</html>

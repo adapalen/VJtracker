@@ -1,0 +1,74 @@
+[
+  {
+    "title": "adapalen | Portfolio",
+    "description": "Portfolio của adapalen - Kỹ sư phần mềm & Nhà phát triển Web.",
+    "url": "/",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "adapalen | Giới Thiệu Bản Thân",
+    "description": "Thông tin cá nhân, kinh nghiệm làm việc, học vấn và kỹ năng của adapalen.",
+    "url": "/p/about/",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "adapalen | Blog Cá Nhân",
+    "description": "Các bài viết chia sẻ kiến thức, kinh nghiệm phát triển phần mềm và công nghệ của adapalen.",
+    "url": "/p/blogs/",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Mô hình hóa cấu trúc Protein 3D với AlphaFold và Foldseek",
+    "description": "Hướng dẫn sử dụng dữ liệu mô phỏng AlphaFold DB và Foldseek phục vụ phân tích cấu trúc protein 3D.",
+    "url": "/p/blogs/articles/chem-alphafold.html",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL",
+    "description": "Nghiên cứu ứng dụng hóa tin học trong khai thác dữ liệu hoạt tính sinh học phân tử qua cơ sở dữ liệu ChEMBL.",
+    "url": "/p/blogs/articles/chem-cheminformatics.html",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Tích hợp Generative AI vào trò chơi Multiplayer: Trường hợp Caro Arena",
+    "description": "Khám phá quy trình tích hợp mô hình ngôn ngữ lớn Gemini API làm đối thủ AI Caro thông minh và quản lý Firestore.",
+    "url": "/p/blogs/articles/tech-ai-caro.html",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions",
+    "description": "Hướng dẫn chi tiết xây dựng hệ thống tự động cào theo dõi giá vé máy bay bằng Puppeteer và GitHub Actions.",
+    "url": "/p/blogs/articles/tech-scraper.html",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Trục bay bận rộn nhất Việt Nam: Phân tích lưu lượng chặng HAN-SGN",
+    "description": "Phân tích lưu lượng chặng bay bận rộn nhất Việt Nam: kết nối Hà Nội (HAN) - TP.HCM (SGN).",
+    "url": "/p/blogs/articles/trivia-aviation.html",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Mật mã học lịch sử: Từ bản dịch Caesar đến mô hình AI Ithaca",
+    "description": "Khám phá lịch sử mật mã học từ bản dịch Caesar cổ đại đến ứng dụng mô hình AI Ithaca trong phục dựng văn bản cổ.",
+    "url": "/p/blogs/articles/trivia-cryptography.html",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Caro Arena",
+    "description": "",
+    "url": "/p/caro-arena/",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "adapalen | Sơ Đồ Trang Website",
+    "description": "Sơ đồ cấu trúc các trang thông tin và bài viết trên website cá nhân của adapalen.",
+    "url": "/p/sitemap/",
+    "lastModified": "2026-07-18"
+  },
+  {
+    "title": "Theo Dõi Giá Vé Máy Bay Vietjet Tự Động | Săn Vé Máy Bay Giá Rẻ",
+    "description": "Công cụ theo dõi giá vé máy bay Vietjet tự động. Cập nhật liên tục biểu đồ biến động giá vé Vietjet, phân tích xu hướng và gợi ý săn vé máy bay giá rẻ tốt nhất.",
+    "url": "/p/VJtracker/",
+    "lastModified": "2026-07-18"
+  }
+]

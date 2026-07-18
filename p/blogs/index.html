@@ -29,6 +29,7 @@
         <a href="../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
         <a href="../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
         <a href="#" class="nav-item active"><i class="fa-solid fa-book"></i> Blog</a>
+        <a href="../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
         <a href="../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
       </nav>
       <div class="header-controls">
@@ -40,74 +41,202 @@
 
     <!-- Blogs List Section -->
     <section class="portfolio-section glass" style="padding: 2.5rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-        <h2 class="section-title" style="margin-bottom: 0;"><i class="fa-solid fa-feather-pointed"></i> Bài viết công nghệ</h2>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="section-title" style="margin-bottom: 0;"><i class="fa-solid fa-feather-pointed"></i> Góc Chia Sẻ Kiến Thức</h2>
         <a href="../../index.html" class="blog-back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
       </div>
+      <p style="color: var(--text-secondary); margin-bottom: 2.5rem; max-width: 750px;">
+        Nơi tôi chia sẻ các bài viết kỹ thuật về lập trình, tự động hóa, hóa tin học và những thông tin khoa học thú vị khác. Chọn chủ đề bên dưới để lọc bài viết.
+      </p>
+
+      <!-- Category Filter Tabs -->
+      <style>
+        .blog-card-link {
+          text-decoration: none;
+          color: inherit;
+          display: block;
+          height: 100%;
+        }
+        .blog-tabs {
+          display: flex;
+          gap: 0.8rem;
+          margin-bottom: 2.5rem;
+          flex-wrap: wrap;
+        }
+        .tab-btn {
+          cursor: pointer;
+          font-family: var(--font-main);
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 0.6rem 1.2rem;
+          border-radius: 30px;
+          border: 1px solid var(--glass-border);
+          background: rgba(255, 255, 255, 0.03);
+          color: var(--text-secondary);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: all 0.2s ease;
+        }
+        .tab-btn:hover {
+          color: var(--accent-color);
+          border-color: var(--accent-color);
+          box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+        }
+        .tab-btn.active {
+          background: rgba(var(--btn-bg-rgb), 0.1);
+          color: var(--accent-color);
+          border-color: var(--accent-color);
+          box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+          text-shadow: 0 0 5px var(--accent-glow);
+        }
+      </style>
+
+      <div class="blog-tabs">
+        <button class="tab-btn active" data-category="all"><i class="fa-solid fa-border-all"></i> Tất cả</button>
+        <button class="tab-btn" data-category="tech"><i class="fa-solid fa-laptop-code"></i> Công nghệ</button>
+        <button class="tab-btn" data-category="chem"><i class="fa-solid fa-flask"></i> Hóa học</button>
+        <button class="tab-btn" data-category="trivia"><i class="fa-solid fa-circle-question"></i> Thông tin thú vị</button>
+      </div>
       
-      <div class="blogs-grid">
-        <!-- Blog 1: Scraper -->
-        <article class="blog-card glass">
-          <div class="blog-content">
-            <div class="blog-meta">
-              <span><i class="fa-regular fa-calendar"></i> 18/07/2026</span>
-              <span><i class="fa-regular fa-clock"></i> 10 phút đọc</span>
+      <div class="blogs-grid" id="blogs-container">
+        <!-- Blog 1: Scraper (Tech) -->
+        <a href="./articles/tech-scraper.html" class="blog-card-link" data-cat="tech">
+          <article class="blog-card glass">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> 18/07/2026</span>
+                <span><i class="fa-regular fa-clock"></i> 10 phút đọc</span>
+              </div>
+              <h3 class="blog-title">Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions</h3>
+              <p class="blog-desc">Chia sẻ chi tiết về cách xây dựng hệ thống cào dữ liệu giá vé máy bay tự động từ Google Flights, khắc phục cơ chế chặn và triển khai chạy định kỳ hoàn toàn miễn phí trên Cloud GitHub Actions.</p>
+              <div class="project-tags" style="margin-top: auto;">
+                <span class="tag">Puppeteer</span>
+                <span class="tag">Automation</span>
+                <span class="tag">Node.js</span>
+              </div>
+              <div class="blog-footer">
+                <span>Đọc thêm</span>
+                <i class="fa-solid fa-angle-right"></i>
+              </div>
             </div>
-            <h3 class="blog-title">Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions</h3>
-            <p class="blog-desc">Chia sẻ chi tiết về cách xây dựng hệ thống cào dữ liệu giá vé máy bay tự động từ Google Flights, khắc phục cơ chế chặn và triển khai chạy định kỳ hoàn toàn miễn phí trên Cloud GitHub Actions.</p>
-            <div class="project-tags" style="margin-top: auto;">
-              <span class="tag">Puppeteer</span>
-              <span class="tag">Automation</span>
-              <span class="tag">Node.js</span>
-            </div>
-            <div class="blog-footer">
-              <span>Đọc thêm</span>
-              <i class="fa-solid fa-angle-right"></i>
-            </div>
-          </div>
-        </article>
+          </article>
+        </a>
 
-        <!-- Blog 2: AI Caro Game -->
-        <article class="blog-card glass">
-          <div class="blog-content">
-            <div class="blog-meta">
-              <span><i class="fa-regular fa-calendar"></i> 16/07/2026</span>
-              <span><i class="fa-regular fa-clock"></i> 8 phút đọc</span>
+        <!-- Blog 2: AI Caro Game (Tech) -->
+        <a href="./articles/tech-ai-caro.html" class="blog-card-link" data-cat="tech">
+          <article class="blog-card glass">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> 16/07/2026</span>
+                <span><i class="fa-regular fa-clock"></i> 8 phút đọc</span>
+              </div>
+              <h3 class="blog-title">Tích hợp Generative AI vào trò chơi Multiplayer: Trường hợp Caro Arena</h3>
+              <p class="blog-desc">Làm thế nào để kết hợp mô hình ngôn ngữ lớn Gemini API thông qua Google AI Studio làm đối thủ cờ Caro thông minh? Thiết kế luồng xử lý nước đi thời gian thực và quản lý phòng đấu Firestore.</p>
+              <div class="project-tags" style="margin-top: auto;">
+                <span class="tag">Gemini API</span>
+                <span class="tag">Firestore</span>
+                <span class="tag">AI Game</span>
+              </div>
+              <div class="blog-footer">
+                <span>Đọc thêm</span>
+                <i class="fa-solid fa-angle-right"></i>
+              </div>
             </div>
-            <h3 class="blog-title">Tích hợp Generative AI vào trò chơi Multiplayer: Trường hợp Caro Arena</h3>
-            <p class="blog-desc">Làm thế nào để kết hợp mô hình ngôn ngữ lớn Gemini API thông qua Google AI Studio làm đối thủ cờ Caro thông minh? Thiết kế luồng xử lý nước đi thời gian thực và quản lý phòng đấu Firestore.</p>
-            <div class="project-tags" style="margin-top: auto;">
-              <span class="tag">Gemini API</span>
-              <span class="tag">Firestore</span>
-              <span class="tag">WebSockets</span>
-            </div>
-            <div class="blog-footer">
-              <span>Đọc thêm</span>
-              <i class="fa-solid fa-angle-right"></i>
-            </div>
-          </div>
-        </article>
+          </article>
+        </a>
 
-        <!-- Blog 3: Web Aesthetics -->
-        <article class="blog-card glass">
-          <div class="blog-content">
-            <div class="blog-meta">
-              <span><i class="fa-regular fa-calendar"></i> 12/07/2026</span>
-              <span><i class="fa-regular fa-clock"></i> 6 phút đọc</span>
+        <!-- Blog 3: Cheminformatics (Chem) -->
+        <a href="./articles/chem-cheminformatics.html" class="blog-card-link" data-cat="chem">
+          <article class="blog-card glass">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> 10/07/2026</span>
+                <span><i class="fa-regular fa-clock"></i> 9 phút đọc</span>
+              </div>
+              <h3 class="blog-title">Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL</h3>
+              <p class="blog-desc">Khám phá cách truy vấn hoạt tính sinh học phân tử qua API ChEMBL, lọc hợp chất tiềm năng IC50 bằng Python phục vụ cho giai đoạn thiết kế thuốc tiền lâm sàng.</p>
+              <div class="project-tags" style="margin-top: auto;">
+                <span class="tag">Python</span>
+                <span class="tag">ChEMBL</span>
+                <span class="tag">Drug Design</span>
+              </div>
+              <div class="blog-footer">
+                <span>Đọc thêm</span>
+                <i class="fa-solid fa-angle-right"></i>
+              </div>
             </div>
-            <h3 class="blog-title">Aesthetics in Frontend: Xu hướng Glassmorphic và Neon Glow</h3>
-            <p class="blog-desc">Khám phá phong cách thiết kế giao diện kính mờ kết hợp hiệu ứng phát sáng neon hiện đại. Cách sử dụng custom CSS variables để tạo ra trải nghiệm người dùng ấn tượng và phản hồi mượt mà.</p>
-            <div class="project-tags" style="margin-top: auto;">
-              <span class="tag">CSS3</span>
-              <span class="tag">UI/UX</span>
-              <span class="tag">Design Tokens</span>
+          </article>
+        </a>
+
+        <!-- Blog 4: AlphaFold & Foldseek (Chem) -->
+        <a href="./articles/chem-alphafold.html" class="blog-card-link" data-cat="chem">
+          <article class="blog-card glass">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> 05/07/2026</span>
+                <span><i class="fa-regular fa-clock"></i> 7 phút đọc</span>
+              </div>
+              <h3 class="blog-title">Mô hình hóa cấu trúc Protein 3D với AlphaFold và Foldseek</h3>
+              <p class="blog-desc">Hướng dẫn sử dụng dữ liệu AlphaFold DB phục vụ phân tích độ tin cậy pLDDT cấu trúc 3D, và dùng Foldseek API để tìm kiếm nhanh các protein có cấu trúc tương đồng.</p>
+              <div class="project-tags" style="margin-top: auto;">
+                <span class="tag">AlphaFold</span>
+                <span class="tag">Foldseek</span>
+                <span class="tag">Structural Biology</span>
+              </div>
+              <div class="blog-footer">
+                <span>Đọc thêm</span>
+                <i class="fa-solid fa-angle-right"></i>
+              </div>
             </div>
-            <div class="blog-footer">
-              <span>Đọc thêm</span>
-              <i class="fa-solid fa-angle-right"></i>
+          </article>
+        </a>
+
+        <!-- Blog 5: Cryptography (Trivia) -->
+        <a href="./articles/trivia-cryptography.html" class="blog-card-link" data-cat="trivia">
+          <article class="blog-card glass">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> 25/06/2026</span>
+                <span><i class="fa-regular fa-clock"></i> 6 phút đọc</span>
+              </div>
+              <h3 class="blog-title">Mật mã học lịch sử: Từ bản dịch Caesar đến mô hình AI Ithaca</h3>
+              <p class="blog-desc">Hành trình lịch sử của mật mã học từ các phép dịch chuyển đơn giản thời La Mã cổ đại đến ứng dụng mạng nơ-ron học sâu để khôi phục và định tuổi văn bản cổ.</p>
+              <div class="project-tags" style="margin-top: auto;">
+                <span class="tag">Cryptography</span>
+                <span class="tag">Ithaca AI</span>
+                <span class="tag">History</span>
+              </div>
+              <div class="blog-footer">
+                <span>Đọc thêm</span>
+                <i class="fa-solid fa-angle-right"></i>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
+        </a>
+
+        <!-- Blog 6: Airline Flow (Trivia) -->
+        <a href="./articles/trivia-aviation.html" class="blog-card-link" data-cat="trivia">
+          <article class="blog-card glass">
+            <div class="blog-content">
+              <div class="blog-meta">
+                <span><i class="fa-regular fa-calendar"></i> 18/06/2026</span>
+                <span><i class="fa-regular fa-clock"></i> 8 phút đọc</span>
+              </div>
+              <h3 class="blog-title">Trục bay bận rộn nhất Việt Nam: Phân tích lưu lượng chặng HAN-SGN</h3>
+              <p class="blog-desc">Phân tích chuyên sâu số liệu về tần suất khai thác, thị phần của các hãng hàng không và quy luật biến động giá vé trên đường bay vàng kết nối Hà Nội - TP.HCM.</p>
+              <div class="project-tags" style="margin-top: auto;">
+                <span class="tag">Aviation</span>
+                <span class="tag">HAN-SGN</span>
+                <span class="tag">Data Analysis</span>
+              </div>
+              <div class="blog-footer">
+                <span>Đọc thêm</span>
+                <i class="fa-solid fa-angle-right"></i>
+              </div>
+            </div>
+          </article>
+        </a>
       </div>
     </section>
   </div>
@@ -129,6 +258,30 @@
       const isLight = document.body.classList.toggle('light-theme');
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
       themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+
+    // JavaScript Filter Logic
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const blogLinks = document.querySelectorAll('.blog-card-link');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Toggle active class in buttons
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const category = btn.getAttribute('data-category');
+
+        // Filter cards
+        blogLinks.forEach(link => {
+          const cardCat = link.getAttribute('data-cat');
+          if (category === 'all' || cardCat === category) {
+            link.style.display = 'block';
+          } else {
+            link.style.display = 'none';
+          }
+        });
+      });
     });
   </script>
 </body>
