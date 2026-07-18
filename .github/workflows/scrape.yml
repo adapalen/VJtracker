@@ -29,12 +29,12 @@ jobs:
         run: npm install
 
       - name: Run Scraper
-        run: node scraper.js
+        run: node scraper/scraper.js
 
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add flights_db.json
+          git add p/VJtracker/flights_db.json
           git commit -m "Auto-update flight prices: $(date)" || echo "No changes to commit"
           git push
