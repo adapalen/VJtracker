@@ -3,42 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sơ đồ cấu trúc các trang thông tin và bài viết trên website cá nhân của adapalen.">
-  <title>adapalen | Sơ Đồ Trang Website</title>
-  <!-- Google Fonts: Inter (with full Vietnamese subset support) -->
+  <meta name="description" content="Sơ đồ cấu trúc phân cấp và cây thư mục các trang thông tin, ứng dụng và bài viết trên website adapalen.">
+  <title>adapalen | Sơ Đồ Cấu Trúc Website (Sitemap)</title>
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome for icons -->
+  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../style.css">
   <style>
-    .sitemap-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-      margin-top: 1.5rem;
+    .sitemap-tree-section {
+      margin-bottom: 2.5rem;
     }
-    .sitemap-item {
+    .sitemap-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .sitemap-section-header i {
+      color: var(--accent-color);
+      font-size: 1.3rem;
+    }
+    .sitemap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+    .sitemap-card {
       display: flex;
       align-items: flex-start;
-      gap: 1.2rem;
+      gap: 1rem;
       padding: 1.25rem;
       border-radius: 12px;
       border: 1px solid var(--glass-border);
       background: rgba(255, 255, 255, 0.02);
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.25 ease, border-color 0.25s ease, box-shadow 0.25s ease;
+      position: relative;
     }
-    .sitemap-item:hover {
-      transform: translateX(5px);
+    .sitemap-card:hover {
+      transform: translateY(-4px);
       border-color: var(--accent-color);
-      box-shadow: 0 4px 20px 0 rgba(0, 240, 255, 0.08);
+      box-shadow: 0 8px 24px 0 rgba(0, 240, 255, 0.12);
     }
-    .sitemap-icon-wrapper {
+    .sitemap-icon-box {
       width: 44px;
       height: 44px;
       border-radius: 10px;
-      background: rgba(var(--btn-bg-rgb), 0.06);
+      background: rgba(var(--btn-bg-rgb), 0.08);
       border: 1px solid var(--glass-border);
       display: flex;
       align-items: center;
@@ -47,37 +65,61 @@
       color: var(--accent-color);
       flex-shrink: 0;
     }
-    .sitemap-details {
+    .sitemap-content {
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
       flex-grow: 1;
     }
-    .sitemap-page-title {
-      font-size: 1.1rem;
+    .sitemap-link {
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--text-primary);
       text-decoration: none;
       transition: color 0.2s;
     }
-    .sitemap-page-title:hover {
+    .sitemap-card:hover .sitemap-link {
       color: var(--accent-color);
     }
-    .sitemap-page-desc {
-      font-size: 0.88rem;
+    .sitemap-desc {
+      font-size: 0.86rem;
       color: var(--text-secondary);
       line-height: 1.5;
     }
-    .sitemap-meta {
+    .sitemap-badges {
       display: flex;
-      gap: 1.2rem;
-      font-size: 0.78rem;
+      gap: 0.8rem;
+      align-items: center;
+      margin-top: 0.4rem;
+      font-size: 0.76rem;
       color: var(--text-secondary);
-      margin-top: 0.2rem;
     }
-    .sitemap-meta span i {
+    .badge-priority {
+      background: rgba(var(--btn-bg-rgb), 0.1);
       color: var(--accent-color);
-      margin-right: 0.3rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      border: 1px solid var(--glass-border);
+    }
+    .xml-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      border: 1px solid var(--accent-color);
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+      background: rgba(var(--btn-bg-rgb), 0.05);
+    }
+    .xml-btn:hover {
+      background: var(--accent-color);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent-glow);
     }
   </style>
 </head>
@@ -110,18 +152,21 @@
     <!-- Sitemap Main Section -->
     <section class="portfolio-section glass" style="padding: 2.5rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-        <h2 class="section-title" style="margin-bottom: 0;"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang web (Sitemap)</h2>
-        <a href="../../index.html" class="blog-back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+        <div>
+          <h2 class="section-title" style="margin-bottom: 0.4rem;"><i class="fa-solid fa-sitemap"></i> Sơ đồ phân cấp Website</h2>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">Cây thư mục kiến trúc toàn bộ các trang thông tin, ứng dụng web và kho bài viết kỹ thuật.</p>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <a href="../../sitemap.xml" target="_blank" class="xml-btn"><i class="fa-solid fa-code"></i> sitemap.xml (SEO)</a>
+          <a href="../../index.html" class="blog-back-btn"><i class="fa-solid fa-arrow-left"></i> Trang chủ</a>
+        </div>
       </div>
-      <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 750px;">
-        Sơ đồ cấu trúc này hiển thị động tất cả các liên kết trang web chính, các ứng dụng con và các bài viết chia sẻ công nghệ hiện có trên website của tôi. Bản đồ này được cập nhật tự động bất cứ khi nào trang web thay đổi.
-      </p>
 
-      <div id="sitemap-container" class="sitemap-list">
-        <!-- Dynamic content will be injected here -->
+      <div id="sitemap-tree-container">
+        <!-- Dynamic Hierarchical Tree content will be injected here -->
         <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
           <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem; color: var(--accent-color);"></i>
-          <p>Đang tải sơ đồ trang web...</p>
+          <p>Đang tải cấu trúc phân cấp sơ đồ trang...</p>
         </div>
       </div>
     </section>
@@ -146,53 +191,54 @@
       themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
     });
 
-    // Helper to get matching fontawesome icons for page type
-    function getPageIcon(url) {
-      if (url === '/') return 'fa-solid fa-house';
-      if (url.includes('/blogs/articles/')) return 'fa-solid fa-feather-pointed';
-      if (url.includes('/blogs/')) return 'fa-solid fa-book';
-      if (url.includes('/about/')) return 'fa-solid fa-user-tie';
-      if (url.includes('/sitemap/')) return 'fa-solid fa-sitemap';
-      if (url.includes('/VJtracker/')) return 'fa-solid fa-plane-departure';
-      if (url.includes('/caro-arena/')) return 'fa-solid fa-gamepad';
-      return 'fa-regular fa-file';
-    }
-
-    // Dynamic sitemap fetch
-    async function loadSitemap() {
-      const container = document.getElementById('sitemap-container');
+    // Dynamic sitemap tree fetch
+    async function loadSitemapTree() {
+      const container = document.getElementById('sitemap-tree-container');
       try {
         const response = await fetch('sitemap.json');
-        if (!response.ok) throw new Error('Không thể tải sơ đồ sitemap.json');
-        const pages = await response.json();
+        if (!response.ok) throw new Error('Không thể tải file cấu trúc sitemap.json');
+        const data = await response.json();
         
         let html = '';
-        pages.forEach(page => {
-          const iconClass = getPageIcon(page.url);
-          // Convert root absolute paths to relative paths for local filesystem testing
-          let href = page.url;
-          if (href === '/') {
-            href = '../../index.html';
-          } else if (href.startsWith('/')) {
-            href = '../..' + href;
-            // append index.html for clean navigation on local file systems
-            if (href.endsWith('/')) {
-              href += 'index.html';
-            }
-          }
-          
+        data.sections.forEach(sec => {
           html += `
-            <div class="sitemap-item">
-              <div class="sitemap-icon-wrapper">
-                <i class="${iconClass}"></i>
+            <div class="sitemap-tree-section">
+              <div class="sitemap-section-header">
+                <i class="${sec.icon}"></i>
+                <span>${sec.name} (${sec.pages.length})</span>
               </div>
-              <div class="sitemap-details">
-                <a href="${href}" class="sitemap-page-title">${page.title}</a>
-                <p class="sitemap-page-desc">${page.description || 'Không có mô tả cho trang này.'}</p>
-                <div class="sitemap-meta">
-                  <span><i class="fa-regular fa-link"></i> ${page.url}</span>
-                  <span><i class="fa-regular fa-clock"></i> Cập nhật: ${page.lastModified}</span>
+              <div class="sitemap-grid">
+          `;
+
+          sec.pages.forEach(p => {
+            let href = p.url;
+            if (href === '/') {
+              href = '../../index.html';
+            } else if (href.startsWith('/')) {
+              href = '../..' + href;
+              if (href.endsWith('/')) {
+                href += 'index.html';
+              }
+            }
+
+            html += `
+              <div class="sitemap-card">
+                <div class="sitemap-icon-box">
+                  <i class="${p.icon}"></i>
                 </div>
+                <div class="sitemap-content">
+                  <a href="${href}" class="sitemap-link">${p.title}</a>
+                  <p class="sitemap-desc">${p.description || 'Trang thông tin trực thuộc hệ thống.'}</p>
+                  <div class="sitemap-badges">
+                    <span class="badge-priority">Độ ưu tiên: ${p.priority}</span>
+                    <span><i class="fa-regular fa-clock"></i> ${p.lastModified}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `
               </div>
             </div>
           `;
@@ -204,14 +250,14 @@
         container.innerHTML = `
           <div style="text-align: center; padding: 2rem; border-radius: 12px; border: 1px dashed var(--red); background: rgba(255, 61, 0, 0.05); color: var(--text-primary);">
             <i class="fa-solid fa-circle-exclamation" style="font-size: 2rem; margin-bottom: 1rem; color: var(--red);"></i>
-            <h4>Lỗi tải Sơ đồ trang web</h4>
+            <h4>Không thể tải sơ đồ phân cấp</h4>
             <p style="color: var(--text-secondary); margin-top: 0.5rem;">${err.message}</p>
           </div>
         `;
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadSitemap);
+    document.addEventListener('DOMContentLoaded', loadSitemapTree);
   </script>
 </body>
 </html>
