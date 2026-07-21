@@ -84,6 +84,11 @@ function getPageMetadata(file) {
     priority = '0.9';
     changefreq = 'weekly';
     icon = 'fa-solid fa-gamepad';
+  } else if (url === '/p/caubingaoa/') {
+    section = 'projects';
+    priority = '0.9';
+    changefreq = 'weekly';
+    icon = 'fa-solid fa-face-laugh-beam';
   } else if (url === '/p/blogs/') {
     section = 'blogs_hub';
     priority = '0.8';

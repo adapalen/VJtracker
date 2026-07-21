@@ -10,7 +10,7 @@
           "description": "Portfolio của adapalen - Kỹ sư phần mềm & Nhà phát triển Web.",
           "url": "/",
           "fullUrl": "https://sincostan.id.vn/",
-          "lastModified": "2026-07-18",
+          "lastModified": "2026-07-21",
           "section": "core",
           "priority": "1.0",
           "changefreq": "daily",
@@ -44,6 +44,17 @@
           "priority": "0.9",
           "changefreq": "weekly",
           "icon": "fa-solid fa-gamepad"
+        },
+        {
+          "title": "Cậu có bị ngáo không? | Satirical Dating Standards Calculator",
+          "description": "Trang web châm biếm tính toán tỷ lệ phần trăm nam giới đáp ứng các tiêu chuẩn hẹn hò phi thực tế và hài hước.",
+          "url": "/p/caubingaoa/",
+          "fullUrl": "https://sincostan.id.vn/p/caubingaoa/",
+          "lastModified": "2026-07-21",
+          "section": "projects",
+          "priority": "0.9",
+          "changefreq": "weekly",
+          "icon": "fa-solid fa-face-laugh-beam"
         },
         {
           "title": "Theo Dõi Giá Vé Máy Bay Vietjet Tự Động | Săn Vé Máy Bay Giá Rẻ",
