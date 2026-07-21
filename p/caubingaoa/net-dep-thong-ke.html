@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nét Đẹp Thống Kê | Male Delusion Calculator VN</title>
+    <meta name="description" content="Khám phá vẻ đẹp của số liệu thống kê dân số nam giới Việt Nam và nghệ thuật cân bằng kỳ vọng thực tế.">
+    
+    <!-- Emoji Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX CDN for TeX/LaTeX Mathematical Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+        ],
+        throwOnError: false
+    });"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background Glow Blobs -->
+    <div class="bg-glow blob-1"></div>
+    <div class="bg-glow blob-2"></div>
+    <div class="bg-glow blob-3"></div>
+
+    <div class="app-container">
+        <!-- Header Section with Separate Top Page Navigation -->
+        <header class="main-header">
+            <div class="header-top-row">
+                <div class="brand-group">
+                    <div class="badge-tag">
+                        <i data-lucide="sparkles"></i> Thống Kê Dân Số Nam Giới VN
+                    </div>
+                    
+                    <!-- Clickable Top Header Sub-Pages Navigation Links -->
+                    <nav class="top-nav-links">
+                        <a href="index.html" class="top-nav-item">
+                            <i data-lucide="calculator"></i> Thước Đo
+                        </a>
+                        <a href="net-dep-thong-ke.html" class="top-nav-item active">
+                            <i data-lucide="bar-chart-2"></i> Nét Đẹp Thống Kê
+                        </a>
+                        <a href="thuoc-chua-benh.html" class="top-nav-item">
+                            <i data-lucide="pill"></i> Thuốc Chữa Bệnh
+                        </a>
+                    </nav>
+                </div>
+
+                <button id="theme-toggle" class="btn-theme-toggle" title="Chuyển chế độ Sáng / Tối">
+                    <i data-lucide="sun" id="theme-icon"></i>
+                    <span id="theme-text">Giao diện Sáng</span>
+                </button>
+            </div>
+            
+            <h1>NÉT ĐẸP THỐNG KÊ & DỮ LIỆU</h1>
+            <p class="subtitle">Những con số biết nói về dân số, phân bố xác suất và nghệ thuật nhìn vào thực tế cuộc sống.</p>
+        </header>
+
+        <!-- SUB-PAGE CONTENT CARD -->
+        <main>
+            <section class="card subpage-card">
+                <div class="card-header">
+                    <h2><i data-lucide="sparkles"></i> Nét Đẹp Thống Kê & Vẻ Đẹp Của Con Số Dân Số</h2>
+                </div>
+                <div class="subpage-body">
+                    <p class="intro-text">
+                        Thống kê học không chỉ là những con số khô khan, mà là bức tranh phản ánh trung thực nhất về đời sống xã hội. Nhìn vào thống kê là cách tốt nhất để thấu hiểu thực tại và cân bằng kỳ vọng của bản thân.
+                    </p>
+
+                    <div class="subpage-content-grid">
+                        <div class="sample-box">
+                            <h3><i data-lucide="pie-chart"></i> 1. Sức Mạnh Của Quy Luật Số Lớn (Law of Large Numbers)</h3>
+                            <p>[Placeholder Sample Text] Khi mẫu quan sát đủ lớn ($N = 35.2\text{ triệu}$ nam giới Việt Nam từ 18–60 tuổi), các biến số sinh học và kinh tế xã hội như chiều cao, thu nhập và trình độ học vấn sẽ tuân theo phân bố chuẩn Gaussian. Đa số dân số hội tụ quanh giá trị trung bình (1m68.5, lương ~9.3 triệu), trong khi những cá thể "hoàn hảo toàn diện" chỉ là các biến số cực hiếm ở phần đuôi phân bố.</p>
+                        </div>
+
+                        <div class="sample-box">
+                            <h3><i data-lucide="trending-up"></i> 2. Phân Bố Xác Suất Đồng Thời (Bayesian Joint Probability)</h3>
+                            <p>[Placeholder Sample Text] Mỗi khi bạn thắt chặt thêm 1 tiêu chuẩn độc lập (Ví dụ: Cao 1m75 + Lương 50 triệu + Đi ô tô + Chưa từng kết hôn), tổng xác suất sẽ giảm mạnh theo công thức nhân xác suất $P = P_1 \times P_2 \times P_3 \times \dots \times P_n$. Sự kết hợp ngẫu nhiên của 5 tiêu chuẩn khắt khe có thể khiến tỷ lệ tìm thấy người ấy rớt xuống dưới 0.001%.</p>
+                        </div>
+
+                        <div class="sample-box">
+                            <h3><i data-lucide="heart"></i> 3. Giá Trị Thực Sự Của Sự Phù Hợp</h3>
+                            <p>[Placeholder Sample Text] Thống kê giúp chúng ta nhận ra rằng một mối quan hệ bền vững không đến từ việc tìm kiếm một con người tiệm cận 0.001% lý tưởng trên giấy tờ, mà đến từ sự đồng điệu về tâm hồn, sự thấu hiểu và cùng nhau xây dựng cuộc sống thực tế.</p>
+                        </div>
+
+                        <div class="sample-box">
+                            <h3><i data-lucide="award"></i> 4. Bức Tranh Thu Nhập Nam Giới Việt Nam</h3>
+                            <p>[Placeholder Sample Text] Theo dữ liệu chính thức của Tổng cục Thống kê (GSO) & ILO: Thu nhập trung bình của nam giới hưởng lương đạt khoảng 9.3 triệu VNĐ/tháng. Người đạt thu nhập từ 20 triệu/tháng đã thuộc top 14%, và đạt từ 50 triệu/tháng đã thuộc top 2.2% trên toàn quốc.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Satirical Footer -->
+        <footer class="app-footer card">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h4><i data-lucide="shield-check"></i> Cam Kết Dữ Liệu & Bản Quyền</h4>
+                    <p>Công cụ mô phỏng toán học dựa trên phân bố xác suất độc lập & có điều kiện (Bayesian Joint Probability). Mọi dữ liệu được đối chiếu với các nguồn thống kê chính thức tại Việt Nam (GSO, Viện Dinh Dưỡng, iSEE, Cục Đăng kiểm, WHO/Bộ Y tế, IDC, VAMM, VAMA, MOC, VNREA, MOLISA).</p>
+                </div>
+                <div class="footer-copyright">
+                    © 2026 Male Delusion Calculator Vietnam Edition. Made with <i data-lucide="heart" class="heart-icon"></i> for reality checks.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Theme Toggler Helper for Subpages
+        const htmlElement = document.documentElement;
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeText = document.getElementById('theme-text');
+
+        function setTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'light') {
+                themeText.textContent = 'Giao diện Tối';
+                themeIcon.setAttribute('data-lucide', 'moon');
+            } else {
+                themeText.textContent = 'Giao diện Sáng';
+                themeIcon.setAttribute('data-lucide', 'sun');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
