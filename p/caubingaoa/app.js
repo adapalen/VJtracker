@@ -491,8 +491,9 @@ function calculateMatches() {
 
 // Satirical verdict generation with dating reality-check mockery
 function getSatiricalVerdict(percent, estimatedCount) {
+    let verdict;
     if (estimatedCount === 0 || percent === 0) {
-        return {
+        verdict = {
             meterPercent: 100,
             scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI (0 NGƯỜI)',
             badge: '💔 0 NGƯỜI ĐẠT TIÊU CHUẨN',
@@ -502,7 +503,7 @@ function getSatiricalVerdict(percent, estimatedCount) {
             isZero: true
         };
     } else if (percent >= 90) {
-        return {
+        verdict = {
             meterPercent: 5,
             scoreText: 'Độ khó: 0% (TẤT CẢ NAM GIỚI)',
             badge: '💚 100% THỰC TẾ',
@@ -511,7 +512,7 @@ function getSatiricalVerdict(percent, estimatedCount) {
             color: '#10b981'
         };
     } else if (percent >= 35) {
-        return {
+        verdict = {
             meterPercent: 20,
             scoreText: 'Độ khó: RẤT DỄ (Chàng Trai Bình Dân)',
             badge: '💚 THỰC TẾ & BÌNH DÂN',
@@ -520,7 +521,7 @@ function getSatiricalVerdict(percent, estimatedCount) {
             color: '#10b981'
         };
     } else if (percent >= 12) {
-        return {
+        verdict = {
             meterPercent: 40,
             scoreText: 'Độ khó: HỢP LÝ (Mẫu Bạn Trai Tiêu Chuẩn)',
             badge: '💙 TIÊU CHUẨN HỢP LÝ',
@@ -529,7 +530,7 @@ function getSatiricalVerdict(percent, estimatedCount) {
             color: '#3b82f6'
         };
     } else if (percent >= 2.5) {
-        return {
+        verdict = {
             meterPercent: 60,
             scoreText: 'Độ khó: KHÁ CAO (Cạnh Tranh Gay Gắt)',
             badge: '💛 HOÀNG TỬ PHỐ THỊ',
@@ -538,7 +539,7 @@ function getSatiricalVerdict(percent, estimatedCount) {
             color: '#f59e0b'
         };
     } else if (percent >= 0.4) {
-        return {
+        verdict = {
             meterPercent: 80,
             scoreText: 'Độ khó: CỰC CAO (Hiếm Như Vé Số)',
             badge: '🧡 BẠCH MÃ HOÀNG TỬ',
@@ -547,7 +548,7 @@ function getSatiricalVerdict(percent, estimatedCount) {
             color: '#f97316'
         };
     } else {
-        return {
+        verdict = {
             meterPercent: 95,
             scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI',
             badge: '💜 TỶ PHÚ NAM THẦN',
@@ -556,6 +557,11 @@ function getSatiricalVerdict(percent, estimatedCount) {
             color: '#a855f7'
         };
     }
+    // Override description when fewer than 100 men meet the criteria
+    if (estimatedCount > 0 && estimatedCount < 100) {
+        verdict.desc = `Chắc ${estimatedCount.toLocaleString('vi-VN')} người này đang trốn khỏi m đó con ơi`;
+    }
+    return verdict;
 }
 
 // Update 1,350 Seat Dots on Oval Stadium Rings
