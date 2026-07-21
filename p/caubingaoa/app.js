@@ -490,73 +490,79 @@ function calculateMatches() {
 }
 
 // Satirical verdict generation with dating reality-check mockery
-function getSatiricalVerdict(percent, estimatedCount) {
-    if (estimatedCount === 0 || percent === 0) {
-        return {
-            meterPercent: 100,
-            scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI (0 NGƯỜI)',
-            badge: '💔 0 NGƯỜI ĐẠT TIÊU CHUẨN',
-            title: 'M BỊ NGÁO RỒI! 🤪',
-            desc: 'M bị ngáo rồi! Tiêu chuẩn của m ảo tưởng đến mức cả 35.2 triệu nam giới Việt Nam không có nổi 1 người đáp ứng được. Tỉnh mộng ngay em ơi!',
-            color: '#ef4444',
-            isZero: true
-        };
-    } else if (percent >= 90) {
-        return {
-            meterPercent: 5,
-            scoreText: 'Độ khó: 0% (TẤT CẢ NAM GIỚI)',
-            badge: '💚 100% THỰC TẾ',
-            title: 'Tất Cả Nam Giới Việt Nam (18 - 60 Tuổi)',
-            desc: 'Yêu cầu quá dễ dãi! Toàn bộ 35.2 triệu nam giới Việt Nam đều sẵn sàng. Ra đầu ngõ vẫy tay nhẹ là có bạn trai ngay!',
-            color: '#10b981'
-        };
-    } else if (percent >= 35) {
-        return {
-            meterPercent: 20,
-            scoreText: 'Độ khó: RẤT DỄ (Chàng Trai Bình Dân)',
-            badge: '💚 THỰC TẾ & BÌNH DÂN',
-            title: 'Chàng Trai Bình Dân Hàng Xóm',
-            desc: 'Tiêu chuẩn vô cùng thực tế! Anh ấy xuất hiện ở mọi quán cà phê vỉa hè hay trà đá. Chỉ cần em mở lòng là chốt đơn!',
-            color: '#10b981'
-        };
-    } else if (percent >= 12) {
-        return {
-            meterPercent: 40,
-            scoreText: 'Độ khó: HỢP LÝ (Mẫu Bạn Trai Tiêu Chuẩn)',
-            badge: '💙 TIÊU CHUẨN HỢP LÝ',
-            title: 'Mẫu Người Bạn Trai Tiêu Chuẩn',
-            desc: 'Yêu cầu rất hợp lý và thực tế. Tỷ lệ cạnh tranh vừa phải, anh ấy hoàn toàn nằm trong tầm tay em đấy!',
-            color: '#3b82f6'
-        };
-    } else if (percent >= 2.5) {
-        return {
-            meterPercent: 60,
-            scoreText: 'Độ khó: KHÁ CAO (Cạnh Tranh Gay Gắt)',
-            badge: '💛 HOÀNG TỬ PHỐ THỊ',
-            title: 'Hotboy Phố Thị Thu Nhập Tốt',
-            desc: 'Tiêu chuẩn tương đối cao! Mẫu nam giới này thu hút rất nhiều chị em. Muốn giữ chân anh ấy thì em phải có chiêu cực đỉnh!',
-            color: '#f59e0b'
-        };
-    } else if (percent >= 0.4) {
-        return {
-            meterPercent: 80,
-            scoreText: 'Độ khó: CỰC CAO (Hiếm Như Vé Số)',
-            badge: '🧡 BẠCH MÃ HOÀNG TỬ',
-            title: 'Bạch Mã Hoàng Tử Trong Truyền Thuyết',
-            desc: 'Vài trăm người mới có 1 người đáp ứng! Anh ấy đẹp trai, có điều kiện lại độc thân. Khuyên em chuẩn bị tinh thần cạnh tranh khốc liệt!',
-            color: '#f97316'
-        };
-    } else {
-        return {
-            meterPercent: 95,
-            scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI',
-            badge: '💜 TỶ PHÚ NAM THẦN',
-            title: 'CEO Tổng Tài Trong Phim Ngôn Tình',
-            desc: 'Tỷ lệ gặp anh ấy còn khó hơn trúng Vietlott Jackpot! Lời khuyên chân thành: Hãy nuôi thêm 3 chú mèo hoặc giảm bớt tiêu chuẩn ngay!',
-            color: '#a855f7'
-        };
+    const verdict = (function() {
+        if (estimatedCount === 0 || percent === 0) {
+            return {
+                meterPercent: 100,
+                scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI (0 NGƯỜI)',
+                badge: '💔 0 NGƯỜI ĐẠT TIÊU CHUẨN',
+                title: 'M BỊ NGÁO RỒI! 🤪',
+                desc: 'M bị ngáo rồi! Tiêu chuẩn của m ảo tưởng đến mức cả 35.2 triệu nam giới Việt Nam không có nổi 1 người đáp ứng được. Tỉnh mộng ngay em ơi!',
+                color: '#ef4444',
+                isZero: true
+            };
+        } else if (percent >= 90) {
+            return {
+                meterPercent: 5,
+                scoreText: 'Độ khó: 0% (TẤT CẢ NAM GIỚI)',
+                badge: '💚 100% THỰC TẾ',
+                title: 'Tất Cả Nam Giới Việt Nam (18 - 60 Tuổi)',
+                desc: 'Yêu cầu quá dễ dãi! Toàn bộ 35.2 triệu nam giới Việt Nam đều sẵn sàng. Ra đầu ngõ vẫy tay nhẹ là có bạn trai ngay!',
+                color: '#10b981'
+            };
+        } else if (percent >= 35) {
+            return {
+                meterPercent: 20,
+                scoreText: 'Độ khó: RẤT DỄ (Chàng Trai Bình Dân)',
+                badge: '💚 THỰC TẾ & BÌNH DÂN',
+                title: 'Chàng Trai Bình Dân Hàng Xóm',
+                desc: 'Tiêu chuẩn vô cùng thực tế! Anh ấy xuất hiện ở mọi quán cà phê vỉa hè hay trà đá. Chỉ cần em mở lòng là chốt đơn!',
+                color: '#10b981'
+            };
+        } else if (percent >= 12) {
+            return {
+                meterPercent: 40,
+                scoreText: 'Độ khó: HỢP LÝ (Mẫu Bạn Trai Tiêu Chuẩn)',
+                badge: '💙 TIÊU CHUẨN HỢP LÝ',
+                title: 'Mẫu Người Bạn Trai Tiêu Chuẩn',
+                desc: 'Yêu cầu rất hợp lý và thực tế. Tỷ lệ cạnh tranh vừa phải, anh ấy hoàn toàn nằm trong tầm tay em đấy!',
+                color: '#3b82f6'
+            };
+        } else if (percent >= 2.5) {
+            return {
+                meterPercent: 60,
+                scoreText: 'Độ khó: KHÁ CAO (Cạnh Tranh Gay Gắt)',
+                badge: '💛 HOÀNG TỬ PHỐ THỊ',
+                title: 'Hotboy Phố Thị Thu Nhập Tốt',
+                desc: 'Tiêu chuẩn tương đối cao! Mẫu nam giới này thu hút rất nhiều chị em. Muốn giữ chân anh ấy thì em phải có chiêu cực đỉnh!',
+                color: '#f59e0b'
+            };
+        } else if (percent >= 0.4) {
+            return {
+                meterPercent: 80,
+                scoreText: 'Độ khó: CỰC CAO (Hiếm Như Vé Số)',
+                badge: '🧡 BẠCH MÃ HOÀNG TỬ',
+                title: 'Bạch Mã Hoàng Tử Trong Truyền Thuyết',
+                desc: 'Vài trăm người mới có 1 người đáp ứng! Anh ấy đẹp trai, có điều kiện lại độc thân. Khuyên em chuẩn bị tinh thần cạnh tranh khốc liệt!',
+                color: '#f97316'
+            };
+        } else {
+            return {
+                meterPercent: 95,
+                scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI',
+                badge: '💜 TỶ PHÚ NAM THẦN',
+                title: 'CEO Tổng Tài Trong Phim Ngôn Tình',
+                desc: 'Tỷ lệ gặp anh ấy còn khó hơn trúng Vietlott Jackpot! Lời khuyên chân thành: Hãy nuôi thêm 3 chú mèo hoặc giảm bớt tiêu chuẩn ngay!',
+                color: '#a855f7'
+            };
+        }
+    })();
+
+    if (estimatedCount < 100) {
+        verdict.desc = `Chắc ${estimatedCount.toLocaleString('vi-VN')} người này đang trốn khỏi m đó con ơi`;
     }
-}
+
+    return verdict;
 
 // Update 1,350 Seat Dots on Oval Stadium Rings
 function renderOvalStadiumSeatGrid(percent, estimatedCount) {
