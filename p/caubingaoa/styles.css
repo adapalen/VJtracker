@@ -280,10 +280,11 @@ body.delusion-shake {
 /* Editorial Title with Keeper.ai Elegance */
 .main-header h1 {
     font-family: var(--font-header);
-    font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+    font-size: clamp(1.8rem, 4.2vw, 3.1rem);
     font-weight: 700;
-    letter-spacing: -0.015em;
-    line-height: 1.15;
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    padding: 0.25rem 0;
     background: linear-gradient(135deg, #132a1e 0%, #2d6a4f 60%, #c28e5d 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
