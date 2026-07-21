@@ -693,8 +693,8 @@ function updateChart(breakdown) {
 
     if (breakdownChart) {
         breakdownChart.data.datasets[0].data = data;
-        breakdownChart.options.scales.x.ticks.color = isDark ? '#cbd5e1' : '#475569';
-        breakdownChart.options.scales.y.ticks.color = isDark ? '#9ca3af' : '#64748b';
+        breakdownChart.options.scales.x.ticks.color = isDark ? '#a6c4b2' : '#3d5e4d';
+        breakdownChart.options.scales.y.ticks.color = isDark ? '#6d8e7c' : '#6c8a7b';
         breakdownChart.update();
         return;
     }
@@ -707,26 +707,26 @@ function updateChart(breakdown) {
                 label: '% Đạt tiêu chí',
                 data: data,
                 backgroundColor: [
-                    'rgba(59, 130, 246, 0.7)',
-                    'rgba(6, 182, 212, 0.7)',
-                    'rgba(16, 185, 129, 0.7)',
-                    'rgba(245, 158, 11, 0.7)',
-                    'rgba(139, 92, 246, 0.7)',
-                    'rgba(234, 179, 8, 0.7)',
-                    'rgba(16, 185, 129, 0.7)',
-                    'rgba(99, 102, 241, 0.7)',
-                    'rgba(236, 72, 153, 0.7)',
-                    'rgba(244, 63, 94, 0.7)',
-                    'rgba(20, 184, 166, 0.7)',
-                    'rgba(168, 85, 247, 0.7)',
-                    'rgba(234, 179, 8, 0.7)',
-                    'rgba(239, 68, 68, 0.7)',
-                    'rgba(59, 130, 246, 0.7)'
+                    'rgba(45, 106, 79, 0.75)',
+                    'rgba(82, 183, 136, 0.75)',
+                    'rgba(116, 198, 157, 0.75)',
+                    'rgba(233, 196, 106, 0.75)',
+                    'rgba(194, 142, 93, 0.75)',
+                    'rgba(212, 163, 115, 0.75)',
+                    'rgba(82, 183, 136, 0.75)',
+                    'rgba(45, 106, 79, 0.75)',
+                    'rgba(231, 111, 81, 0.75)',
+                    'rgba(244, 162, 97, 0.75)',
+                    'rgba(116, 198, 157, 0.75)',
+                    'rgba(194, 142, 93, 0.75)',
+                    'rgba(233, 196, 106, 0.75)',
+                    'rgba(230, 57, 70, 0.75)',
+                    'rgba(45, 106, 79, 0.75)'
                 ],
                 borderColor: [
-                    '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6', '#eab308', '#10b981', '#6366f1',
-                    '#ec4899', '#f43f5e', '#14b8a6', '#a855f7', '#eab308', '#ef4444',
-                    '#3b82f6'
+                    '#2d6a4f', '#52b788', '#74c69d', '#e9c46a', '#c28e5d', '#d4a373', '#52b788', '#2d6a4f',
+                    '#e76f51', '#f4a261', '#74c69d', '#c28e5d', '#e9c46a', '#e63946',
+                    '#2d6a4f'
                 ],
                 borderWidth: 1,
                 borderRadius: 6
