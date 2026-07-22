@@ -606,7 +606,107 @@ function renderOvalStadiumSeatGrid(percent, estimatedCount) {
     stadiumSatireText.textContent = satireMsg;
 }
 
-// Trigger 0% Delusion Overdrive Modal with Bouncing Emojis & Screen Shake
+// Web Audio API Synthesizer for Clown Honk & Siren Mockery Sound Effects
+let audioCtx = null;
+
+function getAudioContext() {
+    if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+        }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    return audioCtx;
+}
+
+// Play exaggerated two-stage Clown Horn ("HONK HONK!") sound
+function playClownHonkSound() {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+
+        const now = ctx.currentTime;
+
+        // Honk 1
+        playSingleHonk(ctx, now, 320, 0.18);
+        // Honk 2 (higher pitch follow-up)
+        playSingleHonk(ctx, now + 0.22, 420, 0.25);
+    } catch (e) {
+        console.warn('Audio play error:', e);
+    }
+}
+
+function playSingleHonk(ctx, startTime, freq, duration) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    // Frequency bend (pitch drop slightly like a squeaky rubber horn)
+    osc.frequency.setValueAtTime(freq, startTime);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.75, startTime + duration);
+
+    // Envelope
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.4, startTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+}
+
+// Play exaggerated dual-sweep Emergency Delusion Siren ("WEE-WOO-WEE-WOO!")
+function playSirenSound() {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+
+        const now = ctx.currentTime + 0.42; // Start right after clown honk
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+
+        // 4 Siren sweeps (Wee-Woo-Wee-Woo)
+        const sweepDuration = 0.30;
+        const sweeps = 4;
+        const lowFreq = 520;
+        const highFreq = 1150;
+
+        for (let i = 0; i < sweeps; i++) {
+            const t = now + i * sweepDuration;
+            if (i % 2 === 0) {
+                osc.frequency.setValueAtTime(lowFreq, t);
+                osc.frequency.linearRampToValueAtTime(highFreq, t + sweepDuration);
+            } else {
+                osc.frequency.setValueAtTime(highFreq, t);
+                osc.frequency.linearRampToValueAtTime(lowFreq, t + sweepDuration);
+            }
+        }
+
+        const totalDuration = sweeps * sweepDuration;
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.04);
+        gain.gain.setValueAtTime(0.3, now + totalDuration - 0.08);
+        gain.gain.linearRampToValueAtTime(0.001, now + totalDuration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + totalDuration);
+    } catch (e) {
+        console.warn('Siren play error:', e);
+    }
+}
+
+// Trigger 0% Delusion Overdrive Modal with Bouncing Emojis, Screen Shake & Sound Effects
 function triggerZeroDelusionOverdrive() {
     if (modalHasBeenTriggered) return;
     modalHasBeenTriggered = true;
@@ -632,6 +732,10 @@ function triggerZeroDelusionOverdrive() {
 
     // Show Modal Overlay
     delusionModalOverlay.classList.remove('hidden');
+
+    // Play Clown Honk & Siren Mockery Sound Effects
+    playClownHonkSound();
+    playSirenSound();
 
     // Explosive Confetti Cannon
     if (window.confetti) {
