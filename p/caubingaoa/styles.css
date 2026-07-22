@@ -1683,3 +1683,206 @@ input:checked + .slider:before {
     transform: translateY(20px);
     pointer-events: none;
 }
+
+
+/* ============================================================
+   RESPONSIVE DESIGN & MOBILE/TABLET OPTIMIZATIONS
+   ============================================================ */
+
+/* Tablet & Smaller Laptops (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .calculator-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .app-container {
+        padding: 1.75rem 1.25rem;
+        gap: 1.75rem;
+    }
+
+    .faq-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-top-row {
+        gap: 0.85rem;
+    }
+}
+
+/* Mobile & Tablet Portrait (max-width: 768px) */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1.25rem 0.85rem;
+        gap: 1.25rem;
+    }
+
+    .card {
+        padding: 1.25rem 1rem;
+        border-radius: var(--radius-md);
+    }
+
+    .header-top-row {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.85rem;
+    }
+
+    .brand-group {
+        justify-content: center;
+    }
+
+    .top-nav-links {
+        width: 100%;
+        justify-content: center;
+        overflow-x: auto;
+        padding: 0.25rem;
+    }
+
+    .top-nav-item {
+        padding: 0.4rem 0.85rem;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .main-header h1 {
+        font-size: clamp(1.6rem, 6vw, 2.5rem);
+    }
+
+    .main-header .subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* Input Preset Chips - Wrapping */
+    .preset-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .chip {
+        flex: 1 1 auto;
+        min-width: 52px;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.78rem;
+        text-align: center;
+    }
+
+    /* Radio Grids Optimization */
+    .radio-grid.grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .radio-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .radio-grid.grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .radio-grid.grid-5 { grid-template-columns: repeat(3, 1fr); }
+    
+    .radio-grid.grid-vehicle,
+    .radio-grid.grid-house {
+        grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+        gap: 0.5rem;
+    }
+
+    .lifestyle-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .radio-card {
+        padding: 0.55rem 0.35rem;
+        font-size: 0.8rem;
+    }
+
+    /* Results Card Adjustments */
+    .percentage-container #percentage-val {
+        font-size: clamp(2.8rem, 11vw, 4.2rem);
+    }
+
+    .count-pill {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.85rem;
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+
+    .oval-stadium-card {
+        padding: 1rem;
+    }
+
+    .oval-stadium-wrapper {
+        aspect-ratio: 16 / 10;
+        max-height: 260px;
+    }
+
+    .actions-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .toast {
+        left: 50%;
+        right: auto;
+        bottom: 1.5rem;
+        transform: translateX(-50%);
+        width: calc(100% - 2rem);
+        max-width: 380px;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+
+    .toast.hidden {
+        transform: translate(-50%, 20px);
+    }
+}
+
+/* Small Smartphone Screens (max-width: 480px) */
+@media (max-width: 480px) {
+    .app-container {
+        padding: 0.85rem 0.5rem;
+        gap: 1rem;
+    }
+
+    .card {
+        padding: 1rem 0.75rem;
+    }
+
+    .main-header h1 {
+        font-size: clamp(1.4rem, 6.5vw, 2.1rem);
+    }
+
+    .radio-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .radio-grid.grid-5 { grid-template-columns: repeat(2, 1fr); }
+    .radio-grid.grid-vehicle,
+    .radio-grid.grid-house {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .radio-card {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.25rem;
+    }
+
+    .toggles-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .toggle-card {
+        padding: 0.75rem 0.85rem;
+    }
+
+    .delusion-modal {
+        padding: 1.25rem 1rem;
+        width: 92vw;
+        max-height: 88vh;
+        overflow-y: auto;
+    }
+
+    .delusion-modal-body h3 {
+        font-size: 1.15rem;
+    }
+}
