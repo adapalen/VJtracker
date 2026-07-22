@@ -1683,38 +1683,3 @@ input:checked + .slider:before {
     transform: translateY(20px);
     pointer-events: none;
 }
-
-
-/* Draggable Bayesian Criterion Modules (Preserves original UI 100% identical) */
-.criterion-module {
-    position: relative;
-    cursor: grab;
-    transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.criterion-module:active {
-    cursor: grabbing;
-}
-
-.criterion-module input,
-.criterion-module select,
-.criterion-module label,
-.criterion-module button,
-.criterion-module .radio-card,
-.criterion-module .chip,
-.criterion-module .switch {
-    cursor: pointer;
-}
-
-.criterion-module input[type="range"] {
-    cursor: pointer;
-}
-
-.criterion-module.is-dragging {
-    opacity: 0.45;
-    transform: scale(0.985);
-}
-
-.criterion-module.drag-over {
-    border-top: 2px dashed var(--accent-sage);
-}

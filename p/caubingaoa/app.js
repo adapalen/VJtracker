@@ -376,7 +376,7 @@ function initOvalStadiumSeats() {
     }
 }
 
-// Calculate total combined match percentage using Bayesian sequential update
+// Calculate total combined match percentage
 function calculateMatches() {
     const ageMin = parseInt(ageMinInput.value);
     const ageMax = parseInt(ageMaxInput.value);
@@ -413,29 +413,27 @@ function calculateMatches() {
     const reqIphone = toggleIphone.checked;
     const reqSingle = toggleSingle.checked;
 
-    // Individual module probabilities
-    const probs = {
-        age: (ageMin <= 18 && ageMax >= 60) ? 1.0 : Math.max(0.02, (ageMax - ageMin + 1) / 43),
-        height: getHeightProbability(minHeight),
-        weight: getWeightIntervalProbability(weightVal),
-        salary: getSalaryProbability(minSalary),
-        edu: getEduProbability(eduValue),
-        job: getJobProbability(jobValue),
-        vehicle: getVehicleProbability(vehicleValue),
-        house: getHouseProbability(houseValue),
-        iphone: getIphoneProbability(reqIphone),
-        religion: getReligionProbability(religionValue),
-        ethnicity: getEthnicityProbability(ethnicityValue),
-        orientation: getOrientationProbability(orientationValue),
-        smoke: getSmokeProbability(smokeValue),
-        drink: getDrinkProbability(drinkValue),
-        single: getSingleProbability(ageMin, ageMax, reqSingle)
-    };
+    // Age span ratio: (ageMax - ageMin + 1) / 43 years (18 to 60)
+    const ageSpanProb = (ageMin <= 18 && ageMax >= 60) ? 1.0 : Math.max(0.02, (ageMax - ageMin + 1) / 43);
 
-    // Overall Bayesian joint probability across all criteria
-    let totalProb = probs.age * probs.height * probs.weight * probs.salary * probs.edu * probs.job * 
-                    probs.vehicle * probs.house * probs.iphone * probs.religion * probs.ethnicity * 
-                    probs.orientation * probs.smoke * probs.drink * probs.single;
+    const heightProb = getHeightProbability(minHeight);
+    const weightProb = getWeightIntervalProbability(weightVal);
+    const salaryProb = getSalaryProbability(minSalary);
+    const eduProb = getEduProbability(eduValue);
+    const jobProb = getJobProbability(jobValue);
+    const vehicleProb = getVehicleProbability(vehicleValue);
+    const houseProb = getHouseProbability(houseValue);
+    const iphoneProb = getIphoneProbability(reqIphone);
+    const religionProb = getReligionProbability(religionValue);
+    const ethnicityProb = getEthnicityProbability(ethnicityValue);
+    const orientationProb = getOrientationProbability(orientationValue);
+    const smokeProb = getSmokeProbability(smokeValue);
+    const drinkProb = getDrinkProbability(drinkValue);
+    const singleProb = getSingleProbability(ageMin, ageMax, reqSingle);
+
+    let totalProb = ageSpanProb * heightProb * weightProb * salaryProb * eduProb * jobProb * vehicleProb * 
+                    houseProb * iphoneProb * religionProb * ethnicityProb * orientationProb * 
+                    smokeProb * drinkProb * singleProb;
     
     // Check if ALL choices are 'any' / baseline
     const isAllAny = (ageMin <= 18 && ageMax >= 60) &&
@@ -468,61 +466,26 @@ function calculateMatches() {
         estimatedCount = 0;
     }
 
-    // Get current module order from DOM (First element = Prior variable)
-    const currentOrder = getModuleOrder();
-
-    // Map ordered breakdown for Chart.js
-    const orderedBreakdown = [];
-    currentOrder.forEach(modId => {
-        switch(modId) {
-            case 'age':
-                orderedBreakdown.push({ label: 'Tuổi', val: probs.age * 100 });
-                break;
-            case 'height':
-                orderedBreakdown.push({ label: 'Cao', val: probs.height * 100 });
-                break;
-            case 'weight':
-                orderedBreakdown.push({ label: 'Nặng', val: probs.weight * 100 });
-                break;
-            case 'salary':
-                orderedBreakdown.push({ label: 'Lương', val: probs.salary * 100 });
-                break;
-            case 'job':
-                orderedBreakdown.push({ label: 'Nghề nghiệp', val: probs.job * 100 });
-                break;
-            case 'vehicle':
-                orderedBreakdown.push({ label: 'Phương tiện', val: probs.vehicle * 100 });
-                break;
-            case 'house':
-                orderedBreakdown.push({ label: 'BĐS / Nhà', val: probs.house * 100 });
-                break;
-            case 'education':
-                orderedBreakdown.push({ label: 'Học vấn', val: probs.edu * 100 });
-                break;
-            case 'religion':
-                orderedBreakdown.push({ label: 'Tôn giáo', val: probs.religion * 100 });
-                break;
-            case 'ethnicity':
-                orderedBreakdown.push({ label: 'Dân tộc', val: probs.ethnicity * 100 });
-                break;
-            case 'orientation':
-                orderedBreakdown.push({ label: 'Tính dục', val: probs.orientation * 100 });
-                break;
-            case 'lifestyle':
-                orderedBreakdown.push({ label: 'Thuốc', val: probs.smoke * 100 });
-                orderedBreakdown.push({ label: 'Rượu', val: probs.drink * 100 });
-                break;
-            case 'toggles':
-                orderedBreakdown.push({ label: 'iPhone', val: probs.iphone * 100 });
-                orderedBreakdown.push({ label: 'Độc thân', val: probs.single * 100 });
-                break;
-        }
-    });
-
     return {
         percent,
         estimatedCount,
-        orderedBreakdown
+        breakdown: {
+            age: ageSpanProb * 100,
+            height: heightProb * 100,
+            weight: weightProb * 100,
+            salary: salaryProb * 100,
+            edu: eduProb * 100,
+            job: jobProb * 100,
+            vehicle: vehicleProb * 100,
+            house: houseProb * 100,
+            iphone: iphoneProb * 100,
+            religion: religionProb * 100,
+            ethnicity: ethnicityProb * 100,
+            orientation: orientationProb * 100,
+            smoke: smokeProb * 100,
+            drink: drinkProb * 100,
+            single: singleProb * 100
+        }
     };
 }
 
@@ -708,18 +671,33 @@ function animateValue(targetVal) {
     requestAnimationFrame(update);
 }
 
-// Chart.js Funnel Render (Renders bars according to Bayesian module order)
-function updateChart(orderedBreakdown) {
+// Chart.js Funnel Render
+function updateChart(breakdown) {
     const chartElem = document.getElementById('breakdown-chart');
-    if (!chartElem || !orderedBreakdown) return;
+    if (!chartElem) return;
     const ctx = chartElem.getContext('2d');
     const isDark = htmlElement.getAttribute('data-theme') === 'dark';
 
-    const labels = orderedBreakdown.map(item => item.label);
-    const data = orderedBreakdown.map(item => item.val);
+    const labels = ['Tuổi', 'Cao', 'Nặng', 'Lương', 'Học vấn', 'Nghề nghiệp', 'Phương tiện', 'BĐS / Nhà', 'iPhone', 'Tôn giáo', 'Dân tộc', 'Tính dục', 'Thuốc', 'Rượu', 'Độc thân'];
+    const data = [
+        breakdown.age,
+        breakdown.height,
+        breakdown.weight,
+        breakdown.salary,
+        breakdown.edu,
+        breakdown.job,
+        breakdown.vehicle,
+        breakdown.house,
+        breakdown.iphone,
+        breakdown.religion,
+        breakdown.ethnicity,
+        breakdown.orientation,
+        breakdown.smoke,
+        breakdown.drink,
+        breakdown.single
+    ];
 
     if (breakdownChart) {
-        breakdownChart.data.labels = labels;
         breakdownChart.data.datasets[0].data = data;
         breakdownChart.options.scales.x.ticks.color = isDark ? '#a6c4b2' : '#3d5e4d';
         breakdownChart.options.scales.y.ticks.color = isDark ? '#6d8e7c' : '#6c8a7b';
@@ -892,7 +870,7 @@ function renderUI() {
         hideDelusionModal();
     }
 
-    updateChart(result.orderedBreakdown);
+    updateChart(result.breakdown);
 }
 
 // Preset Chip Active State Helper
@@ -901,99 +879,6 @@ function updatePresetActive(container, val) {
     chips.forEach(chip => {
         if (parseFloat(chip.dataset.val) === val) chip.classList.add('active');
         else chip.classList.remove('active');
-    });
-}
-
-
-// Bayesian Module Definitions & Human-Readable Labels
-const MODULE_DEFS = {
-    age: { label: 'Tuổi', key: 'age' },
-    height: { label: 'Cao', key: 'height' },
-    weight: { label: 'Nặng', key: 'weight' },
-    salary: { label: 'Lương', key: 'salary' },
-    job: { label: 'Nghề nghiệp', key: 'job' },
-    vehicle: { label: 'Phương tiện', key: 'vehicle' },
-    house: { label: 'BĐS / Nhà', key: 'house' },
-    education: { label: 'Học vấn', key: 'edu' },
-    religion: { label: 'Tôn giáo', key: 'religion' },
-    ethnicity: { label: 'Dân tộc', key: 'ethnicity' },
-    orientation: { label: 'Tính dục', key: 'orientation' },
-    lifestyle: { label: 'Thuốc & Rượu', key: 'lifestyle' },
-    toggles: { label: 'iPhone & Độc thân', key: 'toggles' }
-};
-
-// Get current DOM module order (Highest element = Prior variable)
-function getModuleOrder() {
-    const modules = Array.from(document.querySelectorAll('#calculator-form .criterion-module'));
-    if (modules.length === 0) {
-        return ['age', 'height', 'weight', 'salary', 'job', 'vehicle', 'house', 'education', 'religion', 'ethnicity', 'orientation', 'lifestyle', 'toggles'];
-    }
-    return modules.map(m => m.dataset.moduleId);
-}
-
-// Drag-and-Drop Handler for Bayesian Modules
-function initDragDrop() {
-    const form = document.getElementById('calculator-form');
-    if (!form) return;
-
-    let draggedItem = null;
-
-    form.addEventListener('dragstart', (e) => {
-        const module = e.target.closest('.criterion-module');
-        if (!module) return;
-
-        // Prevent drag initiation if user is adjusting an input/select or clicking radio/switch
-        const targetTag = e.target.tagName.toLowerCase();
-        if (['input', 'select', 'button', 'option'].includes(targetTag) || 
-            e.target.closest('.switch') || 
-            e.target.closest('.radio-card') || 
-            e.target.closest('.chip')) {
-            e.preventDefault();
-            return;
-        }
-
-        draggedItem = module;
-        module.classList.add('is-dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', module.dataset.moduleId);
-    });
-
-    form.addEventListener('dragend', (e) => {
-        if (draggedItem) {
-            draggedItem.classList.remove('is-dragging');
-            draggedItem = null;
-        }
-        document.querySelectorAll('.criterion-module').forEach(m => m.classList.remove('drag-over'));
-        renderUI();
-    });
-
-    form.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-
-        const target = e.target.closest('.criterion-module');
-        if (!target || target === draggedItem) return;
-
-        document.querySelectorAll('.criterion-module').forEach(m => m.classList.remove('drag-over'));
-        target.classList.add('drag-over');
-
-        const rect = target.getBoundingClientRect();
-        const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
-
-        form.insertBefore(draggedItem, next ? target.nextSibling : target);
-    });
-
-    form.addEventListener('dragleave', (e) => {
-        const target = e.target.closest('.criterion-module');
-        if (target) {
-            target.classList.remove('drag-over');
-        }
-    });
-
-    form.addEventListener('drop', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.criterion-module').forEach(m => m.classList.remove('drag-over'));
-        renderUI();
     });
 }
 
@@ -1091,7 +976,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initSubpageNavigation();
     initOvalStadiumSeats();
-    initDragDrop();
     initListeners();
     renderUI();
 });
