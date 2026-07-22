@@ -3,25 +3,6 @@
 const TOTAL_MALE_POPULATION = 35200000; // Total VN males aged 18-60 = 100% baseline
 const TRONG_DONG_STADIUM_SEATS = 135000; // Trống Đồng Stadium Capacity
 const GRID_SEAT_DOTS = 1350; // 1,350 seat dots grid (1 dot = 100 seats)
-// Default Bayesian module order (top = Prior, bottom = final update)
-let moduleOrder = ['age','height','weight','salary','job','vehicle','house','education','religion','ethnicity','orientation','lifestyle','toggles'];
-
-// Human-readable labels for each module
-const MODULE_LABELS = {
-    age: 'Độ Tuổi',
-    height: 'Chiều Cao',
-    weight: 'Cân Nặng',
-    salary: 'Thu Nhập',
-    job: 'Nghề Nghiệp',
-    vehicle: 'Phương Tiện',
-    house: 'Bất Động Sản',
-    education: 'Học Vấn',
-    religion: 'Tôn Giáo',
-    ethnicity: 'Dân Tộc',
-    orientation: 'Xu Hướng',
-    lifestyle: 'Lối Sống',
-    toggles: 'Bắt Buộc'
-};
 
 // DOM Elements
 const htmlElement = document.documentElement;
@@ -395,14 +376,14 @@ function initOvalStadiumSeats() {
     }
 }
 
-// Calculate total combined match percentage using Bayesian sequential update order
+// Calculate total combined match percentage
 function calculateMatches() {
     const ageMin = parseInt(ageMinInput.value);
     const ageMax = parseInt(ageMaxInput.value);
     const minHeight = parseInt(heightInput.value);
     const weightVal = weightSelect.value;
     const minSalary = parseFloat(salaryInput.value);
-
+    
     let eduValue = 'any';
     eduRadios.forEach(r => { if (r.checked) eduValue = r.value; });
 
@@ -432,27 +413,28 @@ function calculateMatches() {
     const reqIphone = toggleIphone.checked;
     const reqSingle = toggleSingle.checked;
 
-    // Per-criterion probabilities keyed by module ID
+    // Age span ratio: (ageMax - ageMin + 1) / 43 years (18 to 60)
     const ageSpanProb = (ageMin <= 18 && ageMax >= 60) ? 1.0 : Math.max(0.02, (ageMax - ageMin + 1) / 43);
+
+    const heightProb = getHeightProbability(minHeight);
+    const weightProb = getWeightIntervalProbability(weightVal);
+    const salaryProb = getSalaryProbability(minSalary);
+    const eduProb = getEduProbability(eduValue);
+    const jobProb = getJobProbability(jobValue);
+    const vehicleProb = getVehicleProbability(vehicleValue);
+    const houseProb = getHouseProbability(houseValue);
+    const iphoneProb = getIphoneProbability(reqIphone);
+    const religionProb = getReligionProbability(religionValue);
+    const ethnicityProb = getEthnicityProbability(ethnicityValue);
+    const orientationProb = getOrientationProbability(orientationValue);
     const smokeProb = getSmokeProbability(smokeValue);
     const drinkProb = getDrinkProbability(drinkValue);
+    const singleProb = getSingleProbability(ageMin, ageMax, reqSingle);
 
-    const criterionProbs = {
-        age:         ageSpanProb,
-        height:      getHeightProbability(minHeight),
-        weight:      getWeightIntervalProbability(weightVal),
-        salary:      getSalaryProbability(minSalary),
-        job:         getJobProbability(jobValue),
-        vehicle:     getVehicleProbability(vehicleValue),
-        house:       getHouseProbability(houseValue),
-        education:   getEduProbability(eduValue),
-        religion:    getReligionProbability(religionValue),
-        ethnicity:   getEthnicityProbability(ethnicityValue),
-        orientation: getOrientationProbability(orientationValue),
-        lifestyle:   smokeProb * drinkProb,          // combined Lifestyle module
-        toggles:     getIphoneProbability(reqIphone) * getSingleProbability(ageMin, ageMax, reqSingle)
-    };
-
+    let totalProb = ageSpanProb * heightProb * weightProb * salaryProb * eduProb * jobProb * vehicleProb * 
+                    houseProb * iphoneProb * religionProb * ethnicityProb * orientationProb * 
+                    smokeProb * drinkProb * singleProb;
+    
     // Check if ALL choices are 'any' / baseline
     const isAllAny = (ageMin <= 18 && ageMax >= 60) &&
                      minHeight <= 150 &&
@@ -470,22 +452,12 @@ function calculateMatches() {
                      !reqIphone &&
                      !reqSingle;
 
-    // Bayesian sequential update: multiply in moduleOrder order, track running posterior
-    let runningPosterior = 1.0;
-    const orderedSteps = moduleOrder.map((id, idx) => {
-        const prob = criterionProbs[id] !== undefined ? criterionProbs[id] : 1.0;
-        runningPosterior = runningPosterior * prob;
-        return { id, label: MODULE_LABELS[id] || id, prob, runningPosterior, isFirst: idx === 0 };
-    });
-
-    let totalProb = runningPosterior;
-
     if (isAllAny) {
         totalProb = 1.0;
     } else {
         totalProb = Math.min(1.0, totalProb);
     }
-
+    
     let percent = totalProb * 100;
     let estimatedCount = Math.round(totalProb * TOTAL_MALE_POPULATION);
 
@@ -497,28 +469,25 @@ function calculateMatches() {
     return {
         percent,
         estimatedCount,
-        orderedSteps,
-        isAllAny,
         breakdown: {
-            age: criterionProbs.age * 100,
-            height: criterionProbs.height * 100,
-            weight: criterionProbs.weight * 100,
-            salary: criterionProbs.salary * 100,
-            edu: criterionProbs.education * 100,
-            job: criterionProbs.job * 100,
-            vehicle: criterionProbs.vehicle * 100,
-            house: criterionProbs.house * 100,
-            iphone: getIphoneProbability(reqIphone) * 100,
-            religion: criterionProbs.religion * 100,
-            ethnicity: criterionProbs.ethnicity * 100,
-            orientation: criterionProbs.orientation * 100,
-            smoke: getSmokeProbability(smokeValue) * 100,
-            drink: getDrinkProbability(drinkValue) * 100,
-            single: getSingleProbability(ageMin, ageMax, reqSingle) * 100
+            age: ageSpanProb * 100,
+            height: heightProb * 100,
+            weight: weightProb * 100,
+            salary: salaryProb * 100,
+            edu: eduProb * 100,
+            job: jobProb * 100,
+            vehicle: vehicleProb * 100,
+            house: houseProb * 100,
+            iphone: iphoneProb * 100,
+            religion: religionProb * 100,
+            ethnicity: ethnicityProb * 100,
+            orientation: orientationProb * 100,
+            smoke: smokeProb * 100,
+            drink: drinkProb * 100,
+            single: singleProb * 100
         }
     };
 }
-
 
 // Satirical verdict generation with dating reality-check mockery
 function getSatiricalVerdict(percent, estimatedCount) {
@@ -702,28 +671,33 @@ function animateValue(targetVal) {
     requestAnimationFrame(update);
 }
 
-// Chart.js Funnel Render — now shows running Bayesian posterior in module order
-function updateChart(orderedSteps) {
+// Chart.js Funnel Render
+function updateChart(breakdown) {
     const chartElem = document.getElementById('breakdown-chart');
-    if (!chartElem || !orderedSteps) return;
+    if (!chartElem) return;
     const ctx = chartElem.getContext('2d');
     const isDark = htmlElement.getAttribute('data-theme') === 'dark';
 
-    const labels = orderedSteps.map(s => s.label);
-    const data = orderedSteps.map(s => s.runningPosterior * 100);
+    const labels = ['Tuổi', 'Cao', 'Nặng', 'Lương', 'Học vấn', 'Nghề nghiệp', 'Phương tiện', 'BĐS / Nhà', 'iPhone', 'Tôn giáo', 'Dân tộc', 'Tính dục', 'Thuốc', 'Rượu', 'Độc thân'];
+    const data = [
+        breakdown.age,
+        breakdown.height,
+        breakdown.weight,
+        breakdown.salary,
+        breakdown.edu,
+        breakdown.job,
+        breakdown.vehicle,
+        breakdown.house,
+        breakdown.iphone,
+        breakdown.religion,
+        breakdown.ethnicity,
+        breakdown.orientation,
+        breakdown.smoke,
+        breakdown.drink,
+        breakdown.single
+    ];
 
-    // Destroy and recreate chart when module order changes (label set changes)
     if (breakdownChart) {
-        const currentLabels = breakdownChart.data.labels;
-        const labelsChanged = currentLabels.join(',') !== labels.join(',');
-        if (labelsChanged) {
-            breakdownChart.destroy();
-            breakdownChart = null;
-        }
-    }
-
-    if (breakdownChart) {
-        breakdownChart.data.labels = labels;
         breakdownChart.data.datasets[0].data = data;
         breakdownChart.options.scales.x.ticks.color = isDark ? '#a6c4b2' : '#3d5e4d';
         breakdownChart.options.scales.y.ticks.color = isDark ? '#6d8e7c' : '#6c8a7b';
@@ -772,7 +746,7 @@ function updateChart(orderedSteps) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `Posterior Bayesian: ${formatPercentage(context.parsed.y)}%`;
+                            return `Đạt tiêu chí: ${formatPercentage(context.parsed.y)}%`;
                         }
                     }
                 }
@@ -896,9 +870,7 @@ function renderUI() {
         hideDelusionModal();
     }
 
-    updateModuleOrderDisplay(result.orderedSteps);
-    renderBayesianChain(result.orderedSteps, result.percent);
-    updateChart(result.orderedSteps);
+    updateChart(result.breakdown);
 }
 
 // Preset Chip Active State Helper
@@ -907,140 +879,6 @@ function updatePresetActive(container, val) {
     chips.forEach(chip => {
         if (parseFloat(chip.dataset.val) === val) chip.classList.add('active');
         else chip.classList.remove('active');
-    });
-}
-
-// Update module order badges and posterior pills
-function updateModuleOrderDisplay(steps) {
-    const form = document.getElementById('calculator-form');
-    const modules = Array.from(form.querySelectorAll('.criterion-module'));
-
-    modules.forEach((el, idx) => {
-        const id = el.dataset.moduleId;
-        const step = steps ? steps.find(s => s.id === id) : null;
-        const order = idx + 1;
-        el.dataset.order = order;
-
-        const badge = el.querySelector('.module-order-badge');
-        if (badge) {
-            badge.textContent = order === 1 ? '#1 · Prior' : '#' + order + ' · Bước ' + order;
-        }
-
-        const pill = el.querySelector('.module-posterior-pill');
-        if (pill && step) {
-            const pct = step.runningPosterior * 100;
-            pill.textContent = (step.isFirst ? 'Prior: ' : '→ ') + formatPercentage(pct) + '%';
-            pill.classList.toggle('is-prior', step.isFirst);
-            pill.classList.toggle('is-constrained', !step.isFirst && pct < 5);
-        }
-    });
-}
-
-// Sync moduleOrder array to match current DOM order
-function syncModuleOrderFromDOM() {
-    const form = document.getElementById('calculator-form');
-    const modules = Array.from(form.querySelectorAll('.criterion-module'));
-    moduleOrder = modules.map(el => el.dataset.moduleId);
-}
-
-// Drag-and-Drop for criterion modules
-function initDragDrop() {
-    const form = document.getElementById('calculator-form');
-    let draggedEl = null;
-
-    form.addEventListener('dragstart', (e) => {
-        const module = e.target.closest('.criterion-module');
-        if (!module) return;
-        draggedEl = module;
-        module.classList.add('is-dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', module.dataset.moduleId);
-    });
-
-    form.addEventListener('dragend', (e) => {
-        if (draggedEl) draggedEl.classList.remove('is-dragging');
-        form.querySelectorAll('.criterion-module').forEach(m => m.classList.remove('drag-over'));
-        draggedEl = null;
-        syncModuleOrderFromDOM();
-        renderUI();
-    });
-
-    form.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        const target = e.target.closest('.criterion-module');
-        if (!target || target === draggedEl) return;
-
-        // Determine whether to insert before or after
-        const rect = target.getBoundingClientRect();
-        const midY = rect.top + rect.height / 2;
-        form.querySelectorAll('.criterion-module').forEach(m => m.classList.remove('drag-over'));
-        target.classList.add('drag-over');
-
-        if (e.clientY < midY) {
-            form.insertBefore(draggedEl, target);
-        } else {
-            form.insertBefore(draggedEl, target.nextSibling);
-        }
-    });
-
-    form.addEventListener('dragleave', (e) => {
-        const target = e.target.closest('.criterion-module');
-        if (target) target.classList.remove('drag-over');
-    });
-
-    form.addEventListener('drop', (e) => {
-        e.preventDefault();
-        form.querySelectorAll('.criterion-module').forEach(m => m.classList.remove('drag-over'));
-    });
-
-    // Make each module draggable via its handle (but whole card is the draggable unit)
-    form.querySelectorAll('.criterion-module').forEach(module => {
-        module.setAttribute('draggable', 'true');
-
-        // Prevent drag from starting on form controls
-        module.querySelectorAll('input, select, button, label').forEach(ctrl => {
-            ctrl.addEventListener('mousedown', (e) => e.stopPropagation());
-        });
-    });
-}
-
-// Render Bayesian sequential chain panel
-function renderBayesianChain(steps, totalPercent) {
-    const panel = document.getElementById('bayesian-chain-panel');
-    if (!panel || !steps) return;
-    panel.innerHTML = '';
-
-    steps.forEach((step, idx) => {
-        const pct = step.runningPosterior * 100;
-        const indivPct = step.prob * 100;
-
-        // Posterior color class
-        let posteriorClass = 'posterior-high';
-        if (pct === 0) posteriorClass = 'posterior-zero';
-        else if (pct < 1) posteriorClass = 'posterior-tiny';
-        else if (pct < 15) posteriorClass = 'posterior-mid';
-
-        const isFirst = idx === 0;
-        const boxClass = isFirst ? 'chain-step-box is-prior-box' : (pct === 0 ? 'chain-step-box is-zero' : 'chain-step-box');
-
-        const stepEl = document.createElement('div');
-        stepEl.className = 'chain-step';
-        stepEl.innerHTML =
-            '<div class="' + boxClass + '">' +
-                (isFirst ? '<span class="chain-step-prior-tag">PRIOR</span>' : '') +
-                '<div class="chain-step-label">' + step.label + '</div>' +
-                '<div class="chain-step-prob">×' + formatPercentage(indivPct) + '%</div>' +
-                '<div class="chain-step-posterior ' + posteriorClass + '">' + formatPercentage(pct) + '%</div>' +
-            '</div>';
-        panel.appendChild(stepEl);
-
-        // Arrow connector (not after last)
-        if (idx < steps.length - 1) {
-            const arrow = document.createElement('div');
-            arrow.className = 'chain-arrow';
-            arrow.innerHTML = '&#8594;';
-            panel.appendChild(arrow);
-        }
     });
 }
 
@@ -1104,16 +942,6 @@ function resetToBaseline() {
     toggleIphone.checked = false;
     toggleSingle.checked = false;
     modalHasBeenTriggered = false;
-
-    // Reset module order to default
-    const defaultOrder = ['age','height','weight','salary','job','vehicle','house','education','religion','ethnicity','orientation','lifestyle','toggles'];
-    moduleOrder = [...defaultOrder];
-    const form = document.getElementById('calculator-form');
-    defaultOrder.forEach(id => {
-        const el = form.querySelector('[data-module-id="' + id + '"]');
-        if (el) form.appendChild(el);
-    });
-
     renderUI();
     showToast('Đã đặt lại về 100% cơ bản!');
 }
@@ -1148,7 +976,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initSubpageNavigation();
     initOvalStadiumSeats();
-    initDragDrop();
     initListeners();
     renderUI();
 });

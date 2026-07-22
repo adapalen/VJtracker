@@ -87,325 +87,357 @@
                 </div>
 
                 <form id="calculator-form" onsubmit="return false;">
-
-                    <!-- MODULE: age -->
-                    <div class="criterion-module" data-module-id="age">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Age Range -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label><i data-lucide="calendar"></i> Độ Tuổi Nam Giới</label>
+                            <span class="value-display" id="age-display">18 - 60 tuổi</span>
                         </div>
-                        <div class="module-order-badge" id="badge-age">#1 · Prior</div>
-                        <div class="form-group">
-                            <div class="label-row">
-                                <label><i data-lucide="calendar"></i> Độ Tuổi Nam Giới</label>
-                                <span class="value-display" id="age-display">18 - 60 tuổi</span>
-                            </div>
-                            <div class="dual-range-container">
-                                <div class="dual-range-track"></div>
-                                <input type="range" id="age-min" min="18" max="60" value="18" step="1">
-                                <input type="range" id="age-max" min="18" max="60" value="60" step="1">
-                            </div>
-                            <div class="range-labels">
-                                <span>18 tuổi</span>
-                                <span>35 tuổi</span>
-                                <span>60 tuổi</span>
-                            </div>
+                        <div class="dual-range-container">
+                            <div class="dual-range-track"></div>
+                            <input type="range" id="age-min" min="18" max="60" value="18" step="1">
+                            <input type="range" id="age-max" min="18" max="60" value="60" step="1">
                         </div>
-                        <div class="module-posterior-pill" id="posterior-age">Prior: 100%</div>
+                        <div class="range-labels">
+                            <span>18 tuổi</span>
+                            <span>35 tuổi</span>
+                            <span>60 tuổi</span>
+                        </div>
                     </div>
 
-                    <!-- MODULE: height -->
-                    <div class="criterion-module" data-module-id="height">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Height Slider -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label><i data-lucide="ruler"></i> Chiều Cao Tối Thiểu</label>
+                            <span class="value-display" id="height-display">≥ 150 cm (Bất kỳ)</span>
                         </div>
-                        <div class="module-order-badge" id="badge-height">#2 · Bước 2</div>
-                        <div class="form-group">
-                            <div class="label-row">
-                                <label><i data-lucide="ruler"></i> Chiều Cao Tối Thiểu</label>
-                                <span class="value-display" id="height-display">≥ 150 cm (Bất kỳ)</span>
-                            </div>
-                            <input type="range" id="height-slider" min="150" max="190" value="150" step="1">
-                            <div class="preset-chips" id="height-presets">
-                                <button type="button" class="chip active" data-val="150">Bất kỳ</button>
-                                <button type="button" class="chip" data-val="165">1m65</button>
-                                <button type="button" class="chip" data-val="170">1m70</button>
-                                <button type="button" class="chip" data-val="175">1m75</button>
-                                <button type="button" class="chip" data-val="180">1m80+</button>
-                            </div>
+                        <input type="range" id="height-slider" min="150" max="190" value="150" step="1">
+                        <div class="preset-chips" id="height-presets">
+                            <button type="button" class="chip active" data-val="150">Bất kỳ</button>
+                            <button type="button" class="chip" data-val="165">1m65</button>
+                            <button type="button" class="chip" data-val="170">1m70</button>
+                            <button type="button" class="chip" data-val="175">1m75</button>
+                            <button type="button" class="chip" data-val="180">1m80+</button>
                         </div>
-                        <div class="module-posterior-pill" id="posterior-height">→ 100%</div>
                     </div>
 
-                    <!-- MODULE: weight -->
-                    <div class="criterion-module" data-module-id="weight">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Weight Range Dropdown Selection (5kg Intervals) -->
+                    <div class="form-group">
+                        <label for="weight-select"><i data-lucide="scale"></i> Khoảng Cân Nặng (Khoảng 5kg)</label>
+                        <div class="select-wrapper">
+                            <select id="weight-select" class="custom-select">
+                                <option value="any" selected>Bất kỳ cân nặng nào (100% Nam giới)</option>
+                                <option value="under_50">Dưới 50 kg (~4.2% Nam giới)</option>
+                                <option value="50_55">50 - 55 kg (~9.9% Nam giới)</option>
+                                <option value="55_60">55 - 60 kg (~18.4% Nam giới)</option>
+                                <option value="60_65">60 - 65 kg (~24.6% Nam giới - Phổ biến nhất)</option>
+                                <option value="65_70">65 - 70 kg (~22.0% Nam giới)</option>
+                                <option value="70_75">70 - 75 kg (~13.1% Nam giới)</option>
+                                <option value="75_80">75 - 80 kg (~5.2% Nam giới)</option>
+                                <option value="80_85">80 - 85 kg (~1.4% Nam giới)</option>
+                                <option value="85_90">85 - 90 kg (~0.25% Nam giới)</option>
+                                <option value="above_90">Trên 90 kg (~0.04% Nam giới)</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon"></i>
                         </div>
-                        <div class="module-order-badge" id="badge-weight">#3 · Bước 3</div>
-                        <div class="form-group">
-                            <label for="weight-select"><i data-lucide="scale"></i> Khoảng Cân Nặng (Khoảng 5kg)</label>
-                            <div class="select-wrapper">
-                                <select id="weight-select" class="custom-select">
-                                    <option value="any" selected>Bất kỳ cân nặng nào (100% Nam giới)</option>
-                                    <option value="under_50">Dưới 50 kg (~4.2% Nam giới)</option>
-                                    <option value="50_55">50 - 55 kg (~9.9% Nam giới)</option>
-                                    <option value="55_60">55 - 60 kg (~18.4% Nam giới)</option>
-                                    <option value="60_65">60 - 65 kg (~24.6% Nam giới - Phổ biến nhất)</option>
-                                    <option value="65_70">65 - 70 kg (~22.0% Nam giới)</option>
-                                    <option value="70_75">70 - 75 kg (~13.1% Nam giới)</option>
-                                    <option value="75_80">75 - 80 kg (~5.2% Nam giới)</option>
-                                    <option value="80_85">80 - 85 kg (~1.4% Nam giới)</option>
-                                    <option value="85_90">85 - 90 kg (~0.25% Nam giới)</option>
-                                    <option value="above_90">Trên 90 kg (~0.04% Nam giới)</option>
-                                </select>
-                                <i data-lucide="chevron-down" class="select-icon"></i>
-                            </div>
-                        </div>
-                        <div class="bmi-calc-card" id="bmi-calc-card">
-                            <div class="bmi-header">
-                                <span class="bmi-title"><i data-lucide="activity"></i> BMI Tự Động</span>
-                                <span class="bmi-val-badge" id="bmi-val-display">BMI = --</span>
-                            </div>
-                            <p class="bmi-status-text" id="bmi-status-desc">Chọn khoảng cân nặng để tính BMI tự động</p>
-                        </div>
-                        <div class="bmi-mockery-box hidden" id="bmi-mockery-box">
-                            <i data-lucide="alert-triangle" class="mockery-icon" id="mockery-icon"></i>
-                            <span class="mockery-text" id="mockery-text">Thế m đã nhìn lại mình chưa? 🤪</span>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-weight">→ 100%</div>
                     </div>
 
-                    <!-- MODULE: salary -->
-                    <div class="criterion-module" data-module-id="salary">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Pure Vietnamese Live Auto BMI Calculation Card -->
+                    <div class="bmi-calc-card" id="bmi-calc-card">
+                        <div class="bmi-header">
+                            <span class="bmi-title"><i data-lucide="activity"></i> BMI Tự Động</span>
+                            <span class="bmi-val-badge" id="bmi-val-display">BMI = --</span>
                         </div>
-                        <div class="module-order-badge" id="badge-salary">#4 · Bước 4</div>
-                        <div class="form-group">
-                            <div class="label-row">
-                                <label><i data-lucide="banknote"></i> Thu Nhập Hàng Tháng</label>
-                                <span class="value-display highlight-gold" id="salary-display">Bất kỳ (≥ 0 Tr)</span>
-                            </div>
-                            <input type="range" id="salary-slider" min="0" max="150" value="0" step="2.5">
-                            <div class="preset-chips" id="salary-presets">
-                                <button type="button" class="chip active" data-val="0">Bất kỳ</button>
-                                <button type="button" class="chip" data-val="10">10 Tr</button>
-                                <button type="button" class="chip" data-val="15">15 Tr</button>
-                                <button type="button" class="chip" data-val="30">30 Tr</button>
-                                <button type="button" class="chip" data-val="50">50 Tr</button>
-                                <button type="button" class="chip" data-val="100">100 Tr+</button>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-salary">→ 100%</div>
+                        <p class="bmi-status-text" id="bmi-status-desc">Chọn khoảng cân nặng để tính BMI tự động</p>
                     </div>
 
-                    <!-- MODULE: job -->
-                    <div class="criterion-module" data-module-id="job">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
-                        </div>
-                        <div class="module-order-badge" id="badge-job">#5 · Bước 5</div>
-                        <div class="form-group">
-                            <label for="job-select"><i data-lucide="briefcase"></i> Ngành Nghề / Nghề Nghiệp</label>
-                            <div class="select-wrapper">
-                                <select id="job-select" class="custom-select">
-                                    <option value="any" selected>Bất kỳ ngành nghề nào (100% Nam giới)</option>
-                                    <option value="unemployed">🚫 Thất nghiệp / Không có việc làm</option>
-                                    <option value="police">👮‍♂️ Công an Nhân dân</option>
-                                    <option value="army">🎖️ Quân đội (Bộ đội / Sĩ quan)</option>
-                                    <option value="doctor">👨‍⚕️ Bác sĩ / Dược sĩ / Y tế</option>
-                                    <option value="lawyer">⚖️ Luật sư / Công chứng / Pháp lý</option>
-                                    <option value="teacher">👨‍🏫 Giáo viên / Giảng viên Đại học</option>
-                                    <option value="it">💻 Kỹ sư IT / Lập trình viên / Công nghệ</option>
-                                    <option value="finance">🏦 Tài chính / Ngân hàng / Chứng khoán</option>
-                                    <option value="pilot_aviation">✈️ Phi công / Hàng không</option>
-                                    <option value="engineer_construction">🏗️ Kỹ sư Xây dựng / Kiến trúc sư</option>
-                                    <option value="ceo">👔 Doanh nhân / Chủ doanh nghiệp / CEO</option>
-                                    <option value="civil_servant">🏛️ Công chức / Viên chức nhà nước</option>
-                                    <option value="freelance_gig">🛵 Tài xế công nghệ / Freelancer / Giao hàng</option>
-                                    <option value="factory_worker">🏭 Công nhân nhà máy / KCN / Lao động phổ thông</option>
-                                </select>
-                                <i data-lucide="chevron-down" class="select-icon"></i>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-job">→ 100%</div>
+                    <!-- Satirical Mockery Box when BMI >= 25.0 or BMI < 18.5 -->
+                    <div class="bmi-mockery-box hidden" id="bmi-mockery-box">
+                        <i data-lucide="alert-triangle" class="mockery-icon" id="mockery-icon"></i>
+                        <span class="mockery-text" id="mockery-text">Thế m đã nhìn lại mình chưa? 🤪</span>
                     </div>
 
-                    <!-- MODULE: vehicle -->
-                    <div class="criterion-module" data-module-id="vehicle">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Salary Slider -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <label><i data-lucide="banknote"></i> Thu Nhập Hàng Tháng</label>
+                            <span class="value-display highlight-gold" id="salary-display">Bất kỳ (≥ 0 Tr)</span>
                         </div>
-                        <div class="module-order-badge" id="badge-vehicle">#6 · Bước 6</div>
-                        <div class="form-group">
-                            <label><i data-lucide="car"></i> Yêu Cầu Phương Tiện Sở Hữu (Tối thiểu)</label>
-                            <div class="radio-grid grid-vehicle">
-                                <label class="radio-card active"><input type="radio" name="vehicle" value="any" checked><span>Bất kỳ / Không yêu cầu</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="wave_sirius"><span>Xe số phổ thông (Wave / Sirius) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="future_jupiter"><span>Xe số cao cấp/Côn tay (Future / Exciter) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="vision_ab"><span>Tay ga tầm trung (Vision / Air Blade) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="sh_vespa"><span>Tay ga cao cấp (Honda SH / Vespa) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="pkl"><span>Mô tô Phân khối lớn (PKL > 200cc) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="car_hatchback_a"><span>Ô tô Hạng A Đô thị (i10 / VF 5) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="car_sedan_bc"><span>Ô tô Sedan B-C (Vios / City / Mazda 3) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="car_suv_bc"><span>SUV B-C (CX-5 / Tucson / CR-V) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="car_suv_de"><span>SUV 7 Chỗ D-E (Everest / Fortuner) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="car_luxury_mid"><span>Ô tô Hạng Sang (Mercedes / BMW / Lexus) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="vehicle" value="car_superluxury"><span>Siêu xe / G63 / Rolls-Royce trở lên</span></label>
-                            </div>
+                        <input type="range" id="salary-slider" min="0" max="150" value="0" step="2.5">
+                        <div class="preset-chips" id="salary-presets">
+                            <button type="button" class="chip active" data-val="0">Bất kỳ</button>
+                            <button type="button" class="chip" data-val="10">10 Tr</button>
+                            <button type="button" class="chip" data-val="15">15 Tr</button>
+                            <button type="button" class="chip" data-val="30">30 Tr</button>
+                            <button type="button" class="chip" data-val="50">50 Tr</button>
+                            <button type="button" class="chip" data-val="100">100 Tr+</button>
                         </div>
-                        <div class="module-posterior-pill" id="posterior-vehicle">→ 100%</div>
                     </div>
 
-                    <!-- MODULE: house -->
-                    <div class="criterion-module" data-module-id="house">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Job / Occupation Dropdown Selection -->
+                    <div class="form-group">
+                        <label for="job-select"><i data-lucide="briefcase"></i> Ngành Nghề / Nghề Nghiệp</label>
+                        <div class="select-wrapper">
+                            <select id="job-select" class="custom-select">
+                                <option value="any" selected>Bất kỳ ngành nghề nào (100% Nam giới)</option>
+                                <option value="unemployed">🚫 Thất nghiệp / Không có việc làm</option>
+                                <option value="police">👮‍♂️ Công an Nhân dân</option>
+                                <option value="army">🎖️ Quân đội (Bộ đội / Sĩ quan)</option>
+                                <option value="doctor">👨‍⚕️ Bác sĩ / Dược sĩ / Y tế</option>
+                                <option value="lawyer">⚖️ Luật sư / Công chứng / Pháp lý</option>
+                                <option value="teacher">👨‍🏫 Giáo viên / Giảng viên Đại học</option>
+                                <option value="it">💻 Kỹ sư IT / Lập trình viên / Công nghệ</option>
+                                <option value="finance">🏦 Tài chính / Ngân hàng / Chứng khoán</option>
+                                <option value="pilot_aviation">✈️ Phi công / Hàng không</option>
+                                <option value="engineer_construction">🏗️ Kỹ sư Xây dựng / Kiến trúc sư</option>
+                                <option value="ceo">👔 Doanh nhân / Chủ doanh nghiệp / CEO</option>
+                                <option value="civil_servant">🏛️ Công chức / Viên chức nhà nước</option>
+                                <option value="freelance_gig">🛵 Tài xế công nghệ / Freelancer / Giao hàng</option>
+                                <option value="factory_worker">🏭 Công nhân nhà máy / KCN / Lao động phổ thông</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="select-icon"></i>
                         </div>
-                        <div class="module-order-badge" id="badge-house">#7 · Bước 7</div>
-                        <div class="form-group">
-                            <label><i data-lucide="home"></i> Sở Hữu Bất Động Sản &amp; Nhà Ở (Tối thiểu)</label>
-                            <div class="radio-grid grid-house">
-                                <label class="radio-card active"><input type="radio" name="house" value="any" checked><span>Bất kỳ / Không yêu cầu đứng tên BĐS</span></label>
-                                <label class="radio-card"><input type="radio" name="house" value="apartment_budget"><span>Chung cư phổ thông / Nhà tập thể trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="house" value="apartment_luxury"><span>Chung cư trung &amp; cao cấp (Vinhomes / Masteri) trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="house" value="grounded_alley"><span>Nhà đất ngõ nhỏ / Nhà phố hẻm trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="house" value="street_front"><span>Nhà mặt phố / Biệt thự Shophouse trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="house" value="mansion_villa"><span>Biệt thự đơn lập / Dinh thự xa xỉ</span></label>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-house">→ 100%</div>
                     </div>
 
-                    <!-- MODULE: education -->
-                    <div class="criterion-module" data-module-id="education">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Unified Vehicle Ownership Section -->
+                    <div class="form-group">
+                        <label><i data-lucide="car"></i> Yêu Cầu Phương Tiện Sở Hữu (Tối thiểu)</label>
+                        <div class="radio-grid grid-vehicle">
+                            <label class="radio-card active">
+                                <input type="radio" name="vehicle" value="any" checked>
+                                <span>Bất kỳ / Không yêu cầu</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="wave_sirius">
+                                <span>Xe số phổ thông (Wave / Sirius) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="future_jupiter">
+                                <span>Xe số cao cấp/Côn tay (Future / Exciter) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="vision_ab">
+                                <span>Tay ga tầm trung (Vision / Air Blade) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="sh_vespa">
+                                <span>Tay ga cao cấp (Honda SH / Vespa) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="pkl">
+                                <span>Mô tô Phân khối lớn (PKL > 200cc) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="car_hatchback_a">
+                                <span>Ô tô Hạng A Đô thị (i10 / VF 5) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="car_sedan_bc">
+                                <span>Ô tô Sedan B-C (Vios / City / Mazda 3) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="car_suv_bc">
+                                <span>SUV B-C (CX-5 / Tucson / CR-V) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="car_suv_de">
+                                <span>SUV 7 Chỗ D-E (Everest / Fortuner) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="car_luxury_mid">
+                                <span>Ô tô Hạng Sang (Mercedes / BMW / Lexus) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="vehicle" value="car_superluxury">
+                                <span>Siêu xe / G63 / Rolls-Royce trở lên</span>
+                            </label>
                         </div>
-                        <div class="module-order-badge" id="badge-education">#8 · Bước 8</div>
-                        <div class="form-group">
-                            <label><i data-lucide="graduation-cap"></i> Trình Độ Học Vấn Tối Thiểu</label>
-                            <div class="radio-grid grid-5">
-                                <label class="radio-card active"><input type="radio" name="education" value="any" checked><span>Bất kỳ</span></label>
-                                <label class="radio-card"><input type="radio" name="education" value="thpt"><span>THPT trở lên</span></label>
-                                <label class="radio-card"><input type="radio" name="education" value="bachelor"><span>Cử nhân / CĐ</span></label>
-                                <label class="radio-card"><input type="radio" name="education" value="master"><span>Thạc sĩ</span></label>
-                                <label class="radio-card"><input type="radio" name="education" value="phd"><span>Tiến sĩ</span></label>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-education">→ 100%</div>
                     </div>
 
-                    <!-- MODULE: religion -->
-                    <div class="criterion-module" data-module-id="religion">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Multi-tier Real Estate / House Ownership Section -->
+                    <div class="form-group">
+                        <label><i data-lucide="home"></i> Sở Hữu Bất Động Sản & Nhà Ở (Tối thiểu)</label>
+                        <div class="radio-grid grid-house">
+                            <label class="radio-card active">
+                                <input type="radio" name="house" value="any" checked>
+                                <span>Bất kỳ / Không yêu cầu đứng tên BĐS</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="house" value="apartment_budget">
+                                <span>Chung cư phổ thông / Nhà tập thể trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="house" value="apartment_luxury">
+                                <span>Chung cư trung & cao cấp (Vinhomes / Masteri) trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="house" value="grounded_alley">
+                                <span>Nhà đất ngõ nhỏ / Nhà phố hẻm trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="house" value="street_front">
+                                <span>Nhà mặt phố / Biệt thự Shophouse trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="house" value="mansion_villa">
+                                <span>Biệt thự đơn lập / Dinh thự xa xỉ</span>
+                            </label>
                         </div>
-                        <div class="module-order-badge" id="badge-religion">#9 · Bước 9</div>
-                        <div class="form-group">
-                            <label><i data-lucide="church"></i> Tôn Giáo</label>
-                            <div class="radio-grid grid-4">
-                                <label class="radio-card active"><input type="radio" name="religion" value="any" checked><span>Bất kỳ</span></label>
-                                <label class="radio-card"><input type="radio" name="religion" value="none"><span>Không tôn giáo / Đạo Ông Bà</span></label>
-                                <label class="radio-card"><input type="radio" name="religion" value="buddhism"><span>Phật giáo</span></label>
-                                <label class="radio-card"><input type="radio" name="religion" value="catholic"><span>Công giáo</span></label>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-religion">→ 100%</div>
                     </div>
 
-                    <!-- MODULE: ethnicity -->
-                    <div class="criterion-module" data-module-id="ethnicity">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
+                    <!-- Education Level (5 Levels) -->
+                    <div class="form-group">
+                        <label><i data-lucide="graduation-cap"></i> Trình Độ Học Vấn Tối Thiểu</label>
+                        <div class="radio-grid grid-5">
+                            <label class="radio-card active">
+                                <input type="radio" name="education" value="any" checked>
+                                <span>Bất kỳ</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="education" value="thpt">
+                                <span>THPT trở lên</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="education" value="bachelor">
+                                <span>Cử nhân / CĐ</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="education" value="master">
+                                <span>Thạc sĩ</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="education" value="phd">
+                                <span>Tiến sĩ</span>
+                            </label>
                         </div>
-                        <div class="module-order-badge" id="badge-ethnicity">#10 · Bước 10</div>
+                    </div>
+
+                    <!-- Religion Filter -->
+                    <div class="form-group">
+                        <label><i data-lucide="church"></i> Tôn Giáo</label>
+                        <div class="radio-grid grid-4">
+                            <label class="radio-card active">
+                                <input type="radio" name="religion" value="any" checked>
+                                <span>Bất kỳ</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="religion" value="none">
+                                <span>Không tôn giáo / Đạo Ông Bà</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="religion" value="buddhism">
+                                <span>Phật giáo</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="religion" value="catholic">
+                                <span>Công giáo</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Ethnicity Filter -->
+                    <div class="form-group">
+                        <label><i data-lucide="globe"></i> Dân Tộc</label>
+                        <div class="radio-grid grid-3">
+                            <label class="radio-card active">
+                                <input type="radio" name="ethnicity" value="any" checked>
+                                <span>Bất kỳ</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="ethnicity" value="kinh">
+                                <span>Dân tộc Kinh</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="ethnicity" value="minority">
+                                <span>Dân tộc thiểu số</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sexual Orientation (LGBT Selection) -->
+                    <div class="form-group">
+                        <label><i data-lucide="compass"></i> Xu Hướng Tính Dục (Orientation)</label>
+                        <div class="radio-grid grid-3">
+                            <label class="radio-card active">
+                                <input type="radio" name="orientation" value="any" checked>
+                                <span>Bất kỳ (Tất cả)</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="orientation" value="straight">
+                                <span>Nam Dị Tính (Thẳng)</span>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="orientation" value="lgbt">
+                                <span>LGBT+ (Gay / Bi)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Lifestyle Filters: Smoke & Drink -->
+                    <div class="lifestyle-grid">
                         <div class="form-group">
-                            <label><i data-lucide="globe"></i> Dân Tộc</label>
+                            <label><i data-lucide="cigarette"></i> Thói Quên Hút Thuốc</label>
                             <div class="radio-grid grid-3">
-                                <label class="radio-card active"><input type="radio" name="ethnicity" value="any" checked><span>Bất kỳ</span></label>
-                                <label class="radio-card"><input type="radio" name="ethnicity" value="kinh"><span>Dân tộc Kinh</span></label>
-                                <label class="radio-card"><input type="radio" name="ethnicity" value="minority"><span>Dân tộc thiểu số</span></label>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-ethnicity">→ 100%</div>
-                    </div>
-
-                    <!-- MODULE: orientation -->
-                    <div class="criterion-module" data-module-id="orientation">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
-                        </div>
-                        <div class="module-order-badge" id="badge-orientation">#11 · Bước 11</div>
-                        <div class="form-group">
-                            <label><i data-lucide="compass"></i> Xu Hướng Tính Dục (Orientation)</label>
-                            <div class="radio-grid grid-3">
-                                <label class="radio-card active"><input type="radio" name="orientation" value="any" checked><span>Bất kỳ (Tất cả)</span></label>
-                                <label class="radio-card"><input type="radio" name="orientation" value="straight"><span>Nam Dị Tính (Thẳng)</span></label>
-                                <label class="radio-card"><input type="radio" name="orientation" value="lgbt"><span>LGBT+ (Gay / Bi)</span></label>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-orientation">→ 100%</div>
-                    </div>
-
-                    <!-- MODULE: lifestyle -->
-                    <div class="criterion-module" data-module-id="lifestyle">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
-                        </div>
-                        <div class="module-order-badge" id="badge-lifestyle">#12 · Bước 12</div>
-                        <div class="lifestyle-grid">
-                            <div class="form-group">
-                                <label><i data-lucide="cigarette"></i> Thói Quên Hút Thuốc</label>
-                                <div class="radio-grid grid-3">
-                                    <label class="radio-card active"><input type="radio" name="smoke" value="any" checked><span>Bất kỳ</span></label>
-                                    <label class="radio-card"><input type="radio" name="smoke" value="no_smoke"><span>Không hút thuốc</span></label>
-                                    <label class="radio-card"><input type="radio" name="smoke" value="smoke"><span>Có hút thuốc</span></label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label><i data-lucide="wine"></i> Thói Quên Uống Rượu Bia</label>
-                                <div class="radio-grid grid-3">
-                                    <label class="radio-card active"><input type="radio" name="drink" value="any" checked><span>Bất kỳ</span></label>
-                                    <label class="radio-card"><input type="radio" name="drink" value="no_drink"><span>Không / Hiếm khi</span></label>
-                                    <label class="radio-card"><input type="radio" name="drink" value="drink"><span>Có uống rượu bia</span></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="module-posterior-pill" id="posterior-lifestyle">→ 100%</div>
-                    </div>
-
-                    <!-- MODULE: toggles -->
-                    <div class="criterion-module" data-module-id="toggles">
-                        <div class="module-drag-handle" title="Kéo để đổi thứ tự (Bayesian Prior)">
-                            <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor"><circle cx="4" cy="4" r="1.8"/><circle cx="10" cy="4" r="1.8"/><circle cx="4" cy="10" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="4" cy="16" r="1.8"/><circle cx="10" cy="16" r="1.8"/></svg>
-                        </div>
-                        <div class="module-order-badge" id="badge-toggles">#13 · Bước 13</div>
-                        <div class="toggles-grid">
-                            <div class="toggle-card">
-                                <div class="toggle-info">
-                                    <i data-lucide="smartphone"></i>
-                                    <span>Bắt buộc dùng iPhone (iOS)</span>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" id="toggle-iphone">
-                                    <span class="slider round"></span>
+                                <label class="radio-card active">
+                                    <input type="radio" name="smoke" value="any" checked>
+                                    <span>Bất kỳ</span>
                                 </label>
-                            </div>
-                            <div class="toggle-card">
-                                <div class="toggle-info">
-                                    <i data-lucide="heart-off"></i>
-                                    <span>Bắt buộc chưa từng kết hôn</span>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" id="toggle-single">
-                                    <span class="slider round"></span>
+                                <label class="radio-card">
+                                    <input type="radio" name="smoke" value="no_smoke">
+                                    <span>Không hút thuốc</span>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="smoke" value="smoke">
+                                    <span>Có hút thuốc</span>
                                 </label>
                             </div>
                         </div>
-                        <div class="module-posterior-pill" id="posterior-toggles">→ 100%</div>
+
+                        <div class="form-group">
+                            <label><i data-lucide="wine"></i> Thói Quên Uống Rượu Bia</label>
+                            <div class="radio-grid grid-3">
+                                <label class="radio-card active">
+                                    <input type="radio" name="drink" value="any" checked>
+                                    <span>Bất kỳ</span>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="drink" value="no_drink">
+                                    <span>Không / Hiếm khi</span>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="drink" value="drink">
+                                    <span>Có uống rượu bia</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Toggles Grid: iPhone, Single -->
+                    <div class="toggles-grid">
+                        <div class="toggle-card">
+                            <div class="toggle-info">
+                                <i data-lucide="smartphone"></i>
+                                <span>Bắt buộc dùng iPhone (iOS)</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-iphone">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-card">
+                            <div class="toggle-info">
+                                <i data-lucide="heart-off"></i>
+                                <span>Bắt buộc chưa từng kết hôn</span>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-single">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
                 </form>
+            </section>
 
             <!-- Right Side: Results & Satire Gauge -->
             <section class="results-section">
@@ -457,28 +489,20 @@
                         <p id="verdict-desc">Tiêu chuẩn của bạn rất ấn tượng. Hãy chuẩn bị tinh thần cạnh tranh với hàng triệu cô gái khác!</p>
                     </div>
 
-                    <!-- Bayesian Sequential Update Chain Panel -->
-                    <div class="bayesian-chain-wrapper">
-                        <div class="bayesian-chain-header">
-                            <i data-lucide="git-merge"></i>
-                            <span>Chuỗi Cập Nhật Bayesian theo Thứ Tự Module</span>
-                            <span class="chain-hint">← Kéo module để đổi Prior</span>
-                        </div>
-                        <div class="bayesian-chain-scroll" id="bayesian-chain-panel">
-                            <!-- populated by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Oval Stadium Oval-Ring Dot Visualizer -->
+                    <!-- Oval Stadium Oval-Ring Dot Visualizer (Pure Oval Dot Stadium Illustration) -->
                     <div class="oval-stadium-card">
                         <div class="oval-stadium-header">
                             <span class="oval-stadium-title"><i data-lucide="landmark"></i> Mô Phỏng Khán Đài Sân Vận Động Trống Đồng (135.000 Chỗ Ngồi)</span>
                             <span class="oval-stadium-badge" id="stadium-seat-badge">135.000 / 135.000 chỗ phát sáng</span>
                         </div>
                         <p class="oval-stadium-subtext">Sơ đồ 1.350 điểm ghế xếp theo vành đai oval Sân vận động Trống Đồng (135.000 chỗ, 1 điểm = 100 ghế). Các ghế phát sáng lấp đầy sân theo tiêu chuẩn của bạn:</p>
+                        
+                        <!-- Oval Stadium Ring Container -->
                         <div class="oval-stadium-wrapper">
+                            <!-- 1,350 Seat Dots Arranged in Concentric Oval Rings -->
                             <div class="oval-seats-ring-container" id="oval-seats-ring"></div>
                         </div>
+
                         <div class="stadium-satire-banner" id="stadium-satire-box">
                             <i data-lucide="flame" class="satire-icon"></i>
                             <span id="stadium-satire-text">Đang lấp đầy chỗ ngồi Sân vận động Trống Đồng...</span>
@@ -487,7 +511,7 @@
 
                     <!-- Filter Breakdown Chart -->
                     <div class="breakdown-wrapper">
-                        <h4><i data-lucide="bar-chart-3"></i> Phân Tích Tỷ Lệ Theo Chuỗi Bayesian</h4>
+                        <h4><i data-lucide="bar-chart-3"></i> Phân Tích Tỷ Lệ Theo Tiêu Chí</h4>
                         <div class="chart-container">
                             <canvas id="breakdown-chart"></canvas>
                         </div>
