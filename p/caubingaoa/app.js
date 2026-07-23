@@ -427,7 +427,10 @@ function calculateMatches() {
     const minHeight = parseInt(heightInput.value);
     const weightVal = weightSelect.value;
     const minSalary = parseFloat(salaryInput.value);
-    
+
+    let regionValue = 'any';
+    regionRadios.forEach(r => { if (r.checked) regionValue = r.value; });
+
     let eduValue = 'any';
     eduRadios.forEach(r => { if (r.checked) eduValue = r.value; });
 
@@ -476,10 +479,10 @@ function calculateMatches() {
     const drinkProb = getDrinkProbability(drinkValue);
     const singleProb = getSingleProbability(ageMin, ageMax, reqSingle);
 
-    let totalProb = ageSpanProb * heightProb * weightProb * salaryProb * eduProb * jobProb * vehicleProb * 
-                    houseProb * iphoneProb * religionProb * ethnicityProb * orientationProb * 
+    let totalProb = ageSpanProb * heightProb * weightProb * salaryProb * eduProb * jobProb * vehicleProb *
+                    houseProb * iphoneProb * regionProb * religionProb * ethnicityProb * orientationProb *
                     smokeProb * drinkProb * singleProb;
-    
+
     // Check if ALL choices are 'any' / baseline
     const isAllAny = (ageMin <= 18 && ageMax >= 60) &&
                      minHeight <= 150 &&
@@ -503,7 +506,7 @@ function calculateMatches() {
     } else {
         totalProb = Math.min(1.0, totalProb);
     }
-    
+
     let percent = totalProb * 100;
     let estimatedCount = Math.round(totalProb * TOTAL_MALE_POPULATION);
 
@@ -520,12 +523,12 @@ function calculateMatches() {
             height: heightProb * 100,
             weight: weightProb * 100,
             salary: salaryProb * 100,
+            region: regionProb * 100,
             edu: eduProb * 100,
             job: jobProb * 100,
             vehicle: vehicleProb * 100,
             house: houseProb * 100,
             iphone: iphoneProb * 100,
-            region: regionProb * 100,
             religion: religionProb * 100,
             ethnicity: ethnicityProb * 100,
             orientation: orientationProb * 100,
@@ -653,7 +656,9 @@ function renderOvalStadiumSeatGrid(percent, estimatedCount) {
     stadiumSatireText.textContent = satireMsg;
 }
 
-// Web Audio API Synthesizer for Clown Honk & Siren Mockery Sound Effects
+// ============================================================
+// Web Audio API Sound Effects Engine
+// ============================================================
 let audioCtx = null;
 
 function getAudioContext() {
@@ -669,17 +674,103 @@ function getAudioContext() {
     return audioCtx;
 }
 
-// Play exaggerated two-stage Clown Horn ("HONK HONK!") sound
-function playClownHonkSound() {
+// Slider tick: subtle click for slider drag feedback
+function playSliderTick(intensity) {
+    if (!isSoundEnabled) return;
     try {
         const ctx = getAudioContext();
         if (!ctx) return;
-
         const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800 + intensity * 400, now);
+        gain.gain.setValueAtTime(0.05, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.06);
+    } catch (e) {}
+}
 
-        // Honk 1
+// Cha-ching: cash register sound for luxury/high-value selections
+function playChaChing() {
+    if (!isSoundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        [880, 1320, 1760].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.07);
+            gain.gain.setValueAtTime(0.18, now + i * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.25);
+        });
+    } catch (e) {}
+}
+
+// Thunder zap: dramatic impact for extreme requirements
+function playThunderZap() {
+    if (!isSoundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        const bufferSize = ctx.sampleRate * 0.3;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+        }
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        source.start(now);
+    } catch (e) {}
+}
+
+// Cricket chirp: lonely void sound for tiny percentages
+function playCricketChirp() {
+    if (!isSoundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(4000, now + i * 0.15);
+            osc.frequency.setValueAtTime(3600, now + i * 0.15 + 0.05);
+            gain.gain.setValueAtTime(0.08, now + i * 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.1);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + i * 0.15);
+            osc.stop(now + i * 0.15 + 0.1);
+        }
+    } catch (e) {}
+}
+
+// Clown Honk: two-stage HONK HONK for 0% delusional result
+function playClownHonkSound() {
+    if (!isSoundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
         playSingleHonk(ctx, now, 320, 0.18);
-        // Honk 2 (higher pitch follow-up)
         playSingleHonk(ctx, now + 0.22, 420, 0.25);
     } catch (e) {
         console.warn('Audio play error:', e);
@@ -689,42 +780,32 @@ function playClownHonkSound() {
 function playSingleHonk(ctx, startTime, freq, duration) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-
     osc.type = 'sawtooth';
-    // Frequency bend (pitch drop slightly like a squeaky rubber horn)
     osc.frequency.setValueAtTime(freq, startTime);
     osc.frequency.exponentialRampToValueAtTime(freq * 0.75, startTime + duration);
-
-    // Envelope
     gain.gain.setValueAtTime(0, startTime);
     gain.gain.linearRampToValueAtTime(0.4, startTime + 0.02);
     gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
     osc.connect(gain);
     gain.connect(ctx.destination);
-
     osc.start(startTime);
     osc.stop(startTime + duration);
 }
 
-// Play exaggerated dual-sweep Emergency Delusion Siren ("WEE-WOO-WEE-WOO!")
+// Siren: WEE-WOO emergency delusion siren
 function playSirenSound() {
+    if (!isSoundEnabled) return;
     try {
         const ctx = getAudioContext();
         if (!ctx) return;
-
-        const now = ctx.currentTime + 0.42; // Start right after clown honk
+        const now = ctx.currentTime + 0.42;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-
         osc.type = 'sine';
-
-        // 4 Siren sweeps (Wee-Woo-Wee-Woo)
         const sweepDuration = 0.30;
         const sweeps = 4;
         const lowFreq = 520;
         const highFreq = 1150;
-
         for (let i = 0; i < sweeps; i++) {
             const t = now + i * sweepDuration;
             if (i % 2 === 0) {
@@ -735,17 +816,13 @@ function playSirenSound() {
                 osc.frequency.linearRampToValueAtTime(lowFreq, t + sweepDuration);
             }
         }
-
         const totalDuration = sweeps * sweepDuration;
-
         gain.gain.setValueAtTime(0, now);
         gain.gain.linearRampToValueAtTime(0.3, now + 0.04);
         gain.gain.setValueAtTime(0.3, now + totalDuration - 0.08);
         gain.gain.linearRampToValueAtTime(0.001, now + totalDuration);
-
         osc.connect(gain);
         gain.connect(ctx.destination);
-
         osc.start(now);
         osc.stop(now + totalDuration);
     } catch (e) {
@@ -822,7 +899,7 @@ function animateValue(targetVal) {
     requestAnimationFrame(update);
 }
 
-// Chart.js Funnel Render
+// Chart.js Breakdown Bar Chart
 function updateChart(breakdown) {
     const chartElem = document.getElementById('breakdown-chart');
     if (!chartElem) return;
@@ -835,6 +912,7 @@ function updateChart(breakdown) {
         breakdown.height,
         breakdown.weight,
         breakdown.salary,
+        breakdown.region,
         breakdown.edu,
         breakdown.job,
         breakdown.vehicle,
@@ -868,6 +946,7 @@ function updateChart(breakdown) {
                     'rgba(82, 183, 136, 0.75)',
                     'rgba(116, 198, 157, 0.75)',
                     'rgba(233, 196, 106, 0.75)',
+                    'rgba(100, 160, 220, 0.75)',
                     'rgba(194, 142, 93, 0.75)',
                     'rgba(212, 163, 115, 0.75)',
                     'rgba(82, 183, 136, 0.75)',
@@ -881,7 +960,8 @@ function updateChart(breakdown) {
                     'rgba(45, 106, 79, 0.75)'
                 ],
                 borderColor: [
-                    '#2d6a4f', '#52b788', '#74c69d', '#e9c46a', '#c28e5d', '#d4a373', '#52b788', '#2d6a4f',
+                    '#2d6a4f', '#52b788', '#74c69d', '#e9c46a', '#64a0dc',
+                    '#c28e5d', '#d4a373', '#52b788', '#2d6a4f',
                     '#e76f51', '#f4a261', '#74c69d', '#c28e5d', '#e9c46a', '#e63946',
                     '#2d6a4f'
                 ],
@@ -942,13 +1022,11 @@ function renderUI() {
     const avgWeightKg = getAverageWeightForRange(selectedWeightVal);
 
     if (avgWeightKg === null) {
-        // "Bất kỳ" Weight selected -> Reset BMI to uncalculated & Hide mockery text completely
         bmiValDisplay.textContent = 'BMI = --';
         bmiStatusDesc.textContent = 'Chọn khoảng cân nặng để tính BMI tự động';
         bmiMockeryBox.style.setProperty('display', 'none', 'important');
         bmiMockeryBox.classList.add('hidden');
     } else {
-        // Specific Weight Range Selected -> Calculate BMI
         const selectedHeightM = (heightVal <= 150 ? 168.5 : heightVal) / 100;
         const bmiScore = avgWeightKg / (selectedHeightM * selectedHeightM);
 
@@ -966,9 +1044,6 @@ function renderUI() {
         }
         bmiStatusDesc.textContent = bmiStatusText;
 
-        // Show satire pop-up text based on BMI thresholds:
-        // BMI < 18.5 -> "M iu hoàng kim cốt à? 💀"
-        // BMI >= 25.0 -> "Thế m đã nhìn lại mình chưa? 🤪"
         if (bmiScore < 18.5) {
             mockeryText.textContent = 'M iu hoàng kim cốt à? 💀';
             bmiMockeryBox.style.setProperty('display', 'flex', 'important');
@@ -1017,7 +1092,7 @@ function renderUI() {
     if (verdict.isZero) {
         triggerZeroDelusionOverdrive();
     } else {
-        modalHasBeenTriggered = false; // Reset trigger state when criteria are relaxed above 0%
+        modalHasBeenTriggered = false;
         hideDelusionModal();
     }
 
@@ -1035,11 +1110,11 @@ function updatePresetActive(container, val) {
 
 // Event Listeners Setup
 function initListeners() {
-    ageMinInput.addEventListener('input', (e) => {
+    ageMinInput.addEventListener('input', () => {
         playSliderTick((parseInt(ageMinInput.value) - 18) / 42);
         renderUI();
     });
-    ageMaxInput.addEventListener('input', (e) => {
+    ageMaxInput.addEventListener('input', () => {
         playSliderTick((parseInt(ageMaxInput.value) - 18) / 42);
         renderUI();
     });
@@ -1066,7 +1141,7 @@ function initListeners() {
 
     // Direct click handler on all radio cards for guaranteed cross-browser clickability
     document.querySelectorAll('.radio-card').forEach(card => {
-        card.addEventListener('click', (e) => {
+        card.addEventListener('click', () => {
             const radio = card.querySelector('input[type="radio"]');
             if (radio && !radio.checked) {
                 radio.checked = true;
