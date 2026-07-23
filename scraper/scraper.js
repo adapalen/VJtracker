@@ -54,7 +54,9 @@ function formatDate(date) {
     { from: 'HAN', to: 'BMV' }, { from: 'BMV', to: 'HAN' },
     { from: 'SGN', to: 'BMV' }, { from: 'BMV', to: 'SGN' },
     { from: 'HAN', to: 'VCS' }, { from: 'VCS', to: 'HAN' },
-    { from: 'SGN', to: 'VCS' }, { from: 'VCS', to: 'SGN' }
+    { from: 'SGN', to: 'VCS' }, { from: 'VCS', to: 'SGN' },
+    { from: 'HAN', to: 'BKK' }, { from: 'BKK', to: 'HAN' },
+    { from: 'SGN', to: 'BKK' }, { from: 'BKK', to: 'SGN' }
   ];
 
   console.log("Launching browser...");

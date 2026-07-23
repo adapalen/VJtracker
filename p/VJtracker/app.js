@@ -91,13 +91,14 @@ const airportNames = {
   'HUI': 'Huế (HUI)',
   'VII': 'Vinh (VII)',
   'BMV': 'Buôn Ma Thuột (BMV)',
-  'VCS': 'Côn Đảo (VCS)'
+  'VCS': 'Côn Đảo (VCS)',
+  'BKK': 'Bangkok (BKK)'
 };
 
 // Route connections matching scraper.js
 const routeMap = {
-  'HAN': ['SGN', 'DAD', 'CXR', 'PQC', 'PXU', 'DLI', 'UIH', 'HUI', 'VII', 'BMV', 'VCS'],
-  'SGN': ['HAN', 'DAD', 'CXR', 'PQC', 'PXU', 'DLI', 'UIH', 'HUI', 'VII', 'BMV', 'VCS'],
+  'HAN': ['SGN', 'DAD', 'CXR', 'PQC', 'PXU', 'DLI', 'UIH', 'HUI', 'VII', 'BMV', 'VCS', 'BKK'],
+  'SGN': ['HAN', 'DAD', 'CXR', 'PQC', 'PXU', 'DLI', 'UIH', 'HUI', 'VII', 'BMV', 'VCS', 'BKK'],
   'DAD': ['HAN', 'SGN'],
   'CXR': ['HAN', 'SGN'],
   'PQC': ['HAN', 'SGN'],
@@ -107,7 +108,8 @@ const routeMap = {
   'HUI': ['HAN', 'SGN'],
   'VII': ['HAN', 'SGN'],
   'BMV': ['HAN', 'SGN'],
-  'VCS': ['HAN', 'SGN']
+  'VCS': ['HAN', 'SGN'],
+  'BKK': ['HAN', 'SGN']
 };
 
 // HSL color configurations for lines
@@ -115,7 +117,11 @@ const routeColors = {
   'HAN-SGN': { border: '#ff3c6b', bg: 'rgba(255, 60, 107, 0.1)' },
   'SGN-HAN': { border: '#00e676', bg: 'rgba(0, 230, 118, 0.1)' },
   'HAN-PXU': { border: '#ffd600', bg: 'rgba(255, 214, 0, 0.1)' },
-  'PXU-HAN': { border: '#00b0ff', bg: 'rgba(0, 176, 255, 0.1)' }
+  'PXU-HAN': { border: '#00b0ff', bg: 'rgba(0, 176, 255, 0.1)' },
+  'HAN-BKK': { border: '#e040fb', bg: 'rgba(224, 64, 251, 0.1)' },
+  'BKK-HAN': { border: '#ff9100', bg: 'rgba(255, 145, 0, 0.1)' },
+  'SGN-BKK': { border: '#00e5ff', bg: 'rgba(0, 229, 255, 0.1)' },
+  'BKK-SGN': { border: '#76ff03', bg: 'rgba(118, 255, 3, 0.1)' }
 };
 
 document.addEventListener('DOMContentLoaded', async () => {

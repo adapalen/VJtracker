@@ -26,6 +26,28 @@
           "priority": "0.8",
           "changefreq": "monthly",
           "icon": "fa-solid fa-user-tie"
+        },
+        {
+          "title": "Cậu bị ngáo à?",
+          "description": "Khám phá vẻ đẹp của số liệu thống kê dân số nam giới Việt Nam và nghệ thuật cân bằng kỳ vọng thực tế.",
+          "url": "/p/caubingaoa/net-dep-thong-ke.html",
+          "fullUrl": "https://sincostan.id.vn/p/caubingaoa/net-dep-thong-ke.html",
+          "lastModified": "2026-07-21",
+          "section": "core",
+          "priority": "0.7",
+          "changefreq": "monthly",
+          "icon": "fa-regular fa-file"
+        },
+        {
+          "title": "Cậu bị ngáo à?",
+          "description": "Kê đơn chữa lành và thực tế hóa tiêu chuẩn chọn bạn đời cho chị em.",
+          "url": "/p/caubingaoa/thuoc-chua-benh.html",
+          "fullUrl": "https://sincostan.id.vn/p/caubingaoa/thuoc-chua-benh.html",
+          "lastModified": "2026-07-21",
+          "section": "core",
+          "priority": "0.7",
+          "changefreq": "monthly",
+          "icon": "fa-regular fa-file"
         }
       ]
     },
@@ -46,11 +68,11 @@
           "icon": "fa-solid fa-gamepad"
         },
         {
-          "title": "Cậu có bị ngáo không?",
-          "description": "",
+          "title": "Cậu bị ngáo à?",
+          "description": "Tính toán tỷ lệ phần trăm nam giới Việt Nam đáp ứng tiêu chuẩn của bạn. Kiểm tra mức độ thực tế hay ảo tưởng trong tiêu chuẩn tìm bạn đời!",
           "url": "/p/caubingaoa/",
           "fullUrl": "https://sincostan.id.vn/p/caubingaoa/",
-          "lastModified": "2026-07-21",
+          "lastModified": "2026-07-22",
           "section": "projects",
           "priority": "0.9",
           "changefreq": "weekly",
@@ -61,7 +83,7 @@
           "description": "Công cụ theo dõi giá vé máy bay Vietjet tự động. Cập nhật liên tục biểu đồ biến động giá vé Vietjet, phân tích xu hướng và gợi ý săn vé máy bay giá rẻ tốt nhất.",
           "url": "/p/VJtracker/",
           "fullUrl": "https://sincostan.id.vn/p/VJtracker/",
-          "lastModified": "2026-07-18",
+          "lastModified": "2026-07-23",
           "section": "projects",
           "priority": "0.9",
           "changefreq": "daily",
