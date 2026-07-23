@@ -21,8 +21,7 @@ const newRecords = [];
 const carrierBases = [
   { carrier: 'Vietjet', basePrice: 1550000 },
   { carrier: 'Vietnam Airlines', basePrice: 2450000 },
-  { carrier: 'Vietravel Airlines', basePrice: 1680000 },
-  { carrier: 'Bamboo Airways', basePrice: 1820000 }
+  { carrier: 'Vietravel Airlines', basePrice: 1680000 }
 ];
 
 console.log("Generating 30-day historical flight price data for Bangkok routes...");
