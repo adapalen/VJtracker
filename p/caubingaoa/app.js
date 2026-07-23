@@ -43,6 +43,7 @@ const eduRadios = document.querySelectorAll('input[name="education"]');
 const jobSelect = document.getElementById('job-select');
 const vehicleRadios = document.querySelectorAll('input[name="vehicle"]');
 const houseRadios = document.querySelectorAll('input[name="house"]');
+const regionRadios = document.querySelectorAll('input[name="region"]');
 const religionRadios = document.querySelectorAll('input[name="religion"]');
 const ethnicityRadios = document.querySelectorAll('input[name="ethnicity"]');
 const orientationRadios = document.querySelectorAll('input[name="orientation"]');
@@ -315,6 +316,17 @@ function getIphoneProbability(isRequired) {
     return 0.33; // ~33.0% iOS market share in VN
 }
 
+// Regional / Provincial Male Distribution Probability (GSO 2024-2026 Data)
+function getRegionProbability(val) {
+    switch(val) {
+        case 'hanoi': return 0.085;    // Nghìn năm văn hiến (HN ~8.5%)
+        case 'hcm': return 0.097;      // Hào sảng (HCM ~9.7%)
+        case 'province': return 0.818; // Tỉnh lẻ / Tỉnh khác (~81.8%)
+        case 'any':
+        default: return 1.0;           // Toàn quốc = 100%
+    }
+}
+
 // Religion Probability
 function getReligionProbability(val) {
     switch(val) {
@@ -456,6 +468,7 @@ function calculateMatches() {
     const vehicleProb = getVehicleProbability(vehicleValue);
     const houseProb = getHouseProbability(houseValue);
     const iphoneProb = getIphoneProbability(reqIphone);
+    const regionProb = getRegionProbability(regionValue);
     const religionProb = getReligionProbability(religionValue);
     const ethnicityProb = getEthnicityProbability(ethnicityValue);
     const orientationProb = getOrientationProbability(orientationValue);
@@ -476,6 +489,7 @@ function calculateMatches() {
                      jobValue === 'any' &&
                      vehicleValue === 'any' &&
                      houseValue === 'any' &&
+                     regionValue === 'any' &&
                      religionValue === 'any' &&
                      ethnicityValue === 'any' &&
                      orientationValue === 'any' &&
@@ -511,6 +525,7 @@ function calculateMatches() {
             vehicle: vehicleProb * 100,
             house: houseProb * 100,
             iphone: iphoneProb * 100,
+            region: regionProb * 100,
             religion: religionProb * 100,
             ethnicity: ethnicityProb * 100,
             orientation: orientationProb * 100,
@@ -814,7 +829,7 @@ function updateChart(breakdown) {
     const ctx = chartElem.getContext('2d');
     const isDark = htmlElement.getAttribute('data-theme') === 'dark';
 
-    const labels = ['Tuổi', 'Cao', 'Nặng', 'Lương', 'Học vấn', 'Nghề nghiệp', 'Phương tiện', 'BĐS / Nhà', 'iPhone', 'Tôn giáo', 'Dân tộc', 'Tính dục', 'Thuốc', 'Rượu', 'Độc thân'];
+    const labels = ['Tuổi', 'Cao', 'Nặng', 'Lương', 'Khu vực', 'Học vấn', 'Nghề nghiệp', 'Phương tiện', 'BĐS / Nhà', 'iPhone', 'Tôn giáo', 'Dân tộc', 'Tính dục', 'Thuốc', 'Rượu', 'Độc thân'];
     const data = [
         breakdown.age,
         breakdown.height,
@@ -972,7 +987,7 @@ function renderUI() {
     salaryDisplay.textContent = salaryVal === 0 ? 'Bất kỳ (≥ 0 Tr)' : `≥ ${salaryVal} Triệu VNĐ`;
     updatePresetActive(salaryPresets, salaryVal);
 
-    [eduRadios, vehicleRadios, houseRadios, religionRadios, ethnicityRadios, orientationRadios, smokeRadios, drinkRadios].forEach(group => {
+    [regionRadios, eduRadios, vehicleRadios, houseRadios, religionRadios, ethnicityRadios, orientationRadios, smokeRadios, drinkRadios].forEach(group => {
         group.forEach(radio => {
             const card = radio.closest('.radio-card');
             if (card) {
@@ -1029,7 +1044,7 @@ function initListeners() {
 
     jobSelect.addEventListener('change', renderUI);
 
-    [...eduRadios, ...vehicleRadios, ...houseRadios, ...religionRadios, ...ethnicityRadios, ...orientationRadios, ...smokeRadios, ...drinkRadios].forEach(
+    [...regionRadios, ...eduRadios, ...vehicleRadios, ...houseRadios, ...religionRadios, ...ethnicityRadios, ...orientationRadios, ...smokeRadios, ...drinkRadios].forEach(
         r => r.addEventListener('change', renderUI)
     );
 
@@ -1067,6 +1082,7 @@ function resetToBaseline() {
     weightSelect.value = 'any';
     salaryInput.value = 0;
     jobSelect.value = 'any';
+    document.querySelector('input[name="region"][value="any"]').checked = true;
     document.querySelector('input[name="education"][value="any"]').checked = true;
     document.querySelector('input[name="vehicle"][value="any"]').checked = true;
     document.querySelector('input[name="house"][value="any"]').checked = true;
