@@ -10,6 +10,12 @@ const themeToggleBtn = document.getElementById('theme-toggle');
 const themeIcon = document.getElementById('theme-icon');
 const themeText = document.getElementById('theme-text');
 
+// Sound Toggle DOM Elements & State
+const soundToggleBtn = document.getElementById('sound-toggle');
+const soundIcon = document.getElementById('sound-icon');
+const soundText = document.getElementById('sound-text');
+let isSoundEnabled = localStorage.getItem('sound_enabled') !== 'false';
+
 // Sub-Page Navigation Tabs & Views
 const navTabs = document.querySelectorAll('.nav-tab');
 const subpageViews = document.querySelectorAll('.subpage-view');
@@ -109,6 +115,32 @@ function initTheme() {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         setTheme(newTheme);
     });
+}
+
+function initSound() {
+    if (!soundToggleBtn) return;
+    setSoundState(isSoundEnabled);
+
+    soundToggleBtn.addEventListener('click', () => {
+        isSoundEnabled = !isSoundEnabled;
+        localStorage.setItem('sound_enabled', isSoundEnabled ? 'true' : 'false');
+        setSoundState(isSoundEnabled);
+        if (isSoundEnabled) {
+            playChaChing();
+        }
+    });
+}
+
+function setSoundState(enabled) {
+    if (!soundIcon || !soundText) return;
+    if (enabled) {
+        soundText.textContent = 'Âm thanh: Bật';
+        soundIcon.setAttribute('data-lucide', 'volume-2');
+    } else {
+        soundText.textContent = 'Âm thanh: Tắt';
+        soundIcon.setAttribute('data-lucide', 'volume-x');
+    }
+    if (window.lucide) lucide.createIcons();
 }
 
 function setTheme(theme) {
@@ -1078,6 +1110,7 @@ function showToast(msg) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    initSound();
     initSubpageNavigation();
     initOvalStadiumSeats();
     initListeners();
