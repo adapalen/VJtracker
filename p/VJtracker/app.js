@@ -53,7 +53,19 @@ function updateCarrierSelectors() {
     if (!checkbox) return;
     
     const parentLabel = checkbox.parentElement;
-    const hasData = routeRecords.some(r => r.carrier === carrier);
+    let hasData = routeRecords.some(r => r.carrier === carrier);
+    
+    // Explicit operational restrictions
+    if (currentRoute.includes('BKK')) {
+      if (carrier === 'Bamboo Airways' || carrier === 'SunPhuquoc Airways') {
+        hasData = false;
+      }
+    }
+    if (currentRoute.includes('PXU') || currentRoute.includes('VCS') || currentRoute.includes('BMV')) {
+      if (carrier === 'SunPhuquoc Airways') {
+        hasData = false;
+      }
+    }
     
     if (hasData) {
       checkbox.disabled = false;
@@ -581,6 +593,10 @@ function generateMockData() {
     routes.forEach(route => {
       leadTimes.forEach(lead => {
         targetCarriers.forEach(carrier => {
+          // Skip non-operating carriers on specific routes
+          if (route.includes('BKK') && (carrier === 'Bamboo Airways' || carrier === 'SunPhuquoc Airways')) return;
+          if ((route.includes('PXU') || route.includes('VCS') || route.includes('BMV')) && carrier === 'SunPhuquoc Airways') return;
+
           // Base price calculation
           let basePrice = route.includes('PXU') ? 1200000 : 1800000;
           // Fluctuations based on lead time and random factors
