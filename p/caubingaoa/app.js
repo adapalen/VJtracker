@@ -1035,12 +1035,28 @@ function updatePresetActive(container, val) {
 
 // Event Listeners Setup
 function initListeners() {
-    ageMinInput.addEventListener('input', renderUI);
-    ageMaxInput.addEventListener('input', renderUI);
-    heightInput.addEventListener('input', renderUI);
+    ageMinInput.addEventListener('input', (e) => {
+        playSliderTick((parseInt(ageMinInput.value) - 18) / 42);
+        renderUI();
+    });
+    ageMaxInput.addEventListener('input', (e) => {
+        playSliderTick((parseInt(ageMaxInput.value) - 18) / 42);
+        renderUI();
+    });
+    heightInput.addEventListener('input', () => {
+        const val = parseInt(heightInput.value);
+        playSliderTick((val - 150) / 40);
+        if (val >= 180) playThunderZap();
+        renderUI();
+    });
 
     weightSelect.addEventListener('change', renderUI);
-    salaryInput.addEventListener('input', renderUI);
+    salaryInput.addEventListener('input', () => {
+        const val = parseFloat(salaryInput.value);
+        playSliderTick(val / 150);
+        if (val >= 100) playThunderZap();
+        renderUI();
+    });
 
     jobSelect.addEventListener('change', renderUI);
 
@@ -1048,19 +1064,42 @@ function initListeners() {
         r => r.addEventListener('change', renderUI)
     );
 
+    // Direct click handler on all radio cards for guaranteed cross-browser clickability
+    document.querySelectorAll('.radio-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio && !radio.checked) {
+                radio.checked = true;
+                const val = radio.value;
+                if (['car_luxury_mid', 'car_superluxury', 'street_front', 'mansion_villa'].includes(val)) {
+                    playChaChing();
+                    if (val === 'car_superluxury' || val === 'mansion_villa') {
+                        playThunderZap();
+                    }
+                }
+                renderUI();
+            }
+        });
+    });
+
     toggleIphone.addEventListener('change', renderUI);
     toggleSingle.addEventListener('change', renderUI);
 
     heightPresets.addEventListener('click', (e) => {
         if (e.target.classList.contains('chip')) {
-            heightInput.value = e.target.dataset.val;
+            const val = parseInt(e.target.dataset.val);
+            heightInput.value = val;
+            if (val >= 180) playThunderZap();
             renderUI();
         }
     });
 
     salaryPresets.addEventListener('click', (e) => {
         if (e.target.classList.contains('chip')) {
-            salaryInput.value = e.target.dataset.val;
+            const val = parseFloat(e.target.dataset.val);
+            salaryInput.value = val;
+            if (val >= 30) playChaChing();
+            if (val >= 100) playThunderZap();
             renderUI();
         }
     });
