@@ -3,99 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Nghiên cứu ứng dụng hóa tin học trong khai thác dữ liệu hoạt tính sinh học phân tử qua cơ sở dữ liệu ChEMBL.">
-  <title>Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL</title>
-  <!-- Google Fonts: Inter -->
+  <meta name="description" content="Ứng dụng Cheminformatics với ChEMBL REST API trong Python để nghiên cứu hoạt tính sinh học và thiết kế thuốc.">
+  <title>Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL | adapalen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../../../style.css">
+  <link rel="stylesheet" href="../../../subpage.css">
 </head>
-<body class="portfolio-page">
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <i class="fa-solid fa-code logo-icon"></i>
-        <div>
-          <h1 id="main-title">adapalen</h1>
-          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+<body>
+  <header class="masthead">
+    <div class="masthead-top-bar">
+      <span class="dateline">Adapalen — Blog</span>
+      <button id="theme-toggle" class="theme-btn">☽</button>
+      <span class="edition-label">sincostan.id.vn</span>
+    </div>
+    <div class="masthead-title-row">
+      <div class="masthead-rule"></div>
+      <a href="../../../index.html" style="text-decoration:none;"><h1 class="masthead-title">ADAPALEN</h1></a>
+      <div class="masthead-rule"></div>
+    </div>
+    <div class="masthead-subtitle-row">
+      <span class="masthead-tagline">Kỹ sư Phần mềm &bull; Phân tích Dữ liệu &bull; Nhà phát triển Web</span>
+    </div>
+    <div class="masthead-nav-bar">
+      <a href="../../../index.html" class="mast-nav">Trang chủ</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../about/index.html" class="mast-nav">Giới thiệu</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#projects" class="mast-nav">Dự án</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../index.html" class="mast-nav active">Blog</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../sitemap/index.html" class="mast-nav">Sơ đồ trang</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#contact" class="mast-nav">Liên hệ</a>
+    </div>
+    <div class="masthead-bottom-rule"></div>
+  </header>
+
+  <main class="subpage-main">
+    <nav class="page-breadcrumb">
+      <a href="../../../index.html">Trang chủ</a>
+      <span>›</span>
+      <a href="../index.html">Blog</a>
+      <span>›</span>
+      <span>Cheminformatics &amp; ChEMBL</span>
+    </nav>
+
+    <article>
+      <header class="article-header">
+        <div class="article-kicker">Hóa học</div>
+        <h2 class="article-title">Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL</h2>
+        <div class="article-meta">
+          <span>10/07/2026</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>9 phút đọc</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>adapalen</span>
         </div>
+      </header>
+      <div class="thin-rule"></div>
+
+      <div class="article-body">
+        <p><strong>Cheminformatics</strong> — hay tin học hóa học — là lĩnh vực ứng dụng các phương pháp máy tính để phân tích, lưu trữ và khai thác thông tin về các phân tử hóa học. Trong khám phá thuốc hiện đại, cheminformatics đóng vai trò cốt lõi: thay vì tổng hợp hàng chục nghìn hợp chất trong phòng thí nghiệm (tốn kém và chậm chạp), các nhà nghiên cứu dùng máy tính để sàng lọc ảo hàng triệu ứng viên, chỉ mang những chất có tiềm năng nhất vào thực nghiệm. Nền tảng dữ liệu trung tâm cho công việc này là <strong>ChEMBL</strong> — cơ sở dữ liệu lớn nhất thế giới về các phân tử hoạt tính sinh học, hiện chứa hơn 2,4 triệu hợp chất và 20 triệu điểm dữ liệu hoạt tính từ hàng trăm nghìn nghiên cứu.</p>
+
+        <h2>ChEMBL REST API — cổng vào kho dữ liệu hoạt tính sinh học</h2>
+        <p>ChEMBL cung cấp một REST API miễn phí, cho phép truy vấn dữ liệu hoạt tính (bioactivity) theo target protein, loại thử nghiệm, và khoảng giá trị IC50/Ki. <strong>IC50</strong> (Inhibitory Concentration 50%) là chỉ số phổ biến nhất: nó biểu thị nồng độ cần thiết để ức chế 50% hoạt động của một enzyme hay receptor mục tiêu — giá trị IC50 càng thấp, hợp chất càng mạnh. Dưới đây là đoạn code Python để lấy dữ liệu hoạt tính IC50 cho target EGFR (một kinase quan trọng trong điều trị ung thư):</p>
+
+        <pre><code>import requests
+import pandas as pd
+
+BASE_URL = "https://www.ebi.ac.uk/chembl/api/data"
+
+def fetch_bioactivity(target_chembl_id, activity_type="IC50", limit=100):
+    """Lay du lieu hoat tinh tu ChEMBL REST API."""
+    params = {
+        "target_chembl_id": target_chembl_id,
+        "standard_type": activity_type,
+        "assay_type": "B",          # Binding assay
+        "standard_relation": "=",
+        "limit": limit,
+        "format": "json",
+    }
+    url = f"{BASE_URL}/activity/"
+    resp = requests.get(url, params=params, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+    return data.get("activities", [])
+
+# EGFR target: CHEMBL203
+activities = fetch_bioactivity("CHEMBL203", limit=200)
+df = pd.DataFrame(activities)
+
+# Giu lai cac cot quan trong
+cols = ["molecule_chembl_id", "canonical_smiles",
+        "standard_value", "standard_units", "pchembl_value"]
+df = df[cols].dropna(subset=["standard_value", "canonical_smiles"])
+
+# Loc IC50 < 100 nM (hoat tinh cao)
+df["standard_value"] = pd.to_numeric(df["standard_value"], errors="coerce")
+potent = df[df["standard_value"] < 100].sort_values("standard_value")
+print(f"Tim thay {len(potent)} hop chat co IC50 < 100 nM")
+print(potent.head())
+</code></pre>
+
+        <h2>Lọc và làm sạch dữ liệu hoạt tính</h2>
+        <p>Dữ liệu thô từ ChEMBL chứa nhiều nhiễu: các thử nghiệm với điều kiện pH khác nhau, các đơn vị đo lường không đồng nhất (nM, µM, µg/mL), hay các giá trị ngoại lai (<em>outlier</em>) từ những nghiên cứu có phương pháp không chuẩn. Bước làm sạch dữ liệu do đó rất quan trọng. Thực tiễn tốt nhất bao gồm: chỉ giữ lại các bản ghi có trường <code>data_validity_comment</code> là <code>null</code> (dữ liệu không bị gắn cờ vấn đề), chuẩn hóa tất cả về đơn vị nM, và loại bỏ các hợp chất có chuỗi SMILES không hợp lệ theo kiểm tra RDKit. Chỉ số <code>pChEMBL</code> — bằng âm log10 của IC50 tính bằng mol/L — rất hữu ích để so sánh hoạt tính trực tiếp vì nó chuẩn hóa đơn vị.</p>
+
+        <h2>Pipeline thiết kế thuốc: Từ dữ liệu đến dự đoán</h2>
+        <p>Sau khi có tập dữ liệu hoạt tính sạch, các nhà nghiên cứu thường xây dựng <strong>QSAR model</strong> (Quantitative Structure-Activity Relationship) — mô hình học máy dự đoán hoạt tính của một hợp chất mới dựa trên cấu trúc phân tử của nó. Fingerprint phân tử (như Morgan fingerprint từ RDKit) biến cấu trúc SMILES thành vector số học mà các thuật toán như Random Forest hay XGBoost có thể học. Bước tiếp theo trong pipeline là sàng lọc ảo: lấy một thư viện hợp chất thương mại (như ZINC database với 750 triệu phân tử), tính fingerprint cho từng phân tử, rồi dùng QSAR model để dự đoán IC50 — chỉ những chất có IC50 dự đoán dưới ngưỡng mong muốn mới được đưa vào tổng hợp thực nghiệm.</p>
+
+        <blockquote>
+          <strong>Quy tắc Lipinski (Rule of Five):</strong> Ngoài hoạt tính, một ứng viên thuốc tốt còn phải "thuốc được" — tức là cơ thể có thể hấp thụ và chuyển hóa nó. Quy tắc Lipinski yêu cầu: MW ≤ 500 Da, logP ≤ 5, số donor H-bond ≤ 5, số acceptor H-bond ≤ 10. Lọc theo tiêu chí này trước khi tổng hợp tiết kiệm rất nhiều chi phí.
+        </blockquote>
+
+        <h2>Ứng dụng mở rộng và tương lai</h2>
+        <p>Cheminformatics hiện đại ngày càng tích hợp sâu với deep learning: các mô hình graph neural network (GNN) học trực tiếp trên đồ thị phân tử, bỏ qua bước tính fingerprint thủ công; các mô hình generative như REINVENT có thể <em>thiết kế ngược</em> — tạo ra cấu trúc phân tử mới tối ưu cho mục tiêu đã cho. ChEMBL với kho dữ liệu khổng lồ tiếp tục là nguồn huấn luyện và benchmark không thể thiếu. Nếu bạn đang bắt đầu hành trình vào lĩnh vực này, RDKit (Python), DeepChem, và ChEMBL API là bộ ba công cụ đầu tiên cần thành thạo.</p>
       </div>
-      <nav class="header-nav">
-        <a href="../../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="../../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
-        <a href="../../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
-        <a href="../index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
-        <a href="../../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
-        <a href="../../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
-      </nav>
-      <div class="header-controls">
-        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
-          <i class="fa-solid fa-moon"></i>
-        </button>
+
+      <div class="article-nav-back">
+        <a href="../index.html" class="back-link">← Quay lại danh sách bài viết</a>
       </div>
-    </header>
-
-    <!-- Article Content -->
-    <article class="portfolio-section glass" style="padding: 2.5rem; line-height: 1.8;">
-      <a href="../index.html" class="blog-back-btn" style="margin-bottom: 1.5rem;"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài viết</a>
-      
-      <div class="blog-meta" style="margin-bottom: 1rem; gap: 1.5rem; font-size: 0.9rem;">
-        <span><i class="fa-regular fa-calendar"></i> 10/07/2026</span>
-        <span><i class="fa-regular fa-clock"></i> 9 phút đọc</span>
-        <span><i class="fa-solid fa-tags"></i> Hóa học</span>
-      </div>
-      
-      <h2 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        Ứng dụng Cheminformatics trong nghiên cứu hoạt tính sinh học từ ChEMBL
-      </h2>
-
-      <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
-        Hóa tin học (Cheminformatics) đóng vai trò then chốt trong sàng lọc thuốc ảo (Virtual screening). Làm thế nào để khai thác và lập mô hình dữ liệu hoạt tính sinh học từ thư viện ChEMBL khổng lồ? Dưới đây là quy trình thực hành chi tiết.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-database"></i> 1. Cơ sở dữ liệu hoạt tính sinh học ChEMBL</h3>
-      <p style="margin-bottom: 1rem;">
-        ChEMBL là cơ sở dữ liệu mở lớn nhất thế giới về các phân tử nhỏ có hoạt tính sinh học giống thuốc. Nó lưu trữ thông tin chi tiết về ái lực liên kết, liều lượng phản hồi hiệu quả ($IC_{50}$, $EC_{50}$, $K_i$) thu thập từ hàng vạn bài báo nghiên cứu khoa học y sinh quốc tế.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-brands fa-python"></i> 2. Quy trình cào lọc dữ liệu bằng Python</h3>
-      <p style="margin-bottom: 1rem;">
-        Chúng tôi sử dụng gói thư viện chính thức <code>chembl_webresource_client</code> để kết nối và truy xuất dữ liệu từ các máy chủ ChEMBL thông qua Python API:
-      </p>
-      <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
-        <li>Truy vấn protein đích đích thực bằng ký hiệu gen (Target Gene Symbol) để lấy mã ID đích ChEMBL (e.g. <code>CHEMBL203</code> cho protein EGFR liên quan đến ung thư).</li>
-        <li>Tải danh sách các phân tử hóa học (Bioactivity compounds) liên kết EGFR có số liệu hoạt tính sinh học cụ thể.</li>
-        <li>Chuẩn hóa giá trị hoạt tính sinh học $IC_{50}$ về đơn vị chuẩn nano-mol ($nM$) và áp dụng hàm logarith nghịch đảo $pIC_{50} = -\log_{10}(IC_{50})$ nhằm phân bố dữ liệu đồng nhất.</li>
-        <li>Lọc bỏ các phân tử vi phạm các nguyên tắc thiết kế thuốc (Lipinski Rule of Five).</li>
-      </ul>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-chart-line"></i> 3. Ứng dụng mô hình học máy QSAR</h3>
-      <p style="margin-bottom: 1.5rem;">
-        Dữ liệu đã được làm sạch sau đó sẽ được tính toán các vân tay hóa học (Molecular fingerprints - MACCS, Morgan fingerprints) để biểu diễn cấu trúc hóa học dưới dạng vector nhị phân. Các mô hình Random Forest hoặc XGBoost sẽ được huấn luyện trên tập dữ liệu này để dự đoán hoạt tính sinh học của các hợp chất mới chưa từng thử nghiệm lâm sàng.
-      </p>
     </article>
-  </div>
+
+    <div class="footer-rule-double"></div>
+    <footer class="mag-footer">
+      <span>© 2025 adapalen &bull; sincostan.id.vn</span>
+      <span>Được xây dựng bằng HTML thuần &bull; GitHub Pages</span>
+    </footer>
+  </main>
 
   <script>
     const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-    if (savedTheme === 'light') {
-      document.body.classList.add('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-    } else {
-      document.body.classList.remove('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    const saved = localStorage.getItem('theme') || 'light';
+    function applyTheme(t) {
+      document.body.classList.toggle('dark-theme', t === 'dark');
+      themeToggle.textContent = t === 'dark' ? '☀' : '☽';
     }
-
+    applyTheme(saved);
     themeToggle.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+      const isDark = document.body.classList.contains('dark-theme');
+      const next = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
     });
   </script>
 </body>

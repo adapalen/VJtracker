@@ -3,99 +3,147 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hướng dẫn sử dụng dữ liệu mô phỏng AlphaFold DB và Foldseek phục vụ phân tích cấu trúc protein 3D.">
-  <title>Mô hình hóa cấu trúc Protein 3D với AlphaFold và Foldseek</title>
-  <!-- Google Fonts: Inter -->
+  <meta name="description" content="Khám phá cách sử dụng AlphaFold và Foldseek để mô hình hóa cấu trúc protein 3D và tìm kiếm tương đồng cấu trúc.">
+  <title>Mô hình hóa cấu trúc Protein 3D với AlphaFold và Foldseek | adapalen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../../../style.css">
+  <link rel="stylesheet" href="../../../subpage.css">
 </head>
-<body class="portfolio-page">
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <i class="fa-solid fa-code logo-icon"></i>
-        <div>
-          <h1 id="main-title">adapalen</h1>
-          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+<body>
+  <header class="masthead">
+    <div class="masthead-top-bar">
+      <span class="dateline">Adapalen — Blog</span>
+      <button id="theme-toggle" class="theme-btn">☽</button>
+      <span class="edition-label">sincostan.id.vn</span>
+    </div>
+    <div class="masthead-title-row">
+      <div class="masthead-rule"></div>
+      <a href="../../../index.html" style="text-decoration:none;"><h1 class="masthead-title">ADAPALEN</h1></a>
+      <div class="masthead-rule"></div>
+    </div>
+    <div class="masthead-subtitle-row">
+      <span class="masthead-tagline">Kỹ sư Phần mềm &bull; Phân tích Dữ liệu &bull; Nhà phát triển Web</span>
+    </div>
+    <div class="masthead-nav-bar">
+      <a href="../../../index.html" class="mast-nav">Trang chủ</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../about/index.html" class="mast-nav">Giới thiệu</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#projects" class="mast-nav">Dự án</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../index.html" class="mast-nav active">Blog</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../sitemap/index.html" class="mast-nav">Sơ đồ trang</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#contact" class="mast-nav">Liên hệ</a>
+    </div>
+    <div class="masthead-bottom-rule"></div>
+  </header>
+
+  <main class="subpage-main">
+    <nav class="page-breadcrumb">
+      <a href="../../../index.html">Trang chủ</a>
+      <span>›</span>
+      <a href="../index.html">Blog</a>
+      <span>›</span>
+      <span>AlphaFold &amp; Foldseek</span>
+    </nav>
+
+    <article>
+      <header class="article-header">
+        <div class="article-kicker">Hóa học</div>
+        <h2 class="article-title">Mô hình hóa cấu trúc Protein 3D với AlphaFold và Foldseek</h2>
+        <div class="article-meta">
+          <span>05/07/2026</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>7 phút đọc</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>adapalen</span>
         </div>
+      </header>
+      <div class="thin-rule"></div>
+
+      <div class="article-body">
+        <p>Trong hơn 50 năm, bài toán dự đoán cấu trúc protein từ chuỗi amino acid — còn gọi là <em>protein folding problem</em> — được coi là một trong những thách thức khó giải nhất của sinh học phân tử. Năm 2020, <strong>AlphaFold2</strong> của DeepMind đã làm chấn động giới khoa học khi đạt độ chính xác gần như tương đương với thực nghiệm X-ray crystallography trong cuộc thi CASP14. Đến nay, cơ sở dữ liệu AlphaFold DB chứa hơn 200 triệu cấu trúc protein dự đoán cho hầu hết mọi sinh vật đã biết — và tất cả đều miễn phí, mở công khai. Bài viết này hướng dẫn bạn cách đọc, diễn giải và tìm kiếm cấu trúc tương đồng từ kho dữ liệu này.</p>
+
+        <h2>Chỉ số pLDDT — thước đo tin cậy của AlphaFold</h2>
+        <p>Điểm khác biệt quan trọng nhất giữa AlphaFold và các phương pháp thực nghiệm là <em>độ tin cậy theo từng vị trí</em>. AlphaFold đính kèm vào mỗi cấu trúc dự đoán một chỉ số gọi là <strong>pLDDT</strong> (predicted Local Distance Difference Test), dao động từ 0 đến 100. Giá trị này được mã hóa màu sắc trong file PDB/mmCIF và trực tiếp trực quan hóa khi bạn mở file trên PyMOL hay Mol*:</p>
+
+        <ul style="margin: 1em 0; padding-left: 1.5em; font-family: 'Source Serif 4', Georgia, serif;">
+          <li><strong style="color:#0066cc;">Xanh đậm (90–100):</strong> Rất tin cậy — cấu trúc được dự đoán với độ chính xác cao, gần sát thực nghiệm.</li>
+          <li><strong style="color:#66aaff;">Xanh nhạt (70–90):</strong> Tin cậy — phù hợp cho hầu hết ứng dụng mô hình hóa phân tử.</li>
+          <li><strong style="color:#ffaa00;">Vàng (50–70):</strong> Thấp — cấu trúc mang tính dự đoán, nên đối chiếu với dữ liệu thực nghiệm.</li>
+          <li><strong style="color:#ff4444;">Cam/Đỏ (&lt;50):</strong> Rất thấp — vùng này khả năng là vô cấu trúc (<em>intrinsically disordered</em>) trong thực tế.</li>
+        </ul>
+
+        <p>Điều quan trọng cần nhớ: pLDDT thấp <em>không có nghĩa là AlphaFold sai</em>. Nhiều protein thực sự có các vùng linh hoạt, không có cấu trúc cố định — và AlphaFold khá giỏi trong việc nhận biết điều này. Các vùng pLDDT thấp thường tương ứng với linker vùng kết nối, đuôi N/C-terminal, hoặc loop bề mặt tiếp xúc dung môi.</p>
+
+        <h2>Truy xuất cấu trúc từ AlphaFold DB</h2>
+        <p>AlphaFold DB cung cấp REST API đơn giản để tải cấu trúc theo UniProt Accession ID. Ví dụ, để lấy cấu trúc của protein p53 của người (UniProt: P04637):</p>
+
+        <pre><code>import requests
+
+def fetch_alphafold_structure(uniprot_id, version=4):
+    """Tai file mmCIF tu AlphaFold Database."""
+    base = "https://alphafold.ebi.ac.uk/files"
+    cif_url = f"{base}/AF-{uniprot_id}-F1-model_v{version}.cif"
+    plddt_url = f"{base}/AF-{uniprot_id}-F1-predicted_aligned_error_v{version}.json"
+
+    cif_resp = requests.get(cif_url, timeout=30)
+    cif_resp.raise_for_status()
+    with open(f"{uniprot_id}.cif", "wb") as f:
+        f.write(cif_resp.content)
+    print(f"Da luu cau truc: {uniprot_id}.cif")
+
+    # PAE matrix - do chinh xac tuong doi giua cac cap residue
+    pae_resp = requests.get(plddt_url, timeout=30)
+    if pae_resp.ok:
+        pae_data = pae_resp.json()
+        avg_pae = sum(pae_data["predicted_aligned_error"][i][i]
+                      for i in range(len(pae_data["residues"]))) / len(pae_data["residues"])
+        print(f"PAE trung binh duong cheo: {avg_pae:.2f} Angstrom")
+
+fetch_alphafold_structure("P04637")
+</code></pre>
+
+        <h2>Tìm kiếm tương đồng cấu trúc với Foldseek</h2>
+        <p><strong>Foldseek</strong> là công cụ tìm kiếm cấu trúc protein tương đồng với tốc độ cực nhanh — tương tự như BLAST nhưng dùng cấu trúc 3D thay vì chuỗi amino acid. Điều này đặc biệt quan trọng vì hai protein có thể có chức năng tương tự nhưng chuỗi trình tự hoàn toàn khác nhau — một hiện tượng gọi là <em>structural convergence</em>. Foldseek mã hóa mỗi residue thành một "chữ cái" trong "ngôn ngữ cấu trúc" 3Di, sau đó áp dụng tìm kiếm tương tự chuỗi siêu nhanh. Với AlphaFold DB làm cơ sở dữ liệu mục tiêu, bạn có thể tìm tất cả protein tương đồng cấu trúc trong 200 triệu entry chỉ trong vài giây.</p>
+
+        <blockquote>
+          <strong>Ứng dụng thực tiễn:</strong> Khi nghiên cứu một protein mồ côi (<em>orphan protein</em>) — không có homologue rõ ràng theo trình tự — Foldseek thường tìm được các protein có cấu trúc tương đồng từ sinh vật khác, gợi ý chức năng có thể có. Đây là cách tiếp cận "cấu trúc trước, chức năng sau" ngày càng phổ biến.
+        </blockquote>
+
+        <h2>Diễn giải kết quả và giới hạn của AlphaFold</h2>
+        <p>Mặc dù AlphaFold cách mạng hóa sinh học cấu trúc, nó không phải toàn năng. Model dự đoán cấu trúc của protein trong trạng thái <em>đơn lẻ</em>, bỏ qua các đối tác tương tác, ligand gắn kết, hay điều kiện pH và nhiệt độ. AlphaFold3 (2024) đã cải thiện đáng kể khả năng dự đoán phức hợp protein-DNA và protein-ligand, nhưng vẫn còn khoảng cách với thực nghiệm đối với các cấu trúc rất lớn hoặc các vùng động lực học phức tạp. Do đó, cách tiếp cận tối ưu là dùng AlphaFold như điểm khởi đầu: nhanh chóng có mô hình 3D để định hướng thực nghiệm, thay vì thay thế hoàn toàn X-ray hay cryo-EM trong những nghiên cứu đòi hỏi độ chính xác tuyệt đối.</p>
       </div>
-      <nav class="header-nav">
-        <a href="../../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="../../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
-        <a href="../../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
-        <a href="../index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
-        <a href="../../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
-        <a href="../../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
-      </nav>
-      <div class="header-controls">
-        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
-          <i class="fa-solid fa-moon"></i>
-        </button>
+
+      <div class="article-nav-back">
+        <a href="../index.html" class="back-link">← Quay lại danh sách bài viết</a>
       </div>
-    </header>
-
-    <!-- Article Content -->
-    <article class="portfolio-section glass" style="padding: 2.5rem; line-height: 1.8;">
-      <a href="../index.html" class="blog-back-btn" style="margin-bottom: 1.5rem;"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài viết</a>
-      
-      <div class="blog-meta" style="margin-bottom: 1rem; gap: 1.5rem; font-size: 0.9rem;">
-        <span><i class="fa-regular fa-calendar"></i> 05/07/2026</span>
-        <span><i class="fa-regular fa-clock"></i> 7 phút đọc</span>
-        <span><i class="fa-solid fa-tags"></i> Hóa học</span>
-      </div>
-      
-      <h2 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        Mô hình hóa cấu trúc Protein 3D với AlphaFold và Foldseek
-      </h2>
-
-      <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
-        Sự ra đời của mô hình AI AlphaFold đã mở ra kỷ nguyên mới cho sinh học cấu trúc. Từ một trình tự axit amin ban đầu, chúng ta có thể dự đoán cấu trúc không gian 3D chính xác cấp độ nguyên tử và tìm kiếm sự tương đồng tiến hóa siêu tốc.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-circle-nodes"></i> 1. Đánh giá độ tin cậy mô hình cấu trúc</h3>
-      <p style="margin-bottom: 1rem;">
-        Cấu trúc protein tải về từ AlphaFold Database (định dạng <code>.pdb</code> hoặc <code>.cif</code>) chứa thông số độ tin cậy dự báo quan trọng: <strong>pLDDT</strong> (predicted Local Distance Difference Test).
-      </p>
-      <p style="margin-bottom: 1rem;">
-        Chỉ số pLDDT chạy từ $0$ đến $100$. Trong phân tích, chúng tôi phân loại:
-      </p>
-      <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
-        <li><strong>pLDDT > 90</strong>: Độ tin cậy siêu cao (rất khớp với thực nghiệm tinh thể tia X).</li>
-        <li><strong>70 &lt; pLDDT &lt; 90</strong>: Độ tin cậy tốt, có thể dùng để dựng cấu hình tương tác liên kết.</li>
-        <li><strong>pLDDT &lt; 50</strong>: Vùng bất định hình, không có cấu trúc không gian ổn định thực tế.</li>
-      </ul>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-magnifying-glass"></i> 2. So sánh cấu trúc không gian bằng Foldseek</h3>
-      <p style="margin-bottom: 1rem;">
-        Khi có cấu trúc 3D của một protein lạ, việc so sánh trình tự axit amin (như BLAST) đôi khi không tìm ra họ hàng tiến hóa vì trình tự thay đổi nhưng cấu trúc 3D vẫn giữ nguyên.
-      </p>
-      <p style="margin-bottom: 1.5rem;">
-        <strong>Foldseek</strong> giải quyết bài toán này bằng cách dịch chuyển các tọa độ 3D thành "chữ cái cấu trúc" (structural alphabet) đặc trưng. Nó cho phép tìm kiếm đối sánh cấu trúc không gian 3D trên cơ sở dữ liệu hàng triệu protein dự đoán chỉ trong vài giây, giúp phát hiện nhanh các họ protein mới và dự báo chức năng chưa biết.
-      </p>
     </article>
-  </div>
+
+    <div class="footer-rule-double"></div>
+    <footer class="mag-footer">
+      <span>© 2025 adapalen &bull; sincostan.id.vn</span>
+      <span>Được xây dựng bằng HTML thuần &bull; GitHub Pages</span>
+    </footer>
+  </main>
 
   <script>
     const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-    if (savedTheme === 'light') {
-      document.body.classList.add('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-    } else {
-      document.body.classList.remove('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    const saved = localStorage.getItem('theme') || 'light';
+    function applyTheme(t) {
+      document.body.classList.toggle('dark-theme', t === 'dark');
+      themeToggle.textContent = t === 'dark' ? '☀' : '☽';
     }
-
+    applyTheme(saved);
     themeToggle.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+      const isDark = document.body.classList.contains('dark-theme');
+      const next = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
     });
   </script>
 </body>

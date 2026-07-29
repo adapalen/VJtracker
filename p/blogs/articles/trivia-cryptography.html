@@ -3,94 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Khám phá lịch sử mật mã học từ bản dịch Caesar cổ đại đến ứng dụng mô hình AI Ithaca trong phục dựng văn bản cổ.">
-  <title>Mật mã học lịch sử: Từ bản dịch Caesar đến mô hình AI Ithaca</title>
-  <!-- Google Fonts: Inter -->
+  <meta name="description" content="Lịch sử mật mã học từ mã Caesar, Vigenère đến mô hình AI Ithaca phục hồi văn bản cổ đại.">
+  <title>Mật mã học lịch sử: Từ bản dịch Caesar đến mô hình AI Ithaca | adapalen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../../../style.css">
+  <link rel="stylesheet" href="../../../subpage.css">
 </head>
-<body class="portfolio-page">
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <i class="fa-solid fa-code logo-icon"></i>
-        <div>
-          <h1 id="main-title">adapalen</h1>
-          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+<body>
+  <header class="masthead">
+    <div class="masthead-top-bar">
+      <span class="dateline">Adapalen — Blog</span>
+      <button id="theme-toggle" class="theme-btn">☽</button>
+      <span class="edition-label">sincostan.id.vn</span>
+    </div>
+    <div class="masthead-title-row">
+      <div class="masthead-rule"></div>
+      <a href="../../../index.html" style="text-decoration:none;"><h1 class="masthead-title">ADAPALEN</h1></a>
+      <div class="masthead-rule"></div>
+    </div>
+    <div class="masthead-subtitle-row">
+      <span class="masthead-tagline">Kỹ sư Phần mềm &bull; Phân tích Dữ liệu &bull; Nhà phát triển Web</span>
+    </div>
+    <div class="masthead-nav-bar">
+      <a href="../../../index.html" class="mast-nav">Trang chủ</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../about/index.html" class="mast-nav">Giới thiệu</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#projects" class="mast-nav">Dự án</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../index.html" class="mast-nav active">Blog</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../sitemap/index.html" class="mast-nav">Sơ đồ trang</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#contact" class="mast-nav">Liên hệ</a>
+    </div>
+    <div class="masthead-bottom-rule"></div>
+  </header>
+
+  <main class="subpage-main">
+    <nav class="page-breadcrumb">
+      <a href="../../../index.html">Trang chủ</a>
+      <span>›</span>
+      <a href="../index.html">Blog</a>
+      <span>›</span>
+      <span>Mật mã học lịch sử</span>
+    </nav>
+
+    <article>
+      <header class="article-header">
+        <div class="article-kicker">Thú vị</div>
+        <h2 class="article-title">Mật mã học lịch sử: Từ bản dịch Caesar đến mô hình AI Ithaca</h2>
+        <div class="article-meta">
+          <span>25/06/2026</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>6 phút đọc</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>adapalen</span>
         </div>
+      </header>
+      <div class="thin-rule"></div>
+
+      <div class="article-body">
+        <p>Bạn có bao giờ nhận được một tin nhắn bí ẩn và tự hỏi: liệu đây có phải mật thư không? Hoặc ngồi xem phim điệp viên và thắc mắc những cái máy mã hóa phức tạp đó hoạt động ra sao? Mật mã học — nghệ thuật bảo vệ thông tin qua mã hóa — có lịch sử dài hơn 3.000 năm, và hành trình của nó từ những trò chơi chữ cái đơn giản thời cổ đại đến các mô hình AI hiện đại phục hồi văn bản cổ đại là một câu chuyện kỳ diệu về trí tuệ con người. Hãy cùng khám phá!</p>
+
+        <h2>Mã Caesar — mật mã đơn giản nhất mọi thời đại</h2>
+        <p>Julius Caesar — vị tướng kiêm nhà độc tài La Mã huyền thoại — không chỉ giỏi đánh trận mà còn là một tay mật mã nghiệp dư cừ khôi. Ông dùng một kỹ thuật cực kỳ đơn giản: dịch chuyển mỗi chữ cái trong bảng chữ cái đi 3 vị trí. Vậy là chữ <code>A</code> thành <code>D</code>, <code>B</code> thành <code>E</code>, và <code>HELLO</code> thành <code>KHOOR</code>. Cách giải mã? Dịch ngược lại 3 vị trí là xong. Nghe có vẻ ngây thơ phải không? Nhưng trong thế giới của thế kỷ thứ nhất trước Công nguyên — khi phần lớn dân số không biết chữ — đây là một lớp bảo vệ đủ tốt để Caesar giao tiếp bí mật với các tướng lĩnh của mình.</p>
+
+        <blockquote>
+          <strong>Thử ngay:</strong> Hãy mã hóa tên của bạn bằng mã Caesar dịch +3. Nếu tên bạn là TUAN, nó sẽ thành WXDQ. Bạn có thể giải mã không? Đây chính là "trò chơi" mà hàng thế kỷ trước, các tướng quân La Mã đã dùng để bảo vệ bí mật chiến trường!
+        </blockquote>
+
+        <h2>Mật mã Vigenère — "Mật mã không thể phá vỡ" trong 300 năm</h2>
+        <p>Mã Caesar có một điểm yếu chết người: chỉ có 25 cách dịch chuyển khác nhau. Một kẻ tấn công kiên nhẫn chỉ cần thử 25 khả năng là xong — điều mà người ta gọi là <em>brute force attack</em>. Vào thế kỷ 16, nhà ngoại giao người Pháp Blaise de Vigenère đã giải quyết vấn đề này bằng một ý tưởng thiên tài: dùng một từ khóa nhiều chữ cái, mỗi chữ cái trong từ khóa mã hóa một ký tự tương ứng trong bản rõ với lượng dịch chuyển khác nhau. Nếu từ khóa là <code>KEY</code>, thì ký tự thứ nhất dịch +K, thứ hai dịch +E, thứ ba dịch +Y, rồi lặp lại. Kết quả là cùng một chữ cái trong bản rõ sẽ được mã hóa thành nhiều ký tự khác nhau trong bản mã — phá vỡ hoàn toàn phân tích tần suất ký tự, vũ khí chủ lực của giải mã thời đó. Mật mã Vigenère được mệnh danh là <em>"le chiffre indéchiffrable"</em> (mật mã không thể phá) và giữ danh hiệu này suốt gần 300 năm — cho đến khi Charles Babbage và Friedrich Kasiski độc lập tìm ra cách phân tích độ dài từ khóa vào thế kỷ 19.</p>
+
+        <h2>Enigma và cuộc chiến trí tuệ Thế chiến II</h2>
+        <p>Nhảy vọt đến thế kỷ 20: Thế chiến II đã đẩy mật mã học lên tầm cao chưa từng có. Máy <strong>Enigma</strong> của Đức Quốc xã là một cỗ máy cơ điện kỳ diệu với hàng tỷ cấu hình có thể — lý thuyết là không thể phá vỡ. Nhưng năm 1941, nhà toán học thiên tài <strong>Alan Turing</strong> cùng đội ngũ tại Bletchley Park đã xây dựng máy "Bombe" — tiền thân của máy tính hiện đại — để phá mã Enigma. Ước tính rằng thành tựu này đã rút ngắn Thế chiến II từ 2 đến 4 năm và cứu hàng triệu sinh mạng. Điều thú vị là Turing không phá Enigma bằng toán học thuần túy mà khai thác <em>lỗi con người</em>: các nhân viên điện báo Đức thường dùng các cụm từ có thể đoán được (như "Heil Hitler" ở cuối tin) để tìm điểm tựa giải mã.</p>
+
+        <h2>Ithaca — khi AI đọc được văn bản cổ đại bị xóa mờ</h2>
+        <p>Và đây là nơi câu chuyện trở nên thực sự kỳ diệu. Năm 2022, nhóm nghiên cứu DeepMind phối hợp với các nhà ngôn ngữ học tại Oxford và Athens đã công bố <strong>Ithaca</strong> — mô hình deep learning đầu tiên có thể phục hồi văn bản trên các tấm bia đá Hy Lạp cổ đại bị hỏng, xác định địa điểm và niên đại tạo ra chúng. Ithaca được huấn luyện trên hơn 78.000 văn bản bia ký Hy Lạp từ cơ sở dữ liệu Packard Humanities Institute. Khi nhập một đoạn văn bản có những ký tự bị mất, Ithaca đề xuất các từ điền vào chỗ trống với xác suất tương ứng — và khi kết hợp với chuyên gia người, độ chính xác đạt tới 72%, so với 43% của chuyên gia làm việc đơn độc. Đây là minh chứng đẹp nhất cho AI-human collaboration: không phải AI thay thế nhà nghiên cứu, mà AI và nhà nghiên cứu cùng nhau làm được điều mà không ai làm được một mình.</p>
+
+        <p>Từ những xáo trộn chữ cái thô sơ của Caesar đến mạng nơ-ron đọc vết mực nhòa trên đá cẩm thạch 2.500 năm tuổi — hành trình của mật mã học và giải mã chứng minh một điều: con người luôn bị cuốn hút bởi bí ẩn, và không bí ẩn nào là vĩnh viễn không thể giải được, chỉ là chưa đến lúc thôi.</p>
       </div>
-      <nav class="header-nav">
-        <a href="../../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="../../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
-        <a href="../../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
-        <a href="../index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
-        <a href="../../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
-        <a href="../../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
-      </nav>
-      <div class="header-controls">
-        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
-          <i class="fa-solid fa-moon"></i>
-        </button>
+
+      <div class="article-nav-back">
+        <a href="../index.html" class="back-link">← Quay lại danh sách bài viết</a>
       </div>
-    </header>
-
-    <!-- Article Content -->
-    <article class="portfolio-section glass" style="padding: 2.5rem; line-height: 1.8;">
-      <a href="../index.html" class="blog-back-btn" style="margin-bottom: 1.5rem;"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài viết</a>
-      
-      <div class="blog-meta" style="margin-bottom: 1rem; gap: 1.5rem; font-size: 0.9rem;">
-        <span><i class="fa-regular fa-calendar"></i> 25/06/2026</span>
-        <span><i class="fa-regular fa-clock"></i> 6 phút đọc</span>
-        <span><i class="fa-solid fa-tags"></i> Thông tin thú vị</span>
-      </div>
-      
-      <h2 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        Mật mã học lịch sử: Từ bản dịch Caesar đến mô hình AI Ithaca
-      </h2>
-
-      <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
-        Bảo mật thông tin không phải phát minh thời Internet. Mong muốn truyền tải thông điệp bí mật đã có từ hàng nghìn năm trước, thúc đẩy nhân loại sáng tạo các thuật toán biến đổi ngôn ngữ vô cùng thú vị.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-key"></i> 1. Mật mã Caesar cổ điển</h3>
-      <p style="margin-bottom: 1rem;">
-        Một trong những thuật toán mã hóa cổ xưa nhất được ghi nhận là <strong>mật mã dịch chuyển Caesar</strong>. Hoàng đế La Mã Julius Caesar đã sử dụng nó để gửi các mệnh lệnh quân sự mật cho các tướng lĩnh của mình.
-      </p>
-      <p style="margin-bottom: 1rem;">
-        Nguyên lý cực kỳ đơn giản: dịch chuyển mỗi chữ cái trong văn bản gốc đi một khoảng cố định (khóa $k$, thông thường Caesar dùng $k=3$) trong bảng chữ cái. Ví dụ: với $k=3$, chữ <code>A</code> biến thành <code>D</code>, chữ <code>B</code> biến thành <code>E</code>. Bản mã hóa này ngày nay rất dễ bị bẻ gãy bằng phương pháp phân tích tần suất ký tự.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-scroll"></i> 2. Phục dựng văn bản cổ đại bằng AI</h3>
-      <p style="margin-bottom: 1rem;">
-        Ngày nay, thay vì che giấu thông điệp, các nhà khảo cổ học lại gặp bài toán ngược: giải mã và phục dựng các văn bản lịch sử bị hư hại nghiêm trọng trên các phiến đá cổ.
-      </p>
-      <p style="margin-bottom: 1.5rem;">
-        Sự ra đời của mô hình AI <strong>Ithaca</strong> (do DeepMind phát triển) là một bước đột phá. Được huấn luyện trên hàng vạn bản khắc tiếng Hy Lạp cổ đại, mạng nơ-ron hồi quy của Ithaca có khả năng phục dựng các phần văn bản bị mất với độ chính xác cao, đồng thời dự báo niên đại lịch sử và địa điểm xuất xứ của tài liệu cổ với sai số cực nhỏ.
-      </p>
     </article>
-  </div>
+
+    <div class="footer-rule-double"></div>
+    <footer class="mag-footer">
+      <span>© 2025 adapalen &bull; sincostan.id.vn</span>
+      <span>Được xây dựng bằng HTML thuần &bull; GitHub Pages</span>
+    </footer>
+  </main>
 
   <script>
     const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-    if (savedTheme === 'light') {
-      document.body.classList.add('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-    } else {
-      document.body.classList.remove('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    const saved = localStorage.getItem('theme') || 'light';
+    function applyTheme(t) {
+      document.body.classList.toggle('dark-theme', t === 'dark');
+      themeToggle.textContent = t === 'dark' ? '☀' : '☽';
     }
-
+    applyTheme(saved);
     themeToggle.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+      const isDark = document.body.classList.contains('dark-theme');
+      const next = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
     });
   </script>
 </body>

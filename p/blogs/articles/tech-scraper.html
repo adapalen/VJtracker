@@ -3,102 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hướng dẫn chi tiết xây dựng hệ thống tự động cào theo dõi giá vé máy bay bằng Puppeteer và GitHub Actions.">
-  <title>Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions</title>
-  <!-- Google Fonts: Inter -->
+  <meta name="description" content="Hướng dẫn xây dựng web scraper theo dõi giá vé máy bay với Puppeteer và tự động hóa bằng GitHub Actions.">
+  <title>Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions | adapalen</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="../../../style.css">
+  <link rel="stylesheet" href="../../../subpage.css">
 </head>
-<body class="portfolio-page">
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <i class="fa-solid fa-code logo-icon"></i>
-        <div>
-          <h1 id="main-title">adapalen</h1>
-          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
+<body>
+  <header class="masthead">
+    <div class="masthead-top-bar">
+      <span class="dateline">Adapalen — Blog</span>
+      <button id="theme-toggle" class="theme-btn">☽</button>
+      <span class="edition-label">sincostan.id.vn</span>
+    </div>
+    <div class="masthead-title-row">
+      <div class="masthead-rule"></div>
+      <a href="../../../index.html" style="text-decoration:none;"><h1 class="masthead-title">ADAPALEN</h1></a>
+      <div class="masthead-rule"></div>
+    </div>
+    <div class="masthead-subtitle-row">
+      <span class="masthead-tagline">Kỹ sư Phần mềm &bull; Phân tích Dữ liệu &bull; Nhà phát triển Web</span>
+    </div>
+    <div class="masthead-nav-bar">
+      <a href="../../../index.html" class="mast-nav">Trang chủ</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../about/index.html" class="mast-nav">Giới thiệu</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#projects" class="mast-nav">Dự án</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../index.html" class="mast-nav active">Blog</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../sitemap/index.html" class="mast-nav">Sơ đồ trang</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="../../../index.html#contact" class="mast-nav">Liên hệ</a>
+    </div>
+    <div class="masthead-bottom-rule"></div>
+  </header>
+
+  <main class="subpage-main">
+    <nav class="page-breadcrumb">
+      <a href="../../../index.html">Trang chủ</a>
+      <span>›</span>
+      <a href="../index.html">Blog</a>
+      <span>›</span>
+      <span>Puppeteer &amp; GitHub Actions</span>
+    </nav>
+
+    <article>
+      <header class="article-header">
+        <div class="article-kicker">Công nghệ</div>
+        <h2 class="article-title">Tự động hóa theo dõi giá vé máy bay: Puppeteer &amp; GitHub Actions</h2>
+        <div class="article-meta">
+          <span>18/07/2026</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>10 phút đọc</span>
+          <span class="article-meta-sep">&bull;</span>
+          <span>adapalen</span>
         </div>
+      </header>
+      <div class="thin-rule"></div>
+
+      <div class="article-body">
+        <p>Giá vé máy bay là một trong những thứ biến động nhất trên internet — chúng thay đổi theo từng giờ, thậm chí từng phút, phụ thuộc vào mùa cao điểm, ngày lễ, chính sách khuyến mãi flash sale và hành vi đặt chỗ tổng thể. Theo dõi thủ công là điều không tưởng nếu bạn muốn chốt được mức giá tốt nhất. Đây chính là lúc tự động hóa phát huy tác dụng. Trong bài viết này, chúng ta sẽ xây dựng một hệ thống scraper hoàn chỉnh bằng <strong>Puppeteer</strong> — thư viện Node.js điều khiển trình duyệt Chrome không giao diện — và triển khai lên <strong>GitHub Actions</strong> để chạy tự động theo lịch mà không tốn một đồng hosting phí nào.</p>
+
+        <h2>Tại sao chọn Puppeteer thay vì các thư viện HTTP thông thường?</h2>
+        <p>Nhiều trang web đặt vé máy bay hiện đại như Google Flights, Traveloka, hay trang chính hãng VietJet đều render nội dung bằng JavaScript phía client. Nếu bạn dùng <code>axios</code> hay <code>fetch</code> đơn thuần để gửi HTTP request, bạn sẽ chỉ nhận được bộ khung HTML rỗng — không có giá tiền nào cả. Puppeteer giải quyết điều này bằng cách mở một trình duyệt Chrome thực sự (hoặc Chromium), chờ JavaScript thực thi xong, rồi mới đọc DOM. Kết quả là bạn thấy đúng thứ mà người dùng thực thấy trên màn hình.</p>
+        <p>Một ưu điểm khác của Puppeteer là khả năng mô phỏng hành vi người dùng: cuộn trang, di chuyển chuột, nhập liệu vào form — tất cả đều có thể lập trình. Điều này giúp bypass nhiều lớp kiểm tra "không phải robot" cơ bản. Dưới đây là đoạn code khởi tạo một phiên Puppeteer và điều hướng đến Google Flights để trích xuất giá:</p>
+
+        <pre><code>const puppeteer = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+puppeteer.use(StealthPlugin());
+
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-blink-features=AutomationControlled',
+      '--window-size=1280,800',
+    ],
+  });
+
+  const page = await browser.newPage();
+  await page.setUserAgent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+    'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'Chrome/124.0.0.0 Safari/537.36'
+  );
+
+  // Dieu huong den Google Flights
+  const url = 'https://www.google.com/travel/flights?q=Flights+to+Ho+Chi+Minh+City+from+Hanoi';
+  await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+
+  // Cho phan tu gia xuat hien
+  await page.waitForSelector('[data-isin]', { timeout: 30000 });
+
+  // Trich xuat text gia
+  const prices = await page.$$eval('[data-isin] span[role="text"]', els =>
+    els.map(el => el.innerText.trim()).filter(Boolean)
+  );
+
+  console.log('Gia tim thay:', prices.slice(0, 5));
+  await browser.close();
+})();
+</code></pre>
+
+        <h2>Kỹ thuật chống phát hiện bot (Anti-Bot Evasion)</h2>
+        <p>Hầu hết các nền tảng thương mại điện tử lớn đều triển khai các giải pháp chống bot như Cloudflare, PerimeterX, hoặc DataDome. Chúng phát hiện scraper thông qua nhiều dấu hiệu: giá trị <code>navigator.webdriver</code> là <code>true</code>, thiếu font nhất định, tốc độ tương tác quá nhanh, hay fingerprint canvas bất thường. Gói <code>puppeteer-extra-plugin-stealth</code> vá lại hầu hết các rò rỉ này. Ngoài ra, hãy thêm delay ngẫu nhiên giữa các thao tác, luân phiên User-Agent, và cân nhắc dùng proxy rotating nếu bạn chạy với tần suất cao. Điều quan trọng nhất: đặt <code>waitUntil: 'networkidle2'</code> để đảm bảo trang đã load xong hoàn toàn trước khi đọc dữ liệu.</p>
+
+        <h2>Tự động hóa với GitHub Actions và cron schedule</h2>
+        <p>GitHub Actions cho phép bạn chạy workflow theo lịch định kỳ hoàn toàn miễn phí trên kho lưu trữ công khai. Cấu hình workflow YAML sau đây sẽ kích hoạt scraper mỗi 6 tiếng, lưu kết quả vào file JSON và commit lên repo:</p>
+
+        <pre><code># .github/workflows/scrape-prices.yml
+name: Flight Price Scraper
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx puppeteer browsers install chrome
+
+      - name: Run scraper
+        run: node scraper.js
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/prices.json
+          git diff --staged --quiet || git commit -m "chore: update flight prices"
+          git push
+</code></pre>
+
+        <blockquote>
+          <strong>Lưu ý thực tiễn:</strong> GitHub Actions miễn phí cung cấp 2.000 phút/tháng cho repo công khai. Với workflow chạy mỗi 6 tiếng (4 lần/ngày), mỗi lần mất khoảng 3–5 phút, bạn dùng khoảng 420–600 phút/tháng — hoàn toàn nằm trong giới hạn miễn phí.
+        </blockquote>
+
+        <h2>Xử lý và lưu trữ dữ liệu giá</h2>
+        <p>Sau khi có mảng giá thô, bước tiếp theo là chuẩn hóa dữ liệu: loại bỏ ký tự tiền tệ, parse thành số, gắn timestamp, và lưu vào file JSON hoặc đẩy lên database như Supabase, Firebase Realtime Database, hoặc đơn giản hơn là Google Sheets qua API. Với một hệ thống đơn giản, bạn có thể dùng cấu trúc JSON phẳng: <code>{"route":"HAN-SGN","date":"2026-08-15","price":890000,"airline":"VietJet"}</code>. Sau nhiều tuần thu thập, bạn sẽ có đủ dữ liệu lịch sử để vẽ biểu đồ xu hướng giá và xác định cửa sổ thời gian mua vé tốt nhất — đó là bước phân tích thực sự thú vị mà chúng ta sẽ khám phá trong các bài viết tiếp theo.</p>
       </div>
-      <nav class="header-nav">
-        <a href="../../../index.html" class="nav-item"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="../../about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
-        <a href="../../../index.html#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
-        <a href="../index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
-        <a href="../../sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
-        <a href="../../../index.html#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
-      </nav>
-      <div class="header-controls">
-        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
-          <i class="fa-solid fa-moon"></i>
-        </button>
+
+      <div class="article-nav-back">
+        <a href="../index.html" class="back-link">← Quay lại danh sách bài viết</a>
       </div>
-    </header>
-
-    <!-- Article Content -->
-    <article class="portfolio-section glass" style="padding: 2.5rem; line-height: 1.8;">
-      <a href="../index.html" class="blog-back-btn" style="margin-bottom: 1.5rem;"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài viết</a>
-      
-      <div class="blog-meta" style="margin-bottom: 1rem; gap: 1.5rem; font-size: 0.9rem;">
-        <span><i class="fa-regular fa-calendar"></i> 18/07/2026</span>
-        <span><i class="fa-regular fa-clock"></i> 10 phút đọc</span>
-        <span><i class="fa-solid fa-tags"></i> Công nghệ</span>
-      </div>
-      
-      <h2 style="font-size: 2.2rem; font-weight: 800; line-height: 1.3; margin-bottom: 1.5rem; background: var(--title-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        Tự động hóa theo dõi giá vé máy bay: Puppeteer & GitHub Actions
-      </h2>
-
-      <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem;">
-        Theo dõi sự biến động của giá vé máy bay là một bài toán thú vị. Làm thế nào để tự động hóa quy trình này một cách ổn định, tối ưu chi phí hạ tầng và thu thập dữ liệu sạch? Bài viết dưới đây sẽ chia sẻ kiến trúc chi tiết.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-terminal"></i> 1. Giới thiệu tổng quan kiến trúc</h3>
-      <p style="margin-bottom: 1rem;">
-        Hệ thống được thiết kế chạy hoàn toàn phi máy chủ (Serverless) để tiết kiệm chi phí vận hành. Toàn bộ logic quét dữ liệu được lập trình bằng Node.js và thư viện điều khiển trình duyệt không đầu (Headless browser) <strong>Puppeteer</strong>.
-      </p>
-      <p style="margin-bottom: 1rem;">
-        Mỗi ngày 3 lần, các bộ kích hoạt tự động (Workflow triggers) của <strong>GitHub Actions</strong> sẽ khởi tạo một máy ảo Linux tạm thời, tải mã nguồn, chạy chương trình quét dữ liệu giá vé máy bay thực tế từ Google Flights, và lưu trữ kết quả thẳng vào file cơ sở dữ liệu JSON tĩnh.
-      </p>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-shield-halved"></i> 2. Vượt qua cơ chế chặn (Anti-bot mechanisms)</h3>
-      <p style="margin-bottom: 1rem;">
-        Các hệ thống OTA lớn như Google Flights tích hợp các thuật toán phát hiện bot tự động rất nghiêm ngặt (Cloudflare, Akamai). Để chương trình chạy mượt mà, chúng tôi áp dụng các giải pháp:
-      </p>
-      <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem;">
-        <li>Sử dụng plugin <code>puppeteer-extra-plugin-stealth</code> để ẩn dấu vết webdriver.</li>
-        <li>Tùy biến User-Agent ngẫu nhiên và mô phỏng chính xác các tham số phần cứng màn hình/độ phân giải.</li>
-        <li>Sắp xếp thời gian trễ ngẫu nhiên giữa các thao tác nhấp chuột và nhập liệu văn bản để giả lập con người.</li>
-        <li>Ép buộc các tham số ngôn ngữ và tiền tệ trong URL truy cập để đảm bảo cấu trúc HTML trả về đồng bộ (hl=vi&gl=VN&curr=VND).</li>
-      </ul>
-
-      <h3 style="color: var(--accent-color); font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem;"><i class="fa-solid fa-cloud-arrow-up"></i> 3. Triển khai CI/CD trên GitHub Actions</h3>
-      <p style="margin-bottom: 1.5rem;">
-        File cấu hình workflow yaml định cấu hình một môi trường Ubuntu chạy ổn định với Node.js 24. Sau khi tiến trình cào hoàn tất và ghi đè dữ liệu mới vào <code>flights_db.json</code>, Git sẽ tự động tạo commit mới và đẩy ngược dữ liệu lên kho chứa (Repository) tự động, giúp cập nhật biểu đồ phân tích lập tức.
-      </p>
     </article>
-  </div>
+
+    <div class="footer-rule-double"></div>
+    <footer class="mag-footer">
+      <span>© 2025 adapalen &bull; sincostan.id.vn</span>
+      <span>Được xây dựng bằng HTML thuần &bull; GitHub Pages</span>
+    </footer>
+  </main>
 
   <script>
     const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-    if (savedTheme === 'light') {
-      document.body.classList.add('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-    } else {
-      document.body.classList.remove('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    const saved = localStorage.getItem('theme') || 'light';
+    function applyTheme(t) {
+      document.body.classList.toggle('dark-theme', t === 'dark');
+      themeToggle.textContent = t === 'dark' ? '☀' : '☽';
     }
-
+    applyTheme(saved);
     themeToggle.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+      const isDark = document.body.classList.contains('dark-theme');
+      const next = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
     });
   </script>
 </body>
