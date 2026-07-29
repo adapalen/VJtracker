@@ -3,148 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Portfolio của adapalen - Kỹ sư phần mềm & Nhà phát triển Web.">
-  <title>adapalen | Portfolio</title>
-  <!-- Google Fonts: Inter (with full Vietnamese subset support) -->
+  <meta name="description" content="adapalen — Kỹ sư phần mềm & Nhà phát triển Web. Trang cá nhân.">
+  <title>adapalen | Trang cá nhân</title>
+
+  <!-- Fonts: Playfair Display (editorial serif) + Source Serif 4 (body) + Space Mono (code/label) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- FontAwesome for icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="portfolio.css">
 </head>
-<body class="portfolio-page">
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <i class="fa-solid fa-code logo-icon"></i>
-        <div>
-          <h1 id="main-title">adapalen</h1>
-          <p class="subtitle">Full Stack Engineer & Data Enthusiast</p>
-        </div>
-      </div>
-      <nav class="header-nav">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> Trang chủ</a>
-        <a href="./p/about/index.html" class="nav-item"><i class="fa-solid fa-user"></i> Giới thiệu</a>
-        <a href="#projects" class="nav-item"><i class="fa-solid fa-folder-open"></i> Dự án</a>
-        <a href="./p/blogs/index.html" class="nav-item"><i class="fa-solid fa-book"></i> Blog</a>
-        <a href="./p/sitemap/index.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Sơ đồ trang</a>
-        <a href="#contact" class="nav-item"><i class="fa-solid fa-envelope"></i> Liên hệ</a>
-      </nav>
-      <div class="header-controls">
-        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
-          <i class="fa-solid fa-moon"></i>
-        </button>
-      </div>
-    </header>
+<body>
 
-    <!-- Hero Section -->
-    <section class="hero-section glass">
-      <div class="hero-content">
-        <span class="hero-badge">Chào mừng đến với không gian của tôi</span>
-        <h2>Xây dựng các giải pháp số sáng tạo và trực quan hóa dữ liệu hiệu quả</h2>
-        <p>Tôi là một nhà phát triển phần mềm chuyên nghiệp, đam mê tạo ra các ứng dụng web tối ưu, các công cụ thu thập thông tin tự động và các bảng phân tích dữ liệu trực quan chất lượng cao.</p>
-        <div class="hero-actions">
-          <a href="#projects" class="btn-primary">Xem dự án của tôi</a>
-          <a href="#contact" class="btn-secondary">Liên hệ</a>
+  <!-- Masthead / Newspaper header -->
+  <header class="masthead">
+    <div class="masthead-top-bar">
+      <span class="dateline">Thứ Ba, 29 tháng 7, 2025</span>
+      <div class="masthead-controls">
+        <button id="theme-toggle" class="theme-btn" title="Chuyển chế độ">☽</button>
+      </div>
+      <span class="edition-label">Số &nbsp;001 &mdash; Phiên bản Cá nhân</span>
+    </div>
+
+    <div class="masthead-title-row">
+      <div class="masthead-rule"></div>
+      <h1 class="masthead-title">ADAPALEN</h1>
+      <div class="masthead-rule"></div>
+    </div>
+
+    <div class="masthead-subtitle-row">
+      <span class="masthead-tagline">Kỹ sư Phần mềm &bull; Phân tích Dữ liệu &bull; Nhà phát triển Web</span>
+    </div>
+
+    <div class="masthead-nav-bar">
+      <a href="#" class="mast-nav active">Trang chủ</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="./p/about/index.html" class="mast-nav">Giới thiệu</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="#projects" class="mast-nav">Dự án</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="./p/blogs/index.html" class="mast-nav">Blog</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="./p/sitemap/index.html" class="mast-nav">Sơ đồ trang</a>
+      <span class="nav-sep">&bull;</span>
+      <a href="#contact" class="mast-nav">Liên hệ</a>
+    </div>
+    <div class="masthead-bottom-rule"></div>
+  </header>
+
+  <!-- ─── FRONT PAGE ─────────────────────────────────────────────── -->
+  <main class="newspaper-main">
+
+    <!-- Column layout: 2/3 hero + 1/3 sidebar -->
+    <div class="front-grid">
+
+      <!-- ── LEAD STORY ─────────────── -->
+      <article class="lead-story">
+        <div class="story-kicker">Tin chính</div>
+        <h2 class="story-headline">Xây dựng các giải pháp kỹ thuật số&nbsp;&mdash; từ web&nbsp;đến dữ liệu</h2>
+        <div class="story-byline">Bởi <strong>adapalen</strong> &mdash; Hà Nội, Việt Nam</div>
+        <div class="story-rule"></div>
+        <div class="story-body two-col">
+          <p>
+            Xin chào. Tôi là một nhà phát triển phần mềm chuyên về các ứng dụng web tối ưu,
+            hệ thống thu thập dữ liệu tự động và bảng phân tích dữ liệu trực quan chất lượng cao.
+            Tôi đã dành nhiều năm làm việc với JavaScript, Python và các công nghệ đám mây hiện đại.
+          </p>
+          <p>
+            Triết lý của tôi rất đơn giản: phần mềm tốt phải hoạt động ổn định, dễ đọc và giải quyết
+            được đúng bài toán của người dùng. Không phức tạp hơn mức cần thiết, nhưng cũng không bao
+            giờ thỏa hiệp về chất lượng.
+          </p>
+          <p>
+            Hiện tại tôi đang phát triển nhiều dự án nguồn mở bao gồm hệ thống theo dõi giá vé
+            máy bay thời gian thực, ứng dụng trò chơi tích hợp AI và các công cụ phân tích thị trường.
+          </p>
+          <p>
+            Ngoài lập trình, tôi quan tâm đến hóa học tính toán, xác suất thống kê ứng dụng và
+            lịch sử công nghệ. Những lĩnh vực tưởng chừng rời rạc này thực ra kết nối với nhau
+            theo những cách rất thú vị.
+          </p>
+        </div>
+        <div class="story-rule"></div>
+        <div class="lead-actions">
+          <a href="#projects" class="mag-btn primary">Xem dự án →</a>
+          <a href="#contact" class="mag-btn secondary">Liên hệ →</a>
+        </div>
+      </article>
+
+      <!-- ── SIDEBAR ─────────────────── -->
+      <aside class="sidebar">
+
+        <!-- Pull quote -->
+        <div class="pull-quote">
+          <span class="pq-mark">"</span>
+          <blockquote>Phần mềm tốt phải hoạt động ổn định, dễ đọc và giải quyết đúng bài toán.</blockquote>
+          <cite>— adapalen</cite>
+        </div>
+
+        <div class="sidebar-rule"></div>
+
+        <!-- Briefs column -->
+        <div class="sidebar-section-label">Thông tin nhanh</div>
+        <ul class="brief-list">
+          <li>
+            <span class="brief-icon">✦</span>
+            <div>
+              <strong>Ngôn ngữ chính</strong>
+              <p>JavaScript &bull; Python &bull; SQL</p>
+            </div>
+          </li>
+          <li>
+            <span class="brief-icon">✦</span>
+            <div>
+              <strong>Framework</strong>
+              <p>Node.js &bull; React &bull; Puppeteer</p>
+            </div>
+          </li>
+          <li>
+            <span class="brief-icon">✦</span>
+            <div>
+              <strong>Đám mây &amp; DevOps</strong>
+              <p>GitHub Actions &bull; Firebase &bull; Vercel</p>
+            </div>
+          </li>
+          <li>
+            <span class="brief-icon">✦</span>
+            <div>
+              <strong>Lĩnh vực quan tâm</strong>
+              <p>Data viz &bull; Web scraping &bull; AI/ML</p>
+            </div>
+          </li>
+        </ul>
+
+        <div class="sidebar-rule"></div>
+
+        <!-- Contact blurb -->
+        <div class="sidebar-section-label">Liên hệ</div>
+        <p class="sidebar-contact-text">Có dự án muốn thực hiện? Hãy liên lạc!</p>
+        <div class="sidebar-contact-icons" id="contact">
+          <a href="mailto:adapalen@sincostan.id.vn" title="Email"><i class="fa-solid fa-envelope"></i></a>
+          <a href="https://github.com/adapalen" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="https://facebook.com/adapalen" target="_blank" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="https://linkedin.com/in/adapalen" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+          <a href="https://youtube.com/@adapalen" target="_blank" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          <a href="https://tiktok.com/@adapalen" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          <a href="https://x.com/adapalen" target="_blank" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+      </aside>
+
+    </div><!-- /front-grid -->
+
+    <!-- ── SECTION RULE ──────────────────────────────────── -->
+    <div class="section-divider">
+      <span class="divider-label">DỰ ÁN NỔI BẬT</span>
+    </div>
+
+    <!-- ── PROJECTS — editorial cards ───────────────────── -->
+    <section id="projects" class="projects-spread">
+
+      <!-- Project 1 — full width leader -->
+      <div class="project-leader">
+        <div class="proj-number">01</div>
+        <div class="proj-leader-body">
+          <div class="proj-kicker">Node.js &bull; Puppeteer &bull; Chart.js &bull; GitHub Actions</div>
+          <h3 class="proj-headline">Bộ theo dõi &amp; Phân tích giá vé VietJet</h3>
+          <p class="proj-desc">
+            Hệ thống tự động theo dõi biến động giá vé máy bay VietJet Air thời gian thực trên
+            42 chặng bay nội địa Việt Nam. Dữ liệu được quét 3 lần mỗi ngày hoàn toàn trên đám mây
+            bằng GitHub Actions, lưu trữ trong cơ sở dữ liệu JSON tĩnh và hiển thị dưới dạng
+            biểu đồ phân tích tương tác giúp người dùng xác định thời điểm mua vé tối ưu.
+          </p>
+          <a href="/p/VJtracker/" class="proj-link">Xem trực tiếp <i class="fa-solid fa-arrow-right"></i></a>
         </div>
       </div>
+
+      <!-- Horizontal rule between projects -->
+      <div class="proj-rule"></div>
+
+      <!-- Projects 2 & 3 — side by side -->
+      <div class="projects-pair">
+        <div class="project-item">
+          <div class="proj-number">02</div>
+          <div class="proj-kicker">HTML5 Canvas &bull; JavaScript &bull; Gemini API</div>
+          <h3 class="proj-headline-sm">Caro Arena</h3>
+          <p class="proj-desc-sm">
+            Trò chơi cờ Caro đối đầu trực tiếp tích hợp mô hình ngôn ngữ lớn Gemini làm đối
+            thủ AI thông minh. Hỗ trợ chế độ nhiều người chơi thời gian thực qua Firebase Firestore.
+          </p>
+          <a href="/p/caro-arena/" class="proj-link">Xem trực tiếp →</a>
+        </div>
+
+        <div class="proj-col-rule"></div>
+
+        <div class="project-item">
+          <div class="proj-number">03</div>
+          <div class="proj-kicker">JavaScript &bull; Interactive App &bull; Satire</div>
+          <h3 class="proj-headline-sm">Cậu có bị ngáo không?</h3>
+          <p class="proj-desc-sm">
+            Ứng dụng châm biếm tính toán tỷ lệ phần trăm nam giới đáp ứng các tiêu chuẩn hẹn hò
+            phi thực tế. Một bình luận nhẹ nhàng về các kỳ vọng xã hội thời hiện đại.
+          </p>
+          <a href="./p/caubingaoa/" class="proj-link">Xem trực tiếp →</a>
+        </div>
+      </div>
+
     </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="portfolio-section">
-      <h2 class="section-title"><i class="fa-solid fa-folder-open"></i> Dự án nổi bật</h2>
-      <div class="projects-grid">
-        <!-- Live Project: Flight Tracker -->
-        <div class="project-card glass">
-          <div class="project-icon-wrapper">
-            <i class="fa-solid fa-plane-departure"></i>
-          </div>
-          <div class="project-details">
-            <h3>Bộ theo dõi & Phân tích giá vé VietJet</h3>
-            <p>Hệ thống tự động theo dõi biến động giá vé máy bay VietJet Air thời gian thực trên 42 chặng bay nội địa Việt Nam. Quét dữ liệu 3x/ngày hoàn toàn trên đám mây bằng GitHub Actions.</p>
-            <div class="project-tags">
-              <span class="tag">Node.js</span>
-              <span class="tag">Puppeteer</span>
-              <span class="tag">Chart.js</span>
-              <span class="tag">GitHub Actions</span>
-            </div>
-            <a href="/p/VJtracker/" class="project-link">Xem Trực Tiếp <i class="fa-solid fa-arrow-right"></i></a>
-          </div>
-        </div>
+    <!-- ── BOTTOM RULE & FOOTER ──────────────────────────── -->
+    <div class="footer-rule-double"></div>
+    <footer class="mag-footer">
+      <span>© 2025 adapalen &bull; sincostan.id.vn</span>
+      <span>Được xây dựng bằng HTML thuần &bull; GitHub Pages</span>
+    </footer>
 
-        <!-- Live Project: Caro Arena -->
-        <div class="project-card glass">
-          <div class="project-icon-wrapper">
-            <i class="fa-solid fa-gamepad"></i>
-          </div>
-          <div class="project-details">
-            <h3>Caro Arena (Trò chơi đối đầu AI)</h3>
-            <p>Trò chơi cờ Caro đối đầu trực tiếp tích hợp mô hình ngôn ngữ lớn (Gemini API) thông qua Google AI Studio làm đối thủ AI thông minh, linh hoạt và tương tác trực quan.</p>
-            <div class="project-tags">
-              <span class="tag">HTML5 Canvas</span>
-              <span class="tag">JavaScript</span>
-              <span class="tag">Gemini API</span>
-              <span class="tag">Google AI Studio</span>
-            </div>
-            <a href="/p/caro-arena/" class="project-link">Xem Trực Tiếp <i class="fa-solid fa-arrow-right"></i></a>
-          </div>
-        </div>
-
-        <!-- Live Project: Cậu có bị ngáo không? -->
-        <div class="project-card glass">
-          <div class="project-icon-wrapper">
-            <i class="fa-solid fa-face-laugh-beam"></i>
-          </div>
-          <div class="project-details">
-            <h3>Cậu có bị ngáo không?</h3>
-            <p>Ứng dụng châm biếm tương tác giúp tính toán tỷ lệ phần trăm nam giới đáp ứng các tiêu chuẩn hẹn hò phi thực tế và hài hước dựa trên các bộ lọc tùy chỉnh.</p>
-            <div class="project-tags">
-              <span class="tag">JavaScript</span>
-              <span class="tag">Interactive App</span>
-              <span class="tag">Dating Stats</span>
-              <span class="tag">Satire</span>
-            </div>
-            <a href="./p/caubingaoa/" class="project-link">Xem Trực Tiếp <i class="fa-solid fa-arrow-right"></i></a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="portfolio-section glass" style="padding: 2rem;">
-      <h2 class="section-title" style="margin-bottom: 1rem;"><i class="fa-solid fa-envelope"></i> Kết nối với tôi</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 600px;">Bạn đang có dự án cần thực hiện hoặc chỉ muốn trò chuyện chia sẻ kiến thức? Hãy liên hệ với tôi qua các kênh dưới đây!</p>
-      <div class="contact-links" style="gap: 1.2rem; justify-content: flex-start; margin-top: 1rem;">
-        <a href="mailto:adapalen@sincostan.id.vn" class="contact-btn" title="Email"><i class="fa-solid fa-envelope"></i></a>
-        <a href="https://github.com/adapalen" target="_blank" class="contact-btn" title="GitHub"><i class="fa-brands fa-github"></i></a>
-        <a href="https://facebook.com/adapalen" target="_blank" class="contact-btn" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
-        <a href="https://x.com/adapalen" target="_blank" class="contact-btn" title="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="https://youtube.com/@adapalen" target="_blank" class="contact-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-        <a href="https://tiktok.com/@adapalen" target="_blank" class="contact-btn" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://linkedin.com/in/adapalen" target="_blank" class="contact-btn" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-      </div>
-    </section>
-  </div>
+  </main>
 
   <script>
-    // Theme toggle script for portfolio page
-    const themeToggle = document.getElementById('theme-toggle');
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    
-    if (savedTheme === 'light') {
-      document.body.classList.add('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
-    } else {
-      document.body.classList.remove('light-theme');
-      themeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+    // ── ISO date in masthead ──────────────────────────────────────
+    const datelineEl = document.querySelector('.dateline');
+    if (datelineEl) {
+      const now = new Date();
+      const days = ['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
+      const months = ['tháng 1','tháng 2','tháng 3','tháng 4','tháng 5','tháng 6',
+                      'tháng 7','tháng 8','tháng 9','tháng 10','tháng 11','tháng 12'];
+      datelineEl.textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()}`;
     }
 
+    // ── Theme toggle ──────────────────────────────────────────────
+    const themeToggle = document.getElementById('theme-toggle');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+
+    function applyTheme(t) {
+      document.body.classList.toggle('dark-theme', t === 'dark');
+      themeToggle.textContent = t === 'dark' ? '☀' : '☽';
+    }
+
+    applyTheme(savedTheme);
+
     themeToggle.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light-theme');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      themeToggle.innerHTML = isLight ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+      const isDark = document.body.classList.contains('dark-theme');
+      const next = isDark ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
     });
   </script>
 </body>
