@@ -1,291 +1,467 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="day">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>So Keo Ban Than – Tu Do Do Hiem | Nam Gioi VN</title>
-<meta name="description" content="Ban thuoc Top bao nhieu % nam gioi Viet Nam? Nhap chi so cua ban de tu do do hiem!">
+<title>So Kèo Bản Thân – Tự Đo Độ Hiếm | Nam Giới VN</title>
+<meta name="description" content="Bạn thuộc Top bao nhiêu % nam giới Việt Nam? Tự đo độ hiếm theo chỉ số thực tế.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link rel="stylesheet" href="styles.css">
 <style>
-.rank-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .7rem;border-radius:999px;font-size:.78rem;font-weight:700;font-family:var(--font-accent);letter-spacing:.04em;border:1px solid transparent}
-.rank-S{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#1a1a1a;border-color:#ffd700}
-.rank-A{background:linear-gradient(135deg,#c084fc,#818cf8);color:#fff;border-color:#c084fc}
-.rank-B{background:linear-gradient(135deg,#34d399,#059669);color:#fff;border-color:#34d399}
-.rank-C{background:linear-gradient(135deg,#60a5fa,#3b82f6);color:#fff;border-color:#60a5fa}
-.rank-D{background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff;border-color:#fb923c}
-.rank-E{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff;border-color:#94a3b8}
-.reverse-hero{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-lg);padding:2rem 1.5rem 1.5rem;text-align:center;position:sticky;top:1rem;backdrop-filter:blur(20px)}
-.hero-title-sm{font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem}
-.hero-rank-label{font-family:var(--font-display);font-size:1.05rem;color:var(--text-muted);margin-bottom:.25rem}
-.hero-top-display{display:inline-block;font-family:var(--font-display);font-size:3.5rem;font-weight:800;line-height:1.15;color:#52b788;background:linear-gradient(135deg,#2d6a4f 0%,#52b788 45%,#e9c46a 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:.25rem 0;padding:0 0.05em}
-.hero-desc{font-size:.88rem;color:var(--text-secondary);margin-top:.75rem;line-height:1.5;min-height:2.5rem}
-.rarity-meter-wrap{margin-top:1.25rem}
-.rarity-meter-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--text-muted);margin-bottom:.4rem}
-.rarity-meter-track{height:10px;background:rgba(45,106,79,.1);border-radius:999px;overflow:hidden;border:1px solid rgba(45,106,79,.15)}
-.rarity-meter-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#10b981,#e9c46a,#ef4444);transition:width .8s cubic-bezier(.34,1.56,.64,1)}
-.category-breakdown{display:flex;flex-direction:column;gap:.6rem;margin-top:1.25rem}
-.cat-row{display:flex;align-items:center;gap:.75rem;background:rgba(27,67,50,.04);border:1px solid rgba(27,67,50,.08);border-radius:var(--radius-sm);padding:.55rem .75rem;transition:background .2s}
-[data-theme="dark"] .cat-row{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
-.cat-row:hover{background:rgba(45,106,79,.09)}
-.cat-icon{font-size:1.1rem;flex-shrink:0;width:1.4rem;text-align:center}
-.cat-info{flex:1;min-width:0}
-.cat-name{font-size:.78rem;color:var(--text-muted);font-weight:500}
-.cat-value{font-size:.85rem;color:var(--text-primary);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cat-pct{font-size:.82rem;font-weight:700;color:var(--accent-sage);flex-shrink:0;min-width:4.5rem;text-align:right}
-.cat-bar-wrap{width:100%;height:3px;background:rgba(45,106,79,.1);border-radius:2px;margin-top:.3rem}
-.cat-bar-fill{height:100%;border-radius:2px;background:var(--accent-sage);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
-.compare-callout{background:rgba(233,196,106,.08);border:1px solid rgba(233,196,106,.2);border-radius:var(--radius-md);padding:.75rem 1rem;margin-top:1rem;font-size:.84rem;color:var(--text-secondary);line-height:1.55}
-.compare-callout .highlight{color:#e9c46a;font-weight:700}
-.radar-wrap{position:relative;height:260px;margin-top:1rem}
-.share-result-card{background:linear-gradient(135deg,rgba(45,106,79,.15),rgba(116,198,157,.08));border:1px solid rgba(45,106,79,.25);border-radius:var(--radius-md);padding:1rem 1.2rem;margin-top:1.25rem;text-align:center}
-.share-result-card p{font-size:.85rem;color:var(--text-secondary);line-height:1.5}
-.share-result-card strong{color:var(--accent-sage)}
-.share-btns{display:flex;gap:.5rem;margin-top:.75rem;justify-content:center;flex-wrap:wrap}
-.reverse-hero.tier-S{box-shadow:0 0 40px rgba(255,215,0,.18),var(--shadow-card)}
-.reverse-hero.tier-A{box-shadow:0 0 40px rgba(192,132,252,.18),var(--shadow-card)}
-.reverse-hero.tier-B{box-shadow:0 0 40px rgba(52,211,153,.18),var(--shadow-card)}
-.reverse-hero.tier-C{box-shadow:0 0 40px rgba(96,165,250,.18),var(--shadow-card)}
-.reverse-hero.tier-D{box-shadow:0 0 40px rgba(251,146,60,.18),var(--shadow-card)}
-@media(max-width:768px){.hero-top-display{font-size:2.8rem}.reverse-hero{position:static}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* === MAGAZINE COLOUR TOKENS === */
+:root{
+  --paper:#faf7f0;
+  --paper2:#f2ede1;
+  --ink:#18140d;
+  --ink2:#3d3626;
+  --muted:#7a6e5a;
+  --rule:#c9bfa8;
+  --burg:#8b1a1a;
+  --burg2:#b52020;
+  --gold:#9a6f0e;
+  --gold2:#c49a1a;
+  --green:#2d5c3e;
+  --font-display:'Playfair Display',Georgia,'Times New Roman',serif;
+  --font-fell:'IM Fell English',Georgia,serif;
+  --font-body:'Lora',Georgia,serif;
+  --font-mono:'Courier Prime','Courier New',monospace;
+  --font-ui:'Plus Jakarta Sans',sans-serif;
+}
+[data-theme="evening"]{
+  --paper:#e8e0cc;
+  --paper2:#ddd5bc;
+  --ink:#0f0d08;
+  --muted:#695d4a;
+  --rule:#b8ae99;
+}
+
+/* Base */
+html,body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.68;min-height:100vh;}
+
+/* Subtle paper lines */
+body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(transparent,transparent 31px,rgba(0,0,0,.018) 31px,rgba(0,0,0,.018) 32px);pointer-events:none;z-index:0;}
+
+/* ── PAGE WRAP ── */
+.page{max-width:1080px;margin:0 auto;padding:0 1.75rem 5rem;position:relative;z-index:1;}
+
+/* ── MASTHEAD ── */
+.masthead{border-top:3.5px solid var(--ink);border-bottom:1px solid var(--ink);padding:.55rem 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+.mag-nav{display:flex;flex-wrap:wrap;}
+.mag-nav a{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;color:var(--muted);padding:.2rem .75rem;border-right:1px solid var(--rule);transition:color .15s;}
+.mag-nav a:first-child{padding-left:0;}
+.mag-nav a:last-child{border-right:none;}
+.mag-nav a:hover,.mag-nav a.active{color:var(--burg);}
+.masthead-right{display:flex;align-items:center;gap:1rem;}
+.masthead-issue{font-family:var(--font-mono);font-size:.62rem;color:var(--muted);letter-spacing:.1em;}
+.btn-theme{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;background:none;border:1px solid var(--rule);color:var(--muted);padding:.2rem .55rem;cursor:pointer;transition:all .15s;}
+.btn-theme:hover{border-color:var(--ink);color:var(--ink);}
+
+/* ── EDITORIAL HERO ── */
+.hero-block{padding:2.5rem 0 1.5rem;text-align:center;border-bottom:3px double var(--ink);}
+.hero-kicker{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burg);margin-bottom:.85rem;}
+.hero-title{font-family:var(--font-display);font-size:clamp(2.6rem,7vw,5rem);font-weight:900;line-height:.92;text-transform:uppercase;letter-spacing:-.02em;color:var(--ink);}
+.hero-title em{font-style:italic;font-weight:700;}
+.hero-sub{font-family:var(--font-fell);font-style:italic;font-size:1.12rem;color:var(--ink2);margin-top:.65rem;line-height:1.45;}
+.hero-byline{font-family:var(--font-mono);font-size:.62rem;color:var(--muted);letter-spacing:.09em;margin-top:.75rem;}
+.hero-byline span{color:var(--burg);}
+
+/* ── MAIN 2-COL GRID ── */
+.mag-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;padding-top:2rem;}
+@media(max-width:760px){.mag-grid{grid-template-columns:1fr;gap:2rem;}.results-col{order:-1;}.form-col{order:1;}}
+
+/* ── COL HEADER ── */
+.col-header{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--ink);padding-bottom:.3rem;margin-bottom:1.75rem;}
+
+/* ── QUESTION GROUPS ── */
+.q-group{margin-bottom:1.65rem;}
+.q-num{font-family:var(--font-mono);font-size:.6rem;color:var(--burg);letter-spacing:.18em;font-weight:700;text-transform:uppercase;margin-bottom:.12rem;}
+.q-label{font-family:var(--font-display);font-size:.98rem;font-weight:700;color:var(--ink);margin-bottom:.45rem;display:flex;align-items:baseline;justify-content:space-between;gap:.5rem;line-height:1.2;}
+.q-val{font-family:var(--font-mono);font-size:.8rem;color:var(--burg);font-weight:700;flex-shrink:0;}
+.q-note{font-family:var(--font-body);font-size:.8rem;font-style:italic;color:var(--muted);margin-bottom:.45rem;}
+
+/* Sliders */
+input[type=range]{-webkit-appearance:none;width:100%;height:1.5px;background:var(--rule);outline:none;cursor:pointer;margin:.6rem 0 .2rem;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;background:var(--ink);border-radius:0;cursor:pointer;border:2.5px solid var(--paper);box-shadow:0 0 0 1px var(--ink);}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;background:var(--ink);border-radius:0;cursor:pointer;border:2.5px solid var(--paper);box-shadow:0 0 0 1px var(--ink);}
+.range-scale{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);}
+
+/* Selects */
+.q-select{width:100%;padding:.42rem .1rem;background:transparent;border:none;border-bottom:1px solid var(--ink);border-radius:0;font-family:var(--font-body);font-size:.88rem;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2318140d'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .2rem center;}
+.q-select:focus{outline:none;border-bottom-color:var(--burg);}
+.bmi-note{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);margin-top:.35rem;}
+
+/* Preset chips */
+.preset-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.4rem;}
+.pre-btn{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.06em;padding:.15rem .4rem;background:transparent;color:var(--muted);border:1px solid var(--rule);cursor:pointer;transition:all .15s;}
+.pre-btn:hover,.pre-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+/* Choice pills (radio) */
+.choice-row{display:flex;flex-wrap:wrap;gap:.3rem;}
+.choice-pill{display:inline-flex;align-items:center;cursor:pointer;font-family:var(--font-body);font-size:.78rem;color:var(--ink2);padding:.2rem .55rem;border:1px solid var(--rule);transition:all .15s;user-select:none;line-height:1.3;}
+.choice-pill:hover{border-color:var(--ink2);}
+.choice-pill.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.choice-pill input[type=radio]{display:none;}
+
+/* Toggle list */
+.toggle-list{border-top:1px solid var(--rule);}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.45rem 0;border-bottom:1px dotted var(--rule);gap:.75rem;}
+.toggle-label-text{font-family:var(--font-body);font-size:.84rem;color:var(--ink);}
+.toggle-label-text small{display:block;font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-top:.05rem;}
+.toggle-check{-webkit-appearance:none;appearance:none;width:34px;height:16px;background:var(--rule);border:1px solid var(--ink2);border-radius:0;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;}
+.toggle-check::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;background:var(--ink);transition:transform .2s;}
+.toggle-check:checked{background:var(--burg);border-color:var(--burg);}
+.toggle-check:checked::after{transform:translateX(18px);background:var(--paper);}
+
+/* Buttons */
+.btn-mag{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;padding:.42rem .85rem;background:transparent;color:var(--ink);border:1px solid var(--ink);cursor:pointer;transition:all .15s;margin-top:.75rem;}
+.btn-mag:hover{background:var(--ink);color:var(--paper);}
+.btn-mag.primary{background:var(--ink);color:var(--paper);}
+.btn-mag.primary:hover{background:var(--burg);border-color:var(--burg);}
+
+/* ── RESULTS COL ── */
+.results-col{position:sticky;top:1rem;}
+@media(max-width:760px){.results-col{position:static;}}
+
+/* Pull-quote result */
+.pullquote{border-left:4px solid var(--burg);padding:.85rem 1.1rem .85rem 1.35rem;margin-bottom:1.5rem;}
+.pq-label{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--burg);margin-bottom:.4rem;}
+.pq-number{font-family:var(--font-display);font-size:4.5rem;font-weight:900;line-height:.92;color:var(--ink);display:block;}
+.pq-suffix{font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--ink2);display:block;margin-top:.3rem;}
+.pq-desc{font-family:var(--font-fell);font-style:italic;font-size:.88rem;color:var(--ink2);margin-top:.75rem;line-height:1.55;}
+.tier-stamp{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;display:inline-block;border:1.5px solid var(--ink);padding:.2rem .6rem;margin-top:.75rem;color:var(--ink);}
+.tier-stamp.ts-S{border-color:var(--gold2);color:var(--gold);}
+.tier-stamp.ts-A{border-color:var(--burg);color:var(--burg);}
+.tier-stamp.ts-B{border-color:var(--green);color:var(--green);}
+.tier-stamp.ts-C{border-color:#1e407a;color:#1e407a;}
+.tier-stamp.ts-D{border-color:var(--ink2);color:var(--ink2);}
+.tier-stamp.ts-E{border-color:var(--muted);color:var(--muted);}
+
+/* Rarity bar */
+.rarity-bar{margin:1.15rem 0;}
+.rb-labels{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.58rem;color:var(--muted);letter-spacing:.07em;margin-bottom:.3rem;}
+.rb-track{height:3px;background:var(--rule);}
+.rb-fill{height:100%;background:var(--ink);transition:width .7s ease;}
+
+/* Annotation */
+.annotation{border-left:3px solid var(--gold2);padding:.55rem .75rem;margin:1rem 0;font-family:var(--font-mono);font-size:.7rem;color:var(--ink2);line-height:1.55;}
+.annotation .hl{color:var(--burg);font-weight:700;}
+
+/* Section ruler */
+.sec-rule{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--ink);padding-bottom:.25rem;margin:1.4rem 0 .85rem;}
+
+/* Breakdown list – table-of-contents style */
+.bd-list{font-size:.82rem;}
+.bd-row{display:flex;align-items:baseline;gap:.3rem;padding:.28rem 0;border-bottom:1px dotted var(--rule);}
+.bd-row:last-child{border-bottom:none;}
+.bd-icon{width:1.3rem;flex-shrink:0;font-size:.88rem;}
+.bd-name{font-family:var(--font-body);font-size:.81rem;color:var(--ink);white-space:nowrap;}
+.bd-dots{flex:1;border-bottom:1px dotted var(--rule);margin:0 .3rem;align-self:flex-end;margin-bottom:.25rem;}
+.bd-pct{font-family:var(--font-mono);font-size:.76rem;color:var(--ink);font-weight:700;white-space:nowrap;}
+.bd-tier{font-family:var(--font-mono);font-size:.6rem;color:var(--muted);min-width:1.4rem;text-align:right;}
+
+/* Radar */
+.radar-wrap{height:230px;position:relative;margin-top:.5rem;}
+
+/* Share row */
+.share-row{border-top:3px double var(--ink);padding-top:.9rem;margin-top:1.5rem;}
+.share-row p{font-family:var(--font-fell);font-style:italic;font-size:.85rem;color:var(--ink2);margin-bottom:.65rem;}
+.share-row p strong{font-style:normal;color:var(--burg);}
+.share-btns-row{display:flex;gap:.4rem;flex-wrap:wrap;}
+
+/* Footer */
+.mag-footer{border-top:1px solid var(--ink);padding:.7rem 0;font-family:var(--font-mono);font-size:.6rem;color:var(--muted);letter-spacing:.05em;margin-top:3rem;}
+
+/* Ornament */
+.ornament{display:flex;align-items:center;gap:.65rem;margin:1.5rem 0;color:var(--rule);}
+.ornament::before,.ornament::after{content:'';flex:1;height:1px;background:var(--rule);}
+.ornament span{font-size:.75rem;color:var(--burg);}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--ink);color:var(--paper);font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;padding:.5rem 1rem;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none;}
+.toast.show{opacity:1;}
+
+@media(max-width:600px){.hero-title{font-size:2.4rem;}.pq-number{font-size:3.2rem;}.page{padding:0 1rem 3rem;}}
 </style>
 </head>
 <body>
-<div class="bg-glow blob-1"></div>
-<div class="bg-glow blob-2"></div>
-<div class="bg-glow blob-3"></div>
-<div class="app-container">
-<header class="main-header">
-  <div class="header-top-row">
-    <div class="brand-group">
-      <div class="badge-tag">🏆 💪 👑 💪 🏆</div>
-      <nav class="top-nav-links">
-        <a href="index.html" class="top-nav-item"><i data-lucide="calculator"></i> Thước Đo</a>
-        <a href="so-keo-ban-than.html" class="top-nav-item active"><i data-lucide="trophy"></i> So Kèo Bản Thân</a>
-        <a href="net-dep-thong-ke.html" class="top-nav-item"><i data-lucide="bar-chart-2"></i> Nét Đẹp Thống Kê</a>
-        <a href="thuoc-chua-benh.html" class="top-nav-item"><i data-lucide="pill"></i> Thuốc Chữa Bệnh</a>
-      </nav>
-    </div>
-    <button id="theme-toggle" class="btn-theme-toggle"><i data-lucide="sun" id="theme-icon"></i><span id="theme-text">Giao diện Sáng</span></button>
+<div class="page">
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <nav class="mag-nav">
+    <a href="index.html">Thước Đo</a>
+    <a href="so-keo-ban-than.html" class="active">So Kèo Bản Thân</a>
+    <a href="net-dep-thong-ke.html">Nét Đẹp Thống Kê</a>
+    <a href="thuoc-chua-benh.html">Thuốc Chữa Bệnh</a>
+  </nav>
+  <div class="masthead-right">
+    <span class="masthead-issue">Số 47 · Tháng 7, 1996</span>
+    <button class="btn-theme" id="theme-toggle">☽ Đổi nền</button>
   </div>
-  <h1>SO KÈO BẢN THÂN 🏆</h1>
-  <p class="subtitle">Nhập chỉ số thực của bạn — Hệ thống tính ngay bạn thuộc <strong>Top X% Nam Giới Việt Nam</strong></p>
 </header>
-<main class="calculator-grid">
-<!-- INPUT -->
-<section class="card input-card">
-  <div class="card-header">
-    <h2><i data-lucide="user-check"></i> Nhập Chỉ Số Của Bạn</h2>
-    <button id="btn-reset" class="btn-icon-text"><i data-lucide="rotate-ccw"></i> Đặt lại</button>
-  </div>
-  <form id="self-form" onsubmit="return false;">
-    <!-- Age -->
-    <div class="form-group">
-      <div class="label-row"><label><i data-lucide="calendar"></i> Tuổi của bạn</label><span class="value-display" id="age-display">25 tuổi</span></div>
-      <input type="range" id="age-slider" min="18" max="60" value="25" step="1">
-      <div class="range-labels"><span>18 tuổi</span><span>60 tuổi</span></div>
-    </div>
-    <!-- Height -->
-    <div class="form-group">
-      <div class="label-row"><label><i data-lucide="ruler"></i> Chiều cao của bạn</label><span class="value-display" id="height-display">170 cm</span></div>
-      <input type="range" id="height-slider" min="150" max="195" value="170" step="1">
-      <div class="range-labels"><span>150 cm</span><span>195 cm</span></div>
-    </div>
-    <!-- Weight -->
-    <div class="form-group">
-      <label for="weight-select"><i data-lucide="scale"></i> Cân nặng của bạn</label>
-      <div class="select-wrapper">
-        <select id="weight-select" class="custom-select">
-          <option value="under_50">Dưới 50 kg</option>
-          <option value="50_55">50 – 55 kg</option>
-          <option value="55_60">55 – 60 kg</option>
-          <option value="60_65" selected>60 – 65 kg (Phổ biến nhất)</option>
-          <option value="65_70">65 – 70 kg</option>
-          <option value="70_75">70 – 75 kg</option>
-          <option value="75_80">75 – 80 kg</option>
-          <option value="80_85">80 – 85 kg</option>
-          <option value="85_90">85 – 90 kg</option>
-          <option value="above_90">Trên 90 kg</option>
-        </select>
-        <i data-lucide="chevron-down" class="select-icon"></i>
-      </div>
-      <p id="bmi-display" style="margin-top:.4rem;font-size:.82rem;color:var(--text-muted)"></p>
-    </div>
-    <!-- Salary -->
-    <div class="form-group">
-      <div class="label-row"><label><i data-lucide="banknote"></i> Thu nhập hàng tháng</label><span class="value-display highlight-gold" id="salary-display">10 Triệu VNĐ</span></div>
-      <input type="range" id="salary-slider" min="0" max="150" value="10" step="2.5">
-      <div class="preset-chips" id="salary-presets">
-        <button type="button" class="chip" data-val="5">5 Tr</button>
-        <button type="button" class="chip active" data-val="10">10 Tr</button>
-        <button type="button" class="chip" data-val="15">15 Tr</button>
-        <button type="button" class="chip" data-val="30">30 Tr</button>
-        <button type="button" class="chip" data-val="50">50 Tr</button>
-        <button type="button" class="chip" data-val="100">100 Tr+</button>
-      </div>
-    </div>
-    <!-- Education -->
-    <div class="form-group">
-      <label><i data-lucide="graduation-cap"></i> Trình độ học vấn</label>
-      <div class="radio-grid grid-5">
-        <label class="radio-card active"><input type="radio" name="education" value="below_thpt" checked><span>Dưới THPT</span></label>
-        <label class="radio-card"><input type="radio" name="education" value="thpt"><span>THPT / Trung cấp</span></label>
-        <label class="radio-card"><input type="radio" name="education" value="bachelor"><span>Cử nhân / CĐ</span></label>
-        <label class="radio-card"><input type="radio" name="education" value="master"><span>Thạc sĩ</span></label>
-        <label class="radio-card"><input type="radio" name="education" value="phd"><span>Tiến sĩ</span></label>
-      </div>
-    </div>
-    <!-- Job -->
-    <div class="form-group">
-      <label for="job-select"><i data-lucide="briefcase"></i> Ngành nghề / Nghề nghiệp</label>
-      <div class="select-wrapper">
-        <select id="job-select" class="custom-select">
-          <option value="factory_worker" selected>🏭 Công nhân / Lao động phổ thông</option>
-          <option value="freelance_gig">🛵 Tài xế công nghệ / Freelancer</option>
-          <option value="civil_servant">🏛️ Công chức / Viên chức nhà nước</option>
-          <option value="teacher">👨‍🏫 Giáo viên / Giảng viên</option>
-          <option value="engineer_construction">🏗️ Kỹ sư Xây dựng / Kiến trúc sư</option>
-          <option value="finance">🏦 Tài chính / Ngân hàng</option>
-          <option value="it">💻 Kỹ sư IT / Lập trình viên</option>
-          <option value="doctor">👨‍⚕️ Bác sĩ / Y tế</option>
-          <option value="army">🎖️ Quân đội / Bộ đội</option>
-          <option value="police">👮‍♂️ Công an Nhân dân</option>
-          <option value="lawyer">⚖️ Luật sư / Pháp lý</option>
-          <option value="ceo">👔 Doanh nhân / CEO</option>
-          <option value="pilot_aviation">✈️ Phi công / Hàng không</option>
-          <option value="unemployed">🚫 Đang thất nghiệp</option>
-        </select>
-        <i data-lucide="chevron-down" class="select-icon"></i>
-      </div>
-    </div>
-    <!-- Vehicle -->
-    <div class="form-group">
-      <label><i data-lucide="car"></i> Phương tiện bạn sở hữu (cao nhất)</label>
-      <div class="radio-grid grid-vehicle">
-        <label class="radio-card active"><input type="radio" name="vehicle" value="none" checked><span>Chưa có xe</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="wave_sirius"><span>Xe số (Wave / Sirius)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="future_jupiter"><span>Xe số cao / Côn tay</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="vision_ab"><span>Tay ga tầm trung (Vision / AB)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="sh_vespa"><span>Tay ga cao cấp (SH / Vespa)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="pkl"><span>Mô tô PKL (>200cc)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="car_hatchback_a"><span>Ô tô Hạng A (i10 / VF5)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="car_sedan_bc"><span>Sedan B-C (Vios / Mazda 3)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="car_suv_bc"><span>SUV B-C (CX-5 / CR-V)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="car_suv_de"><span>SUV D-E (Fortuner / Everest)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="car_luxury_mid"><span>Hạng Sang (Mercedes / BMW)</span></label>
-        <label class="radio-card"><input type="radio" name="vehicle" value="car_superluxury"><span>Siêu xe / Rolls-Royce</span></label>
-      </div>
-    </div>
-    <!-- House -->
-    <div class="form-group">
-      <label><i data-lucide="home"></i> Bất động sản bạn sở hữu / đứng tên</label>
-      <div class="radio-grid grid-house">
-        <label class="radio-card active"><input type="radio" name="house" value="none" checked><span>Chưa có BĐS</span></label>
-        <label class="radio-card"><input type="radio" name="house" value="apartment_budget"><span>Chung cư phổ thông</span></label>
-        <label class="radio-card"><input type="radio" name="house" value="apartment_luxury"><span>Chung cư cao cấp (Vinhomes)</span></label>
-        <label class="radio-card"><input type="radio" name="house" value="grounded_alley"><span>Nhà đất ngõ hẻm</span></label>
-        <label class="radio-card"><input type="radio" name="house" value="street_front"><span>Nhà mặt phố / Shophouse</span></label>
-        <label class="radio-card"><input type="radio" name="house" value="mansion_villa"><span>Biệt thự / Dinh thự</span></label>
-      </div>
-    </div>
-    <!-- Region -->
-    <div class="form-group">
-      <label><i data-lucide="map-pin"></i> Khu vực bạn đang sống</label>
-      <div class="radio-grid grid-4">
-        <label class="radio-card active"><input type="radio" name="region" value="province" checked><span>Tỉnh lẻ</span></label>
-        <label class="radio-card"><input type="radio" name="region" value="hanoi"><span>Hà Nội</span></label>
-        <label class="radio-card"><input type="radio" name="region" value="hcm"><span>TP. Hồ Chí Minh</span></label>
-      </div>
-    </div>
-    <!-- Lifestyle -->
-    <div class="form-group">
-      <label><i data-lucide="heart-pulse"></i> Lối sống &amp; Trạng thái</label>
-      <div class="toggles-grid">
-        <div class="toggle-card">
-          <div><div style="font-weight:600;font-size:.88rem">🚭 Bạn không hút thuốc lá?</div><div style="font-size:.78rem;color:var(--text-muted)">Không hút thuốc = Top 57.7% về thói quen này</div></div>
-          <label class="toggle-switch"><input type="checkbox" id="toggle-no-smoke"><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-card">
-          <div><div style="font-weight:600;font-size:.88rem">🧃 Bạn không uống rượu bia?</div><div style="font-size:.78rem;color:var(--text-muted)">Không uống = Top 23% hiếm nhất về thói quen này</div></div>
-          <label class="toggle-switch"><input type="checkbox" id="toggle-no-drink"><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-card">
-          <div><div style="font-weight:600;font-size:.88rem">📱 Bạn dùng iPhone?</div><div style="font-size:.78rem;color:var(--text-muted)">iOS = Top 33% theo thiết bị di động</div></div>
-          <label class="toggle-switch"><input type="checkbox" id="toggle-iphone"><span class="toggle-slider"></span></label>
-        </div>
-        <div class="toggle-card">
-          <div><div style="font-weight:600;font-size:.88rem">💍 Bạn hiện đang độc thân?</div><div style="font-size:.78rem;color:var(--text-muted)">Phụ thuộc độ tuổi của bạn</div></div>
-          <label class="toggle-switch"><input type="checkbox" id="toggle-single"><span class="toggle-slider"></span></label>
-        </div>
-      </div>
-    </div>
-  </form>
-</section>
-<!-- RESULTS -->
-<section class="card result-card">
-  <div class="reverse-hero" id="reverse-hero">
-    <div class="hero-title-sm">🏆 KẾT QUẢ SO KÈO</div>
-    <div class="hero-rank-label">Bạn thuộc</div>
-    <div class="hero-top-display" id="hero-top-display">Top --</div>
-    <div style="font-size:.78rem;color:var(--text-muted);margin-top:.2rem">nam giới Việt Nam (18 – 60 tuổi)</div>
-    <div class="hero-desc" id="hero-desc">Đang tính toán...</div>
-    <div style="margin-top:1rem;display:flex;justify-content:center">
-      <div class="rank-badge rank-E" id="hero-tier-badge">⚪ Đang xử lý...</div>
-    </div>
-    <div class="rarity-meter-wrap">
-      <div class="rarity-meter-label"><span>Phổ biến</span><span>Cực hiếm</span></div>
-      <div class="rarity-meter-track"><div class="rarity-meter-fill" id="rarity-meter-fill" style="width:10%"></div></div>
-    </div>
-    <div class="compare-callout"><span id="compare-text">Đang phân tích...</span></div>
-  </div>
-  <div class="card-header" style="margin-top:1.5rem">
-    <h2><i data-lucide="bar-chart-3"></i> Phân Tích Từng Tiêu Chí</h2>
-  </div>
-  <div class="category-breakdown" id="cat-breakdown"></div>
-  <div class="card-header" style="margin-top:1.5rem">
-    <h2><i data-lucide="activity"></i> Biểu Đồ Radar Chỉ Số</h2>
-  </div>
-  <div class="radar-wrap"><canvas id="radar-chart"></canvas></div>
-  <div class="share-result-card">
-    <p id="share-summary-text">Đang tính toán kết quả của bạn...</p>
-    <div class="share-btns">
-      <button id="btn-share" class="btn-icon-text"><i data-lucide="share-2"></i> Sao chép kết quả</button>
-      <button id="btn-challenge" class="btn-icon-text" style="background:rgba(233,196,106,.12);border-color:rgba(233,196,106,.3);color:#e9c46a"><i data-lucide="swords"></i> Thách bạn bè so kèo</button>
-    </div>
-  </div>
-  <div id="toast" class="toast hidden"><span id="toast-message">Đã sao chép!</span></div>
-</section>
-</main>
-<footer class="footer-note">
-  <p>⚠️ Dữ liệu mang tính tham khảo và giải trí. Nguồn: GSO 2024-2026, WHO, VAMA, VNREA, IDC, MOLISA.</p>
-</footer>
+
+<!-- EDITORIAL HERO -->
+<div class="hero-block">
+  <p class="hero-kicker">✦ &nbsp;Chuyên mục Tự Kiểm Tra&nbsp; ✦</p>
+  <h1 class="hero-title">So Kèo<br><em>Bản Thân</em></h1>
+  <p class="hero-sub">Khảo sát: Nhập chỉ số của bạn — Hệ thống tính ngay bạn thuộc<br>Top X% nam giới Việt Nam trong số 35,2 triệu người (18–60 tuổi)</p>
+  <p class="hero-byline"><span>Phân tích theo số liệu</span> GSO 2024–2026 · MOLISA · WHO · VAMA · VNREA · IDC</p>
 </div>
+
+<!-- TWO-COLUMN GRID -->
+<div class="mag-grid">
+
+<!-- ════ FORM COLUMN ════ -->
+<div class="form-col">
+  <p class="col-header">Phần I — Điền Chỉ Số Của Bạn</p>
+
+  <!-- Q.01 Age -->
+  <div class="q-group">
+    <p class="q-num">Q.01 / Tuổi tác</p>
+    <div class="q-label"><span>Bạn bao nhiêu tuổi?</span><span class="q-val" id="age-display">25 tuổi</span></div>
+    <input type="range" id="age-slider" min="18" max="60" value="25" step="1">
+    <div class="range-scale"><span>18</span><span>60</span></div>
+  </div>
+
+  <!-- Q.02 Height -->
+  <div class="q-group">
+    <p class="q-num">Q.02 / Chiều cao</p>
+    <div class="q-label"><span>Chiều cao của bạn (cm)?</span><span class="q-val" id="height-display">170 cm</span></div>
+    <input type="range" id="height-slider" min="150" max="195" value="170" step="1">
+    <div class="range-scale"><span>150 cm</span><span>195 cm</span></div>
+  </div>
+
+  <!-- Q.03 Weight -->
+  <div class="q-group">
+    <p class="q-num">Q.03 / Cân nặng &amp; BMI</p>
+    <p class="q-note">Chọn khoảng cân nặng gần nhất để hệ thống tính BMI tự động</p>
+    <select id="weight-select" class="q-select">
+      <option value="under_50">Dưới 50 kg</option>
+      <option value="50_55">50 – 55 kg</option>
+      <option value="55_60">55 – 60 kg</option>
+      <option value="60_65" selected>60 – 65 kg &nbsp;(Phổ biến nhất)</option>
+      <option value="65_70">65 – 70 kg</option>
+      <option value="70_75">70 – 75 kg</option>
+      <option value="75_80">75 – 80 kg</option>
+      <option value="80_85">80 – 85 kg</option>
+      <option value="85_90">85 – 90 kg</option>
+      <option value="above_90">Trên 90 kg</option>
+    </select>
+    <p class="bmi-note" id="bmi-display">BMI ≈ 22.8 · Cân đối</p>
+  </div>
+
+  <!-- Q.04 Salary -->
+  <div class="q-group">
+    <p class="q-num">Q.04 / Thu nhập</p>
+    <div class="q-label"><span>Thu nhập hàng tháng (triệu VNĐ)?</span><span class="q-val" id="salary-display">10 Tr</span></div>
+    <input type="range" id="salary-slider" min="0" max="150" value="10" step="2.5">
+    <div class="preset-row" id="salary-presets">
+      <button class="pre-btn" data-val="5" type="button">5 Tr</button>
+      <button class="pre-btn active" data-val="10" type="button">10 Tr</button>
+      <button class="pre-btn" data-val="15" type="button">15 Tr</button>
+      <button class="pre-btn" data-val="30" type="button">30 Tr</button>
+      <button class="pre-btn" data-val="50" type="button">50 Tr</button>
+      <button class="pre-btn" data-val="100" type="button">100 Tr+</button>
+    </div>
+  </div>
+
+  <!-- Q.05 Education -->
+  <div class="q-group">
+    <p class="q-num">Q.05 / Học vấn</p>
+    <p class="q-label" style="margin-bottom:.4rem">Trình độ học vấn cao nhất?</p>
+    <div class="choice-row">
+      <label class="choice-pill active"><input type="radio" name="education" value="below_thpt" checked><span>Dưới THPT</span></label>
+      <label class="choice-pill"><input type="radio" name="education" value="thpt"><span>THPT / TC</span></label>
+      <label class="choice-pill"><input type="radio" name="education" value="bachelor"><span>Cử nhân / CĐ</span></label>
+      <label class="choice-pill"><input type="radio" name="education" value="master"><span>Thạc sĩ</span></label>
+      <label class="choice-pill"><input type="radio" name="education" value="phd"><span>Tiến sĩ</span></label>
+    </div>
+  </div>
+
+  <!-- Q.06 Job -->
+  <div class="q-group">
+    <p class="q-num">Q.06 / Nghề nghiệp</p>
+    <p class="q-label" style="margin-bottom:.4rem">Ngành nghề hiện tại?</p>
+    <select id="job-select" class="q-select">
+      <option value="factory_worker" selected>🏭 Công nhân / Lao động phổ thông</option>
+      <option value="freelance_gig">🛵 Tài xế công nghệ / Freelancer</option>
+      <option value="civil_servant">🏛️ Công chức / Viên chức nhà nước</option>
+      <option value="teacher">👨‍🏫 Giáo viên / Giảng viên</option>
+      <option value="engineer_construction">🏗️ Kỹ sư Xây dựng / Kiến trúc sư</option>
+      <option value="finance">🏦 Tài chính / Ngân hàng</option>
+      <option value="it">💻 Kỹ sư IT / Lập trình viên</option>
+      <option value="doctor">👨‍⚕️ Bác sĩ / Y tế</option>
+      <option value="army">🎖️ Quân đội / Bộ đội</option>
+      <option value="police">👮‍♂️ Công an Nhân dân</option>
+      <option value="lawyer">⚖️ Luật sư / Pháp lý</option>
+      <option value="ceo">👔 Doanh nhân / CEO</option>
+      <option value="pilot_aviation">✈️ Phi công / Hàng không</option>
+      <option value="unemployed">🚫 Đang thất nghiệp</option>
+    </select>
+  </div>
+
+  <!-- Q.07 Vehicle -->
+  <div class="q-group">
+    <p class="q-num">Q.07 / Phương tiện</p>
+    <p class="q-label" style="margin-bottom:.4rem">Phương tiện cao nhất bạn sở hữu?</p>
+    <div class="choice-row">
+      <label class="choice-pill active"><input type="radio" name="vehicle" value="none" checked><span>Chưa có</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="wave_sirius"><span>Wave / Sirius</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="future_jupiter"><span>Xe số cao / Côn tay</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="vision_ab"><span>Vision / AB</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="sh_vespa"><span>SH / Vespa</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="pkl"><span>PKL >200cc</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="car_hatchback_a"><span>Ô tô Hạng A</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="car_sedan_bc"><span>Sedan B-C</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="car_suv_bc"><span>SUV B-C</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="car_suv_de"><span>SUV D-E</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="car_luxury_mid"><span>Xe hạng sang</span></label>
+      <label class="choice-pill"><input type="radio" name="vehicle" value="car_superluxury"><span>Siêu xe</span></label>
+    </div>
+  </div>
+
+  <!-- Q.08 House -->
+  <div class="q-group">
+    <p class="q-num">Q.08 / Bất động sản</p>
+    <p class="q-label" style="margin-bottom:.4rem">BĐS bạn đứng tên / sở hữu?</p>
+    <div class="choice-row">
+      <label class="choice-pill active"><input type="radio" name="house" value="none" checked><span>Chưa có</span></label>
+      <label class="choice-pill"><input type="radio" name="house" value="apartment_budget"><span>Chung cư phổ thông</span></label>
+      <label class="choice-pill"><input type="radio" name="house" value="apartment_luxury"><span>Chung cư cao cấp</span></label>
+      <label class="choice-pill"><input type="radio" name="house" value="grounded_alley"><span>Nhà đất ngõ hẻm</span></label>
+      <label class="choice-pill"><input type="radio" name="house" value="street_front"><span>Nhà mặt phố</span></label>
+      <label class="choice-pill"><input type="radio" name="house" value="mansion_villa"><span>Biệt thự / Dinh thự</span></label>
+    </div>
+  </div>
+
+  <!-- Q.09 Region -->
+  <div class="q-group">
+    <p class="q-num">Q.09 / Khu vực sinh sống</p>
+    <p class="q-label" style="margin-bottom:.4rem">Bạn đang sống ở đâu?</p>
+    <div class="choice-row">
+      <label class="choice-pill active"><input type="radio" name="region" value="province" checked><span>Tỉnh lẻ</span></label>
+      <label class="choice-pill"><input type="radio" name="region" value="hanoi"><span>Hà Nội</span></label>
+      <label class="choice-pill"><input type="radio" name="region" value="hcm"><span>TP. HCM</span></label>
+    </div>
+  </div>
+
+  <!-- Q.10-13 Lifestyle -->
+  <div class="q-group">
+    <p class="q-num">Q.10–13 / Lối sống &amp; Trạng thái</p>
+    <p class="q-label" style="margin-bottom:.5rem">Đánh dấu các câu phù hợp với bạn</p>
+    <div class="toggle-list">
+      <div class="toggle-row">
+        <div class="toggle-label-text">🚭 Bạn không hút thuốc lá<small>Không hút = Top 57.7% về thói quen này</small></div>
+        <input type="checkbox" class="toggle-check" id="toggle-no-smoke">
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label-text">🧃 Bạn không uống rượu bia<small>Không uống = Top 23% hiếm nhất</small></div>
+        <input type="checkbox" class="toggle-check" id="toggle-no-drink">
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label-text">📱 Bạn dùng iPhone<small>iOS = Top 33% theo thiết bị di động</small></div>
+        <input type="checkbox" class="toggle-check" id="toggle-iphone">
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label-text">💍 Bạn hiện đang độc thân<small>Phụ thuộc độ tuổi của bạn</small></div>
+        <input type="checkbox" class="toggle-check" id="toggle-single">
+      </div>
+    </div>
+  </div>
+
+  <div class="ornament"><span>✦</span></div>
+  <button id="btn-reset" class="btn-mag">↺ &nbsp;Đặt lại từ đầu</button>
+</div><!-- end form-col -->
+
+<!-- ════ RESULTS COLUMN ════ -->
+<div class="results-col">
+  <p class="col-header">Phần II — Kết Quả Phân Tích</p>
+
+  <!-- Pull-quote percentage -->
+  <div class="pullquote">
+    <p class="pq-label">Bạn thuộc</p>
+    <span class="pq-number" id="hero-top-display">—</span>
+    <span class="pq-suffix">nam giới Việt Nam (18 – 60 tuổi)</span>
+    <p class="pq-desc" id="hero-desc">Đang tính toán...</p>
+    <div class="tier-stamp ts-E" id="hero-tier-badge">⌛ Đang xử lý</div>
+  </div>
+
+  <!-- Rarity bar -->
+  <div class="rarity-bar">
+    <div class="rb-labels"><span>Phổ biến</span><span>Cực hiếm</span></div>
+    <div class="rb-track"><div class="rb-fill" id="rarity-meter-fill" style="width:15%"></div></div>
+  </div>
+
+  <!-- Annotation / comparison -->
+  <div class="annotation"><span id="compare-text">Đang phân tích dữ liệu của bạn...</span></div>
+
+  <!-- Per-category breakdown -->
+  <p class="sec-rule">Phân tích từng tiêu chí</p>
+  <div id="cat-breakdown" class="bd-list"></div>
+
+  <!-- Radar chart -->
+  <p class="sec-rule">Biểu đồ radar chỉ số</p>
+  <div class="radar-wrap"><canvas id="radar-chart"></canvas></div>
+
+  <!-- Share -->
+  <div class="share-row">
+    <p id="share-summary-text">Đang tính toán kết quả của bạn...</p>
+    <div class="share-btns-row">
+      <button id="btn-share" class="btn-mag primary">↑ Sao chép kết quả</button>
+      <button id="btn-challenge" class="btn-mag">⚔ Thách bạn bè</button>
+    </div>
+  </div>
+</div><!-- end results-col -->
+
+</div><!-- end mag-grid -->
+
+<!-- FOOTER -->
+<div class="mag-footer">
+  <p>⚠ Dữ liệu mang tính tham khảo và giải trí. Không nhằm mục đích phân biệt hay hạ thấp bất kỳ ai. &nbsp;·&nbsp; Nguồn: GSO 2024–2026 · WHO · VAMA · VNREA · IDC · MOLISA</p>
+</div>
+
+</div><!-- end page -->
+
+<!-- TOAST -->
+<div id="toast" class="toast"><span id="toast-message"></span></div>
+
 <script>
 const $ = id => document.getElementById(id);
 const htmlEl = document.documentElement;
-const themeToggleBtn = $('theme-toggle'), themeIconEl = $('theme-icon'), themeTextEl = $('theme-text');
-const ageSlider=$('age-slider'),ageDisplay=$('age-display'),heightSlider=$('height-slider'),heightDisplay=$('height-display');
-const weightSelect=$('weight-select'),salarySlider=$('salary-slider'),salaryDisplay=$('salary-display'),salaryPresets=$('salary-presets');
+
+// DOM refs
+const themeToggle=$('theme-toggle');
+const ageSlider=$('age-slider'),ageDisplay=$('age-display');
+const heightSlider=$('height-slider'),heightDisplay=$('height-display');
+const weightSelect=$('weight-select'),bmiNote=$('bmi-display');
+const salarySlider=$('salary-slider'),salaryDisplay=$('salary-display'),salaryPresets=$('salary-presets');
 const jobSelect=$('job-select');
 const eduRadios=document.querySelectorAll('input[name="education"]');
 const vehicleRadios=document.querySelectorAll('input[name="vehicle"]');
 const houseRadios=document.querySelectorAll('input[name="house"]');
 const regionRadios=document.querySelectorAll('input[name="region"]');
 const toggleNoSmoke=$('toggle-no-smoke'),toggleNoDrink=$('toggle-no-drink'),toggleIphone=$('toggle-iphone'),toggleSingle=$('toggle-single');
-const bmiDisplay=$('bmi-display'),heroTopDisplay=$('hero-top-display'),heroDesc=$('hero-desc'),heroTierBadge=$('hero-tier-badge');
-const reverseHero=$('reverse-hero'),rarityMeterFill=$('rarity-meter-fill'),compareText=$('compare-text'),catBreakdown=$('cat-breakdown');
+const heroTopDisplay=$('hero-top-display'),heroDesc=$('hero-desc'),heroTierBadge=$('hero-tier-badge');
+const rarityFill=$('rarity-meter-fill'),compareText=$('compare-text'),catBreakdown=$('cat-breakdown');
 const shareSummaryText=$('share-summary-text'),btnShare=$('btn-share'),btnChallenge=$('btn-challenge'),btnReset=$('btn-reset');
-const toast=$('toast'),toastMessage=$('toast-message');
+const toast=$('toast'),toastMsg=$('toast-message');
 let radarChart=null;
 
-function initTheme(){const s=localStorage.getItem('theme')||'dark';applyTheme(s);themeToggleBtn.addEventListener('click',()=>applyTheme(htmlEl.getAttribute('data-theme')==='dark'?'light':'dark'));}
-function applyTheme(t){htmlEl.setAttribute('data-theme',t);localStorage.setItem('theme',t);if(t==='light'){themeTextEl.textContent='Giao diện Tối';themeIconEl.setAttribute('data-lucide','moon');}else{themeTextEl.textContent='Giao diện Sáng';themeIconEl.setAttribute('data-lucide','sun');}if(window.lucide)lucide.createIcons();if(radarChart)radarChart.update();}
+// ── THEME ──
+themeToggle.addEventListener('click',()=>{
+  const cur=htmlEl.getAttribute('data-theme');
+  const next=cur==='day'?'evening':'day';
+  htmlEl.setAttribute('data-theme',next);
+  themeToggle.textContent=next==='day'?'☽ Đổi nền':'☀ Đổi nền';
+  if(radarChart)radarChart.update();
+});
 
+// ── MATH ──
 function erf(x){const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+p*x);return s*(1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));}
 function getHeightTopPct(h){if(h<=150)return 100;if(h>=195)return 0.01;const z=(h-168.5)/(6.2*Math.sqrt(2));return Math.max(0.01,Math.min(100,0.5*(1-erf(z))*100));}
 function getSalaryTopPct(s){if(s<=0)return 100;if(s<=5)return 85;if(s<=10)return 45;if(s<=15)return 28;if(s<=20)return 16;if(s<=30)return 8.5;if(s<=50)return 3.2;if(s<=100)return 0.8;return 0.25;}
@@ -294,100 +470,181 @@ function getVehicleTopPct(v){return{none:100,wave_sirius:98.2,future_jupiter:60.
 function getHouseTopPct(v){return{none:100,apartment_budget:10.5,apartment_luxury:6.3,grounded_alley:3.5,street_front:1.0,mansion_villa:0.2}[v]||100;}
 function getJobTopPct(v){return{unemployed:97.8,factory_worker:31.5,freelance_gig:25,civil_servant:20,teacher:18,engineer_construction:15,army:13,police:11,finance:9,it:7,doctor:5,ceo:3,lawyer:2,pilot_aviation:0.5}[v]||50;}
 function calcBMI(h,w){const wm={under_50:47.5,'50_55':52.5,'55_60':57.5,'60_65':62.5,'65_70':67.5,'70_75':72.5,'75_80':77.5,'80_85':82.5,'85_90':87.5,above_90:95};const kg=wm[w];if(!kg)return null;const hm=h/100;return kg/(hm*hm);}
-function getTier(c){if(c<=0.5)return{tier:'S',label:'👑 Hạng S – SIÊu HIẾM',cls:'rank-S',heroCls:'tier-S',meterPct:98};if(c<=2)return{tier:'A',label:'💜 Hạng A – CỰC HIẾM',cls:'rank-A',heroCls:'tier-A',meterPct:88};if(c<=8)return{tier:'B',label:'💚 Hạng B – RẤT TỐT',cls:'rank-B',heroCls:'tier-B',meterPct:72};if(c<=20)return{tier:'C',label:'💙 Hạng C – KHÁ TỐT',cls:'rank-C',heroCls:'tier-C',meterPct:52};if(c<=50)return{tier:'D',label:'🧡 Hạng D – TRUNG BÌNH',cls:'rank-D',heroCls:'tier-D',meterPct:30};return{tier:'E',label:'⚪ Hạng E – PHỔ BIẾN',cls:'rank-E',heroCls:'tier-E',meterPct:10};}
-function getDesc(tier,c,cats){const t=c.toFixed(1);const best=[...cats].sort((a,b)=>a.topPct-b.topPct)[0];const bs=best?best.name+' (Top '+best.topPct.toFixed(1)+'%)':'';if(tier==='S')return'Thánh hiếm! Bạn thuộc nhóm cực kỳ ưu tú với chỉ số tổng hợp Top '+t+'%. Siêu phẩm! 👑';if(tier==='A')return'Xuất sắc! Top '+t+'% tổng hợp. Điểm nổi bật nhất là '+bs+'. Flex ngay thôi! 💪';if(tier==='B')return'Chỉ số khá tốt! Top '+t+'% tổng hợp. Bạn vượt đa số nam giới cùng lứa — nhất là về '+bs+'. Tiếp tục phát huy! 💪';if(tier==='C')return'Chỉ số trên trung bình! Top '+t+'% tổng hợp. Bạn đang ổn, nhưng còn nhiều tiềm năng cải thiện để leo rank. Let’s go! 🎯';if(tier==='D')return'Mức trung bình — Top '+t+'% tổng hợp. Tập trung cải thiện '+(best?best.name:'chỉ số yếu nhất')+'! 💡';return'Chỉ số phổ biến — Top '+t+'% tổng hợp. Hành trình lên rank bắt đầu từ hôm nay! 🔥';}
-function getCompare(tier,c){const t=c.toFixed(1);if(tier==='S')return'🏆 Bạn hiếm hơn khoảng <span class="highlight">99.5%</span> nam giới VN. Trong 35 triệu người, chỉ khoảng <span class="highlight">~175.000 người</span> có profile tương đương.';if(tier==='A')return'⭐ Bạn vượt qua khoảng <span class="highlight">98%</span> nam giới cùng độ tuổi. Cực kỳ hiếm có!';if(tier==='B')return'💚 Bạn thuộc nhóm <span class="highlight">Top '+t+'%</span> — tỉnh là tốt hơn khoảng '+(100-c).toFixed(0)+'% nam giới VN cùng tiêu chí. Rất ấn tượng!';if(tier==='C')return'💙 Bạn tốt hơn khoảng <span class="highlight">'+(100-c).toFixed(0)+'%</span> nam giới cùng nhóm chỉ số. Tiếp tục cải thiện!';if(tier==='D')return'🎯 Bạn ở mức trung bình. Tập trung cải thiện <span class="highlight">1-2 chỉ số yếu nhất</span> để bứt tốp!';return'📈 Hầu hết các chỉ số của bạn đang ở mức phổ biến. <span class="highlight">Mỗi bước tiến nhỏ đều tạo ra khoảng cách lớn</span> theo thời gian.';}
 
+// ── TIER ──
+function getTier(c){
+  if(c<=0.5)return{t:'S',label:'\u{1F451} H\u1ea1ng S \u2013 SI\u00caU HI\u1ebeM',cls:'ts-S',mp:97};
+  if(c<=2)return{t:'A',label:'\u2606 H\u1ea1ng A \u2013 C\u1ef0C HI\u1ebeM',cls:'ts-A',mp:87};
+  if(c<=8)return{t:'B',label:'\u25a0 H\u1ea1ng B \u2013 R\u1ea4T T\u1ed0T',cls:'ts-B',mp:71};
+  if(c<=20)return{t:'C',label:'\u25a1 H\u1ea1ng C \u2013 KH\u00c1 T\u1ed0T',cls:'ts-C',mp:50};
+  if(c<=50)return{t:'D',label:'\u2014 H\u1ea1ng D \u2013 TRUNG B\u00ccNH',cls:'ts-D',mp:28};
+  return{t:'E',label:'\u2026 H\u1ea1ng E \u2013 PH\u1ed4 BI\u1ebcN',cls:'ts-E',mp:9};
+}
+
+function getDesc(tier,c,cats){
+  const t=c.toFixed(1);
+  const best=[...cats].sort((a,b)=>a.topPct-b.topPct)[0];
+  const bs=best?best.name+' (Top '+best.topPct.toFixed(1)+'%)':'';
+  if(tier==='S')return'Thánh hiếm! Bạn thuộc nhóm cực kỳ ưu tú — Top '+t+'% tổng hợp. Trong 35 triệu nam giới, chỉ một số ít đạt profile này. Đỉnh của chóp! 👑';
+  if(tier==='A')return'Xuất sắc! Top '+t+'% tổng hợp. Điểm nổi bật nhất của bạn: '+bs+'. Hiếm như hàng tuyển! 💪';
+  if(tier==='B')return'Chỉ số rất tốt — Top '+t+'% tổng hợp. Bạn vượt đa số nam giới cùng lứa, nhất là về '+bs+'. Tiếp tục phát huy!';
+  if(tier==='C')return'Chỉ số trên trung bình — Top '+t+'% tổng hợp. Còn nhiều tiềm năng cải thiện để leo hạng B. Let's go! 🎯';
+  if(tier==='D')return'Mức trung bình — Top '+t+'% tổng hợp. Tập trung cải thiện '+(best?best.name:'chỉ số yếu nhất')+' để bứt tốp! 💡';
+  return'Chỉ số phổ biến — Top '+t+'% tổng hợp. Hành trình lên rank bắt đầu từ hôm nay! 🔥';
+}
+
+function getCompare(tier,c){
+  const t=c.toFixed(1);
+  if(tier==='S')return'Bạn hiếm hơn khoảng <span class="hl">99.5%</span> nam giới VN cùng nhóm chỉ số. Trong 35 triệu người, chỉ khoảng <span class="hl">~175.000 người</span> có profile tương đương.';
+  if(tier==='A')return'Bạn vượt qua khoảng <span class="hl">98%</span> nam giới cùng độ tuổi. Cực kỳ hiếm có — chỉ ~1 trong 50 người đạt mức này.';
+  if(tier==='B')return'Bạn thuộc nhóm <span class="hl">Top '+t+'%</span> — tốt hơn '+(100-c).toFixed(0)+'% nam giới VN cùng tiêu chí. Rất ấn tượng!';
+  if(tier==='C')return'Bạn tốt hơn khoảng <span class="hl">'+(100-c).toFixed(0)+'%</span> nam giới cùng nhóm chỉ số. Tiếp tục cải thiện!';
+  if(tier==='D')return'Mức trung bình — tập trung cải thiện <span class="hl">1–2 chỉ số yếu nhất</span> để bứt tốp nhanh nhất.';
+  return'Hầu hết các chỉ số đang ở mức phổ biến. <span class="hl">Mỗi bước tiến nhỏ đều tạo khoảng cách lớn</span> theo thời gian.';
+}
+
+// ── COMPUTE ──
 function computeResults(){
-  const age=parseInt(ageSlider.value),height=parseInt(heightSlider.value),weight=weightSelect.value,salary=parseFloat(salarySlider.value),job=jobSelect.value;
+  const age=parseInt(ageSlider.value),height=parseInt(heightSlider.value);
+  const weight=weightSelect.value,salary=parseFloat(salarySlider.value),job=jobSelect.value;
   let edu='below_thpt';eduRadios.forEach(r=>{if(r.checked)edu=r.value;});
   let vehicle='none';vehicleRadios.forEach(r=>{if(r.checked)vehicle=r.value;});
   let house='none';houseRadios.forEach(r=>{if(r.checked)house=r.value;});
   const noSmoke=toggleNoSmoke.checked,noDrink=toggleNoDrink.checked,hasIphone=toggleIphone.checked,isSingle=toggleSingle.checked;
-  const vLabel=vehicle==='none'?'Chưa có xe':Array.from(vehicleRadios).find(r=>r.value===vehicle).closest('label').querySelector('span').textContent;
-  const hLabel=house==='none'?'Chưa có BĐS':Array.from(houseRadios).find(r=>r.value===house).closest('label').querySelector('span').textContent;
-  const eduMap={below_thpt:'Dưới THPT',thpt:'THPT / Trung cấp',bachelor:'Cử nhân / CĐ',master:'Thạc sĩ',phd:'Tiến sĩ'};
+  const vEl=Array.from(vehicleRadios).find(r=>r.value===vehicle);
+  const vLabel=vehicle==='none'?'Chưa có xe':(vEl?vEl.closest('label').querySelector('span').textContent:'?');
+  const hEl=Array.from(houseRadios).find(r=>r.value===house);
+  const hLabel=house==='none'?'Chưa có BĐS':(hEl?hEl.closest('label').querySelector('span').textContent:'?');
+  const eduMap={below_thpt:'Dưới THPT',thpt:'THPT / TC',bachelor:'Cử nhân / CĐ',master:'Thạc sĩ',phd:'Tiến sĩ'};
   const cats=[
-    {key:'height',icon:'📏',name:'Chiều cao',value:height+' cm',topPct:getHeightTopPct(height)},
-    {key:'salary',icon:'💰',name:'Thu nhập',value:salary===0?'Không có':salary+' Triệu VNĐ/tháng',topPct:getSalaryTopPct(salary)},
-    {key:'edu',icon:'🎓',name:'Học vấn',value:eduMap[edu]||edu,topPct:getEduTopPct(edu)},
-    {key:'job',icon:'💼',name:'Nghề nghiệp',value:jobSelect.options[jobSelect.selectedIndex].text.replace(/^.s/,''),topPct:getJobTopPct(job)},
-    {key:'vehicle',icon:'🚗',name:'Phương tiện',value:vLabel,topPct:getVehicleTopPct(vehicle)},
-    {key:'house',icon:'🏠',name:'Bất động sản',value:hLabel,topPct:getHouseTopPct(house)},
+    {key:'h',icon:'📏',name:'Chiều cao',value:height+' cm',topPct:getHeightTopPct(height)},
+    {key:'s',icon:'💰',name:'Thu nhập',value:salary===0?'Không có':salary+' Tr/tháng',topPct:getSalaryTopPct(salary)},
+    {key:'e',icon:'🎓',name:'Học vấn',value:eduMap[edu]||edu,topPct:getEduTopPct(edu)},
+    {key:'j',icon:'💼',name:'Nghề nghiệp',value:jobSelect.options[jobSelect.selectedIndex].text.replace(/^.s/,''),topPct:getJobTopPct(job)},
+    {key:'v',icon:'🚗',name:'Phương tiện',value:vLabel,topPct:getVehicleTopPct(vehicle)},
+    {key:'r',icon:'🏠',name:'Bất động sản',value:hLabel,topPct:getHouseTopPct(house)},
   ];
-  if(noSmoke)cats.push({key:'smoke',icon:'🚭',name:'Không hút thuốc',value:'Không hút thuốc lá',topPct:57.7});
-  if(noDrink)cats.push({key:'drink',icon:'🧃',name:'Không uống rượu',value:'Không uống rượu bia',topPct:23.0});
-  if(hasIphone)cats.push({key:'iphone',icon:'📱',name:'Dùng iPhone',value:'iOS / iPhone',topPct:33.0});
-  if(isSingle){const sp=age<=22?92:age<=28?62:age<=35?28:age<=45?12:5;cats.push({key:'single',icon:'💍',name:'Độc thân',value:'Đang độc thân',topPct:sp});}
+  if(noSmoke)cats.push({key:'sm',icon:'🚭',name:'Không hút thuốc',value:'Không hút',topPct:57.7});
+  if(noDrink)cats.push({key:'dr',icon:'🧃',name:'Không uống rượu',value:'Không uống',topPct:23.0});
+  if(hasIphone)cats.push({key:'ip',icon:'📱',name:'Dùng iPhone',value:'iOS / iPhone',topPct:33.0});
+  if(isSingle){const sp=age<=22?92:age<=28?62:age<=35?28:age<=45?12:5;cats.push({key:'si',icon:'💍',name:'Độc thân',value:'Đang độc thân',topPct:sp});}
   const geo=Math.pow(cats.map(c=>c.topPct).reduce((a,b)=>a*b,1),1/cats.length);
   return{cats,composite:geo};
 }
+
+// ── RENDER BREAKDOWN ──
 function renderBreakdown(cats){
   catBreakdown.innerHTML='';
   cats.forEach(cat=>{
-    const p=cat.topPct,bw=Math.max(2,100-p);
-    const tc=p<=1?'rank-S':p<=5?'rank-A':p<=15?'rank-B':p<=35?'rank-C':p<=65?'rank-D':'rank-E';
+    const p=cat.topPct;
     const tl=p<=1?'S':p<=5?'A':p<=15?'B':p<=35?'C':p<=65?'D':'E';
-    const pl=p>=99.5?'Phổ biến':'Top '+p.toFixed(1)+'%';
-    const row=document.createElement('div');row.className='cat-row';
-    row.innerHTML='<div class="cat-icon">'+cat.icon+'</div><div class="cat-info"><div class="cat-name">'+cat.name+'</div><div class="cat-value">'+cat.value+'</div><div class="cat-bar-wrap"><div class="cat-bar-fill" style="width:'+bw+'%"></div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:.2rem;flex-shrink:0"><span class="rank-badge '+tc+'" style="font-size:.68rem;padding:.15rem .45rem">Hạng '+tl+'</span><span class="cat-pct">'+pl+'</span></div>';
+    const pl=p>=99.5?'phổ biến':'Top '+p.toFixed(1)+'%';
+    const row=document.createElement('div');
+    row.className='bd-row';
+    row.innerHTML='<span class="bd-icon">'+cat.icon+'</span><span class="bd-name">'+cat.name+'</span><span class="bd-dots"></span><span class="bd-pct">'+pl+'</span><span class="bd-tier">'+tl+'</span>';
     catBreakdown.appendChild(row);
   });
 }
+
+// ── RADAR CHART ──
 function updateRadarChart(cats){
-  const isDark=htmlEl.getAttribute('data-theme')==='dark';
   const labels=cats.map(c=>c.name);
   const data=cats.map(c=>Math.max(0,Math.min(100,100-c.topPct)));
+  const inkColor='rgba(24,20,13,0.12)';
+  const burgColor='#8b1a1a';
   if(radarChart){radarChart.data.labels=labels;radarChart.data.datasets[0].data=data;radarChart.update();return;}
-  const ctx=document.getElementById('radar-chart').getContext('2d');
-  radarChart=new Chart(ctx,{type:'radar',data:{labels,datasets:[{label:'Dộ hiếm (%)',data,backgroundColor:'rgba(45,106,79,.2)',borderColor:'#52b788',borderWidth:2,pointBackgroundColor:'#52b788',pointBorderColor:'#fff',pointRadius:4,pointHoverRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,color:isDark?'#6d8e7c':'#5a7a6b',font:{size:9},backdropColor:'transparent',callback:v=>v+'%'},grid:{color:'rgba(45,106,79,.15)'},angleLines:{color:'rgba(45,106,79,.15)'},pointLabels:{color:isDark?'#a6c4b2':'#3d5e4d',font:{size:10,weight:'600'}}}}}});
+  const ctx=$('radar-chart').getContext('2d');
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{labels,datasets:[{label:'Độ hiếm',data,backgroundColor:'rgba(139,26,26,0.1)',borderColor:burgColor,borderWidth:1.5,pointBackgroundColor:burgColor,pointBorderColor:getComputedStyle(document.documentElement).getPropertyValue('--paper').trim()||'#faf7f0',pointRadius:3.5,pointHoverRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,color:'#7a6e5a',font:{size:8,family:'Courier Prime'},backdropColor:'transparent',callback:v=>v+'%'},grid:{color:inkColor},angleLines:{color:inkColor},pointLabels:{color:'#18140d',font:{size:9,family:'Courier Prime',weight:'400'}}}}}
+  });
 }
+
+// ── MAIN RENDER ──
 function renderUI(){
-  ageDisplay.textContent=ageSlider.value+' tuổi';
-  heightDisplay.textContent=heightSlider.value+' cm';
-  const sal=parseFloat(salarySlider.value);
-  salaryDisplay.textContent=sal===0?'Không có':sal+' Triệu VNĐ';
-  salaryPresets.querySelectorAll('.chip').forEach(c=>{if(parseFloat(c.dataset.val)===sal)c.classList.add('active');else c.classList.remove('active');});
-  const bmi=calcBMI(parseInt(heightSlider.value),weightSelect.value);
-  if(bmi){const bl=bmi<18.5?'Gầy':bmi<23?'Cân đối':bmi<25?'Thừa cân':'Béo phì';bmiDisplay.textContent='BMI ≈ '+bmi.toFixed(1)+' · '+bl;}
-  [eduRadios,vehicleRadios,houseRadios,regionRadios].forEach(g=>g.forEach(r=>{const card=r.closest('.radio-card');if(card){if(r.checked)card.classList.add('active');else card.classList.remove('active');}}));
-  const res=computeResults();const tier=getTier(res.composite);const cs=res.composite.toFixed(1);
+  const age=parseInt(ageSlider.value),height=parseInt(heightSlider.value),salary=parseFloat(salarySlider.value);
+  ageDisplay.textContent=age+' tuổi';
+  heightDisplay.textContent=height+' cm';
+  salaryDisplay.textContent=salary===0?'Không có':salary+' Tr';
+
+  // salary presets
+  salaryPresets.querySelectorAll('.pre-btn').forEach(b=>{
+    if(parseFloat(b.dataset.val)===salary)b.classList.add('active');else b.classList.remove('active');
+  });
+
+  // BMI
+  const bmi=calcBMI(height,weightSelect.value);
+  if(bmi){const bl=bmi<18.5?'Gầy':bmi<23?'Cân đối':bmi<25?'Thừa cân':'Béo phì';bmiNote.textContent='BMI ≈ '+bmi.toFixed(1)+' · '+bl;}
+  else bmiNote.textContent='';
+
+  // Active states for choice-pills
+  document.querySelectorAll('.choice-row').forEach(row=>{
+    row.querySelectorAll('.choice-pill').forEach(pill=>{
+      const radio=pill.querySelector('input[type=radio]');
+      if(radio){if(radio.checked)pill.classList.add('active');else pill.classList.remove('active');}
+    });
+  });
+
+  const res=computeResults();
+  const tier=getTier(res.composite);
+  const cs=res.composite.toFixed(1);
+
   heroTopDisplay.textContent='Top '+cs+'%';
-  heroDesc.textContent=getDesc(tier.tier,res.composite,res.cats);
-  heroTierBadge.textContent=tier.label;heroTierBadge.className='rank-badge '+tier.cls;
-  reverseHero.className='reverse-hero '+tier.heroCls;
-  rarityMeterFill.style.width=tier.meterPct+'%';
-  compareText.innerHTML=getCompare(tier.tier,res.composite);
-  renderBreakdown(res.cats);updateRadarChart(res.cats);
+  heroDesc.textContent=getDesc(tier.t,res.composite,res.cats);
+  heroTierBadge.textContent=tier.label;
+  heroTierBadge.className='tier-stamp '+tier.cls;
+  rarityFill.style.width=tier.mp+'%';
+  compareText.innerHTML=getCompare(tier.t,res.composite);
+
+  renderBreakdown(res.cats);
+  updateRadarChart(res.cats);
   shareSummaryText.innerHTML='Bạn thuộc <strong>Top '+cs+'%</strong> nam giới VN. '+tier.label+'.';
 }
-function initListeners(){
-  [ageSlider,heightSlider,salarySlider].forEach(el=>el.addEventListener('input',renderUI));
-  [weightSelect,jobSelect].forEach(el=>el.addEventListener('change',renderUI));
-  [...eduRadios,...vehicleRadios,...houseRadios,...regionRadios].forEach(r=>r.addEventListener('change',renderUI));
-  [toggleNoSmoke,toggleNoDrink,toggleIphone,toggleSingle].forEach(el=>el.addEventListener('change',renderUI));
-  document.querySelectorAll('.radio-card').forEach(card=>{card.addEventListener('click',()=>{const radio=card.querySelector('input[type="radio"]');if(radio&&!radio.checked){radio.checked=true;renderUI();}});});
-  salaryPresets.addEventListener('click',e=>{if(e.target.classList.contains('chip')){salarySlider.value=e.target.dataset.val;renderUI();}});
-  btnReset.addEventListener('click',()=>{
-    ageSlider.value=25;heightSlider.value=170;salarySlider.value=10;weightSelect.value='60_65';jobSelect.value='factory_worker';
-    document.querySelector('input[name="education"][value="below_thpt"]').checked=true;
-    document.querySelector('input[name="vehicle"][value="none"]').checked=true;
-    document.querySelector('input[name="house"][value="none"]').checked=true;
-    document.querySelector('input[name="region"][value="province"]').checked=true;
-    toggleNoSmoke.checked=false;toggleNoDrink.checked=false;toggleIphone.checked=false;toggleSingle.checked=false;
-    renderUI();showToast('Đã đặt lại!');
+
+// ── LISTENERS ──
+[ageSlider,heightSlider,salarySlider].forEach(el=>el.addEventListener('input',renderUI));
+[weightSelect,jobSelect].forEach(el=>el.addEventListener('change',renderUI));
+[...eduRadios,...vehicleRadios,...houseRadios,...regionRadios].forEach(r=>r.addEventListener('change',renderUI));
+[toggleNoSmoke,toggleNoDrink,toggleIphone,toggleSingle].forEach(el=>el.addEventListener('change',renderUI));
+
+// Choice pill clicks
+document.querySelectorAll('.choice-row').forEach(row=>{
+  row.querySelectorAll('.choice-pill').forEach(pill=>{
+    pill.addEventListener('click',()=>{
+      const radio=pill.querySelector('input[type=radio]');
+      if(radio&&!radio.checked){radio.checked=true;renderUI();}
+    });
   });
-  btnShare.addEventListener('click',()=>{
-    const text='🏆 SO KÈO BẢN THÂN – KẾT QUẢ\n\n• Thuộc: '+heroTopDisplay.textContent+' nam giới Việt Nam\n• Xếp hạng: '+heroTierBadge.textContent+'\n\nKiểm tra độ hiếm của bạn tại: https://adapalen.github.io/VJtracker/p/caubingaoa/so-keo-ban-than.html 🚀';
-    navigator.clipboard.writeText(text).then(()=>showToast('Đã sao chép kết quả!')).catch(()=>showToast('Không thể sao chép!'));
-  });
-  btnChallenge.addEventListener('click',()=>{
-    const text='🔥 Tao thuộc '+heroTopDisplay.textContent+' nam giới VN! Mày được bao nhiêu %? 😏\nSo kèo tại: https://adapalen.github.io/VJtracker/p/caubingaoa/so-keo-ban-than.html';
-    navigator.clipboard.writeText(text).then(()=>showToast('Đã sao chép lời thách đấu!')).catch(()=>showToast('Không thể sao chép!'));
-  });
-}
-function showToast(msg){toastMessage.textContent=msg;toast.classList.remove('hidden');setTimeout(()=>toast.classList.add('hidden'),2800);}
-document.addEventListener('DOMContentLoaded',()=>{initTheme();initListeners();renderUI();if(window.lucide)lucide.createIcons();});
+});
+
+salaryPresets.addEventListener('click',e=>{
+  if(e.target.classList.contains('pre-btn')){salarySlider.value=e.target.dataset.val;renderUI();}
+});
+
+btnReset.addEventListener('click',()=>{
+  ageSlider.value=25;heightSlider.value=170;salarySlider.value=10;weightSelect.value='60_65';jobSelect.value='factory_worker';
+  document.querySelector('input[name="education"][value="below_thpt"]').checked=true;
+  document.querySelector('input[name="vehicle"][value="none"]').checked=true;
+  document.querySelector('input[name="house"][value="none"]').checked=true;
+  document.querySelector('input[name="region"][value="province"]').checked=true;
+  toggleNoSmoke.checked=false;toggleNoDrink.checked=false;toggleIphone.checked=false;toggleSingle.checked=false;
+  renderUI();showToast('Đã đặt lại!');
+});
+
+btnShare.addEventListener('click',()=>{
+  const text='🏆 SO KÈO BẢN THÂN — KẾT QUẢ\n\n• '+heroTopDisplay.textContent+' nam giới Việt Nam\n• '+heroTierBadge.textContent+'\n\nKiểm tra tại: https://adapalen.github.io/VJtracker/p/caubingaoa/so-keo-ban-than.html 🚀';
+  navigator.clipboard.writeText(text).then(()=>showToast('Đã sao chép kết quả!')).catch(()=>showToast('Không thể sao chép!'));
+});
+btnChallenge.addEventListener('click',()=>{
+  const text='🔥 Tao thuộc '+heroTopDisplay.textContent+' nam giới VN! Mày được bao nhiêu %? 😏\nhttps://adapalen.github.io/VJtracker/p/caubingaoa/so-keo-ban-than.html';
+  navigator.clipboard.writeText(text).then(()=>showToast('Đã sao chép lời thách đấu!')).catch(()=>showToast('Không thể sao chép!'));
+});
+
+function showToast(msg){toastMsg.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2800);}
+
+// Init
+document.addEventListener('DOMContentLoaded',()=>{renderUI();});
 </script>
 </body>
 </html>
