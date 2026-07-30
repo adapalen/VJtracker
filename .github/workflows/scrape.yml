@@ -37,4 +37,5 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add p/VJtracker/flights_db.json
           git commit -m "Auto-update flight prices: $(date)" || echo "No changes to commit"
+          git pull --rebase origin main
           git push
