@@ -77,7 +77,7 @@ function formatDate(date) {
 
   console.log(`Total tasks to execute in parallel: ${queue.length}`);
   
-  const concurrency = 2; // Run 2 pages in parallel
+  const concurrency = 4; // Run 4 pages in parallel
   const worker = async (workerId) => {
     const page = await browser.newPage();
     await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
@@ -93,8 +93,12 @@ function formatDate(date) {
       const url = `https://www.google.com/travel/flights?q=Flights%20from%20${route.from}%20to%20${route.to}%20on%20${target.dateStr}%20oneway&hl=vi&gl=VN&curr=VND`;
       
       try {
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-        await new Promise(r => setTimeout(r, 6000)); // Wait 6s for lazy loading
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 25000 });
+        try {
+          await page.waitForSelector('li.pIav2d', { timeout: 4000 });
+        } catch (e) {
+          await new Promise(r => setTimeout(r, 1500));
+        }
 
         const flights = await page.evaluate(() => {
           const listItems = Array.from(document.querySelectorAll('li.pIav2d'));

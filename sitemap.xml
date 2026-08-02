@@ -2,55 +2,55 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sincostan.id.vn/</loc>
-    <lastmod>2026-07-21</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/about/</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/articles/chem-alphafold.html</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/articles/chem-cheminformatics.html</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/articles/tech-ai-caro.html</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/articles/tech-scraper.html</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/articles/trivia-aviation.html</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/articles/trivia-cryptography.html</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/blogs/</loc>
-    <lastmod>2026-07-18</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -73,6 +73,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://sincostan.id.vn/p/caubingaoa/so-keo-ban-than.html</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://sincostan.id.vn/p/caubingaoa/thuoc-chua-benh.html</loc>
     <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
@@ -80,7 +86,7 @@
   </url>
   <url>
     <loc>https://sincostan.id.vn/p/sitemap/</loc>
-    <lastmod>2026-07-20</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>

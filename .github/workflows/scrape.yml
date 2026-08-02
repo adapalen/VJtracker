@@ -18,11 +18,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -35,7 +36,29 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add p/VJtracker/flights_db.json
+          git fetch origin main
+          node -e '
+            const fs = require("fs");
+            const { execSync } = require("child_process");
+            const dbPath = "p/VJtracker/flights_db.json";
+            let localData = [];
+            if (fs.existsSync(dbPath)) {
+              try { localData = JSON.parse(fs.readFileSync(dbPath, "utf8")); } catch(e){}
+            }
+            try {
+              const remoteRaw = execSync("git show origin/main:p/VJtracker/flights_db.json", { encoding: "utf8" });
+              const remoteData = JSON.parse(remoteRaw);
+              const remoteKeys = new Set(remoteData.map(r => r.crawlTimestamp + "_" + r.route + "_" + r.carrier + "_" + r.leadDays));
+              const newRecords = localData.filter(r => !remoteKeys.has(r.crawlTimestamp + "_" + r.route + "_" + r.carrier + "_" + r.leadDays));
+              console.log(`Merging ${newRecords.length} new records into latest remote flights_db.json...`);
+              const merged = remoteData.concat(newRecords);
+              execSync("git reset --hard origin/main");
+              fs.writeFileSync(dbPath, JSON.stringify(merged, null, 2), "utf8");
+            } catch(e) {
+              console.log("Merge fallback:", e.message);
+            }
+          '
+          node scripts/generate-sitemap.js
+          git add p/VJtracker/flights_db.json sitemap.xml p/sitemap/sitemap.json
           git commit -m "Auto-update flight prices: $(date)" || echo "No changes to commit"
-          git pull --rebase origin main
-          git push
+          git push origin main
