@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "scrape": "node scraper/scraper.js && npm run sitemap",
+    "scrape": "node scraper/scraper.js",
     "sitemap": "node scripts/generate-sitemap.js"
   },
   "keywords": [],
