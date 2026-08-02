@@ -1,4 +1,5 @@
 name: Scrape Flights Daily
+# Robust thrice-daily automated price crawler with conflict-free git merge
 
 on:
   schedule:
