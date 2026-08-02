@@ -56,9 +56,13 @@ jobs:
               fs.writeFileSync(dbPath, JSON.stringify(merged, null, 2), "utf8");
             } catch(e) {
               console.log("Merge fallback:", e.message);
+              try {
+                execSync("git reset --hard origin/main");
+                fs.writeFileSync(dbPath, JSON.stringify(localData, null, 2), "utf8");
+              } catch(err) {}
             }
           '
           node scripts/generate-sitemap.js
-          git add p/VJtracker/flights_db.json sitemap.xml p/sitemap/sitemap.json
+          git add -A
           git commit -m "Auto-update flight prices: $(date)" || echo "No changes to commit"
           git push origin main
