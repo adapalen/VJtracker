@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   await loadDb();
   populateDestinations('HAN');
-  buildCarrierChips();
+  buildAirlineChecks();
   refreshAll();
 
   // Auto-poll every 5 min
@@ -162,6 +162,25 @@ function onDestChange(dest) {
   refreshAll();
 }
 
+function reverseRoute() {
+  const originSel = document.getElementById('origin-select');
+  const destSel   = document.getElementById('dest-select');
+  const oldOrigin = originSel.value;
+  const oldDest   = destSel.value;
+  // Set origin to old dest
+  originSel.value = oldDest;
+  populateDestinations(oldDest);
+  // Set dest to old origin (if it exists in new dest list)
+  const opts = Array.from(destSel.options).map(o => o.value);
+  if (opts.includes(oldOrigin)) destSel.value = oldOrigin;
+  // Simpler: just swap and set
+  currentRoute = `${oldDest}-${oldOrigin}`;
+  originSel.value = oldDest;
+  populateDestinations(oldDest);
+  destSel.value = oldOrigin;
+  refreshAll();
+}
+
 // ── Lead Time Pills ───────────────────────────────────────────
 function setLeadTime(val) {
   currentLeadTime = val;
@@ -171,30 +190,35 @@ function setLeadTime(val) {
   refreshAll();
 }
 
-// ── Carrier Chips ─────────────────────────────────────────────
-function buildCarrierChips() {
-  const wrap = document.getElementById('carrier-toggles');
+// ── Airline Checkboxes ───────────────────────────────────────
+function buildAirlineChecks() {
+  const wrap = document.getElementById('airline-checks');
+  if (!wrap) return;
   wrap.innerHTML = '';
-  const allCarriers = Object.keys(CARRIER_COLORS);
-  allCarriers.forEach(carrier => {
-    const color = CARRIER_COLORS[carrier];
-    const chip = document.createElement('div');
-    chip.className = 'carrier-chip' + (selectedCarriers.includes(carrier) ? ' active' : '');
-    chip.id = 'chip-' + carrier.replace(/\s/g, '-');
-    chip.innerHTML = `<span class="chip-dot" style="background:${color}"></span>${carrier}`;
-    chip.onclick = () => toggleCarrier(carrier);
-    wrap.appendChild(chip);
+  Object.entries(CARRIER_COLORS).forEach(([carrier, color]) => {
+    const label = document.createElement('label');
+    label.className = 'airline-check-label';
+    label.style.color = color;
+    label.dataset.carrier = carrier;
+    label.innerHTML = `
+      <span class="check-box"><i class="fa-solid fa-check"></i></span>
+      <span class="airline-dot" style="background:${color}"></span>
+      <span>${carrier}</span>`;
+    label.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleCarrier(carrier);
+    });
+    wrap.appendChild(label);
   });
 }
 
-function syncCarrierChips() {
-  const allCarriers = Object.keys(CARRIER_COLORS);
-  allCarriers.forEach(carrier => {
-    const chip = document.getElementById('chip-' + carrier.replace(/\s/g, '-'));
-    if (!chip) return;
-    const avail = isCarrierAvailable(carrier);
-    chip.classList.toggle('disabled', !avail);
-    chip.classList.toggle('active', selectedCarriers.includes(carrier) && avail);
+function syncAirlineChecks() {
+  document.querySelectorAll('.airline-check-label').forEach(label => {
+    const carrier = label.dataset.carrier;
+    const isAvail   = isCarrierAvailable(carrier);
+    const isChecked = selectedCarriers.includes(carrier) && isAvail;
+    label.classList.toggle('disabled', !isAvail);
+    label.classList.toggle('checked', isChecked);
   });
 }
 
@@ -207,8 +231,9 @@ function toggleCarrier(carrier) {
   } else {
     selectedCarriers.push(carrier);
   }
-  syncCarrierChips();
+  syncAirlineChecks();
   renderChart();
+  renderTable();
 }
 
 // ── Master Refresh ────────────────────────────────────────────
@@ -216,9 +241,9 @@ function refreshAll() {
   // Auto-select Vietjet if nothing selected or all invalid
   const avail = Object.keys(CARRIER_COLORS).filter(isCarrierAvailable);
   if (!selectedCarriers.some(c => avail.includes(c))) {
-    selectedCarriers = avail.slice(0, 1); // default to first available
+    selectedCarriers = avail.slice(0, 1);
   }
-  syncCarrierChips();
+  syncAirlineChecks();
   updateLastScan();
   updateStatsRow();
   updateAnalysisCards();
@@ -230,6 +255,7 @@ function refreshAll() {
   const el = document.getElementById('chart-route-label');
   if (el) el.textContent = `${AIRPORT_NAMES[o] || o} → ${AIRPORT_NAMES[d] || d}`;
 }
+
 
 // ── Last Scan ─────────────────────────────────────────────────
 function updateLastScan() {
