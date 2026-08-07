@@ -254,23 +254,31 @@ select.sel option { background: var(--surface); color: var(--ink); }
 }
 
 .airline-check-label {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.28rem 0.65rem;
+  padding: 0.3rem 0.7rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
   background: var(--surface);
   cursor: pointer;
   user-select: none;
-  transition: border-color 0.15s, opacity 0.2s;
+  transition: border-color 0.15s, opacity 0.2s, background 0.15s;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--ink-2);
+  color: var(--ink-3);
 }
-.airline-check-label:hover:not(.disabled) {
+/* Hover: non-disabled only */
+.airline-check-label:hover:not(.disabled):not(.checked) {
   border-color: var(--ink-2);
   color: var(--ink);
+}
+/* Checked state: border becomes carrier color (driven by label's inline color) */
+.airline-check-label.checked {
+  border-color: currentColor;
+  color: inherit;
+  background: var(--surface);
 }
 /* Hidden native checkbox */
 .airline-check-label input[type="checkbox"] {
@@ -300,20 +308,28 @@ select.sel option { background: var(--surface); color: var(--ink); }
   background: currentColor;
   border-color: currentColor;
 }
-.airline-check-label.checked .check-box i { opacity: 1; }
+.airline-check-label.checked .check-box i {
+  opacity: 1;
+  color: #fff;
+}
 /* Color dot */
 .airline-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  transition: opacity 0.2s;
 }
-/* Disabled (no data for route) */
+/* Disabled: no data for this route – clear visual indication */
 .airline-check-label.disabled {
-  opacity: 0.3;
+  opacity: 0.28;
   cursor: not-allowed;
   pointer-events: none;
 }
-
+/* Strike through carrier name when disabled */
+.airline-check-label.disabled > span:last-child {
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-3);
+}
 
 /* ── STATS ROW ───────────────────────────────────────────────── */
 .stats-row {

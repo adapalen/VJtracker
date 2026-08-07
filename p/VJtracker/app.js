@@ -80,11 +80,26 @@ function avg(arr) {
   return arr.reduce((s, v) => s + v, 0) / arr.length;
 }
 
+// Cache: which carriers have actual DB records for current route (recomputed on each refresh)
+let _carriersWithData = new Set();
+
+function recomputeCarriersWithData() {
+  _carriersWithData = new Set(
+    db
+      .filter(r => r.route === currentRoute && r.lowestPrice != null)
+      .map(r => r.carrier)
+  );
+}
+
 // ── Carrier Availability ──────────────────────────────────────
+// An airline is available only if the DB actually has price records for it
+// on the current route. Hardcoded blocklists are a secondary guard.
 function isCarrierAvailable(carrier) {
+  // Hardcoded structural blocks (routes the airline simply does not fly)
   if (currentRoute.includes('BKK') && BKK_BLOCKED.has(carrier)) return false;
   if (['PXU','VCS','BMV'].some(c => currentRoute.includes(c)) && SMALL_ROUTE_BLOCKED.has(carrier)) return false;
-  return true;
+  // Primary check: does the DB actually contain records?
+  return _carriersWithData.has(carrier);
 }
 
 // ── Initialization ────────────────────────────────────────────
@@ -214,11 +229,13 @@ function buildAirlineChecks() {
 
 function syncAirlineChecks() {
   document.querySelectorAll('.airline-check-label').forEach(label => {
-    const carrier = label.dataset.carrier;
+    const carrier   = label.dataset.carrier;
     const isAvail   = isCarrierAvailable(carrier);
     const isChecked = selectedCarriers.includes(carrier) && isAvail;
     label.classList.toggle('disabled', !isAvail);
-    label.classList.toggle('checked', isChecked);
+    label.classList.toggle('checked',  isChecked);
+    // Tooltip: explain why disabled
+    label.title = isAvail ? '' : 'Không có chuyến bay của hãng này trên chặng đang chọn';
   });
 }
 
@@ -238,11 +255,18 @@ function toggleCarrier(carrier) {
 
 // ── Master Refresh ────────────────────────────────────────────
 function refreshAll() {
-  // Auto-select Vietjet if nothing selected or all invalid
-  const avail = Object.keys(CARRIER_COLORS).filter(isCarrierAvailable);
-  if (!selectedCarriers.some(c => avail.includes(c))) {
-    selectedCarriers = avail.slice(0, 1);
+  // 1. Recompute which carriers have real data for this route
+  recomputeCarriersWithData();
+
+  // 2. Prune selected carriers that no longer have data
+  selectedCarriers = selectedCarriers.filter(c => isCarrierAvailable(c));
+
+  // 3. Default: select Vietjet if available, otherwise first available carrier
+  if (selectedCarriers.length === 0) {
+    const avail = Object.keys(CARRIER_COLORS).filter(isCarrierAvailable);
+    selectedCarriers = avail.includes('Vietjet') ? ['Vietjet'] : avail.slice(0, 1);
   }
+
   syncAirlineChecks();
   updateLastScan();
   updateStatsRow();
@@ -255,7 +279,6 @@ function refreshAll() {
   const el = document.getElementById('chart-route-label');
   if (el) el.textContent = `${AIRPORT_NAMES[o] || o} → ${AIRPORT_NAMES[d] || d}`;
 }
-
 
 // ── Last Scan ─────────────────────────────────────────────────
 function updateLastScan() {
