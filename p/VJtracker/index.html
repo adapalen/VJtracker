@@ -3,235 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Công cụ theo dõi giá vé máy bay Vietjet tự động. Cập nhật liên tục biểu đồ biến động giá vé Vietjet, phân tích xu hướng và gợi ý săn vé máy bay giá rẻ tốt nhất.">
-  <meta name="keywords" content="giá vé Vietjet, theo dõi giá vé, theo dõi giá vé máy bay, giá vé máy bay, săn vé máy bay giá rẻ, biểu đồ giá vé, Vietjet Air, phân tích giá vé">
-  <title>Theo Dõi Giá Vé Máy Bay Vietjet Tự Động | Săn Vé Máy Bay Giá Rẻ</title>
-  
-  <!-- OpenGraph Meta Tags for Social Media SEO -->
-  <meta property="og:title" content="Công cụ theo dõi giá vé máy bay Vietjet tự động | Săn Vé Rẻ">
-  <meta property="og:description" content="Cập nhật liên tục biểu đồ biến động giá vé Vietjet 3x/ngày, tự động phân tích và đưa ra gợi ý Mua Ngay hoặc Chờ Thêm giúp bạn săn vé máy bay giá rẻ nhất.">
+  <meta name="description" content="Theo dõi giá vé máy bay Việt Nam tự động. Cập nhật 3 lần/ngày. Biểu đồ xu hướng giá và gợi ý thời điểm mua vé tối ưu.">
+  <meta property="og:title" content="VJ Price Tracker – Theo dõi giá vé máy bay tự động">
+  <meta property="og:description" content="Biểu đồ giá vé theo thời gian thực, phân tích xu hướng, gợi ý mua vé tốt nhất.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sincostan.id.vn/p/VJtracker/">
-  <!-- Google Fonts: Inter (with full Vietnamese subset support) -->
+  <title>VJTracker – Theo dõi giá vé tự động</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- FontAwesome for icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app-container">
-    <header class="app-header">
-      <div class="logo-area">
-        <a href="/" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 1.2rem;">
-          <i class="fa-solid fa-plane-departure logo-icon"></i>
-          <div>
-            <h1 id="main-title">Theo Dõi Giá Vé Máy Bay Vietjet</h1>
-            <p class="subtitle">Công cụ tự động theo dõi giá vé, cập nhật biểu đồ giá vé máy bay và phân tích xu hướng săn vé rẻ tối ưu</p>
-          </div>
-        </a>
-      </div>
-      <div class="header-controls">
-        <button id="theme-toggle" class="btn-icon glass" title="Chuyển chế độ Sáng/Tối">
-          <i class="fa-solid fa-moon"></i>
-        </button>
-        <div class="last-updated-badge" id="last-updated">
-          <i class="fa-solid fa-rotate"></i>
-          <span>Lần quét cuối: Đang tải...</span>
-        </div>
-      </div>
-    </header>
 
-    <!-- Dynamic Stats Cards based on selected route -->
-    <section class="stats-grid" id="stats-container">
-      <div class="stat-card glass" id="card-latest-price">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-plane-arrival"></i> Giá vé mới nhất</span>
-          <i class="fa-solid fa-tag trend-icon text-secondary" style="color: var(--accent-color);"></i>
-        </div>
-        <div class="price-val" id="val-latest-price">Đang tải...</div>
-        <div class="card-footer">
-          <span class="trend-desc" id="desc-latest-price">Khoảng thời gian: Mua trước 7 ngày</span>
-        </div>
-      </div>
-      
-      <div class="stat-card glass" id="card-avg-price">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-chart-simple"></i> Giá trung bình</span>
-          <i class="fa-solid fa-calculator trend-icon text-secondary"></i>
-        </div>
-        <div class="price-val" id="val-avg-price">Đang tải...</div>
-        <div class="card-footer">
-          <span class="trend-desc" id="desc-avg-price">Tính trên toàn bộ lịch sử quét</span>
-        </div>
-      </div>
-      
-      <div class="stat-card glass" id="card-min-price">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-award"></i> Thấp nhất lịch sử</span>
-          <i class="fa-solid fa-circle-arrow-down trend-icon green"></i>
-        </div>
-        <div class="price-val" id="val-min-price">Đang tải...</div>
-        <div class="card-footer">
-          <span class="trend-desc" id="desc-min-price">Thời điểm ghi nhận tốt nhất</span>
-        </div>
-      </div>
-      
-      <div class="stat-card glass" id="card-recommendation">
-        <div class="card-header">
-          <span class="route-badge"><i class="fa-solid fa-circle-info"></i> Gợi ý mua vé</span>
-          <i class="fa-solid fa-arrow-trend-down trend-icon green" id="icon-rec"></i>
-        </div>
-        <div class="price-val" id="val-recommendation" style="font-size: 1.5rem; line-height: 1.8rem;">Đang tính toán...</div>
-        <div class="card-footer">
-          <span class="recommendation-badge buy" id="badge-rec">MUA NGAY</span>
-          <span class="trend-desc" id="desc-recommendation">Giá đang ở mức ổn định</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Main Chart Section -->
-    <main class="main-content glass">
-      <div class="chart-header" style="flex-direction: column; align-items: stretch; gap: 1rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-          <div class="control-group" style="align-items: center; gap: 0.8rem;">
-            <select id="origin-select" class="dropdown" onchange="onOriginChange(this.value)" style="min-width: 180px;">
-              <option value="HAN" selected>Hà Nội (HAN)</option>
-              <option value="SGN">TP. HCM (SGN)</option>
-              <option value="DAD">Đà Nẵng (DAD)</option>
-              <option value="CXR">Nha Trang (CXR)</option>
-              <option value="PQC">Phú Quốc (PQC)</option>
-              <option value="PXU">Pleiku (PXU)</option>
-              <option value="DLI">Đà Lạt (DLI)</option>
-              <option value="UIH">Quy Nhơn (UIH)</option>
-              <option value="HUI">Huế (HUI)</option>
-              <option value="VII">Vinh (VII)</option>
-              <option value="BMV">Buôn Ma Thuột (BMV)</option>
-              <option value="VCS">Côn Đảo (VCS)</option>
-              <option value="BKK">Bangkok (BKK)</option>
-            </select>
-            <span style="color: var(--text-secondary); font-size: 1.1rem;"><i class="fa-solid fa-arrow-right"></i></span>
-            <select id="dest-select" class="dropdown" onchange="onDestChange(this.value)" style="min-width: 180px;">
-              <!-- populated dynamically -->
-            </select>
-          </div>
-          <div class="control-group">
-            <select id="lead-time-select" class="dropdown" onchange="setLeadTime(this.value)">
-              <option value="all">Tất cả khoảng thời gian</option>
-              <option value="7" selected>Mua trước 7 ngày</option>
-              <option value="14">Mua trước 14 ngày</option>
-              <option value="30">Mua trước 30 ngày</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Airline Multiple Choice Selector -->
-        <div class="airline-selector-group" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 0.6rem 1rem; border-radius: 8px;">
-          <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);"><i class="fa-solid fa-plane"></i> Chọn hãng bay so sánh:</span>
-          <div style="display: flex; gap: 1.2rem; flex-wrap: wrap;">
-            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-vietjet" value="Vietjet" checked onchange="toggleCarrier('Vietjet')"> Vietjet
-            </label>
-            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-bamboo" value="Bamboo Airways" onchange="toggleCarrier('Bamboo Airways')"> Bamboo Airways
-            </label>
-            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-vietravel" value="Vietravel Airlines" onchange="toggleCarrier('Vietravel Airlines')"> Vietravel Airlines
-            </label>
-            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-vietnam" value="Vietnam Airlines" onchange="toggleCarrier('Vietnam Airlines')"> Vietnam Airlines
-            </label>
-            <label class="carrier-label" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer; color: var(--text-primary);">
-              <input type="checkbox" id="carrier-sunphuquoc" value="SunPhuquoc Airways" onchange="toggleCarrier('SunPhuquoc Airways')"> SunPhuquoc Airways
-            </label>
-          </div>
-        </div>
-      </div>
-      
-      <div class="chart-container">
-        <canvas id="priceChart"></canvas>
-      </div>
-    </main>
-
-    <!-- FAQ & Detailed Logs Section -->
-    <section class="faq-section glass">
-      <h2 class="section-title"><i class="fa-solid fa-circle-question"></i> Hỏi đáp & Hướng dẫn săn vé máy bay giá rẻ</h2>
-      
-      <div class="faq-accordion">
-        <details class="faq-item" open>
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-list-ul"></i> Xem lịch sử theo dõi giá vé máy bay Vietjet chi tiết ở đâu?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <div class="table-container">
-              <table id="flights-table">
-                <thead>
-                  <tr>
-                    <th>Thời gian quét</th>
-                    <th>Chặng bay</th>
-                    <th>Hãng bay</th>
-                    <th>Ngày khởi hành</th>
-                    <th>Mua trước</th>
-                    <th>Giá (VND)</th>
-                    <th>Chuyến bay có sẵn</th>
-                  </tr>
-                </thead>
-                <tbody id="table-body">
-                  <tr>
-                    <td colspan="7" class="no-data">Đang tải cơ sở dữ liệu...</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-clock"></i> Tần suất theo dõi giá vé máy bay Vietjet là bao lâu?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <p>Dữ liệu được cập nhật tự động <strong>3 lần mỗi ngày</strong> vào lúc <strong>8:00 Sáng, 2:00 Chiều và 8:00 Tối giờ địa phương</strong> sử dụng Windows Task Scheduler (hoặc thông qua GitHub Actions trên kho lưu trữ đám mây).</p>
-          </div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-chart-line"></i> Cách tính gợi ý săn vé máy bay giá rẻ (MUA NGAY vs CHỜ THÊM) hoạt động thế nào?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <p>Gợi ý được tính toán bằng cách so sánh giá quét mới nhất với mức trung bình lịch sử của chặng bay và khoảng thời gian mua trước đó:</p>
-            <ul>
-              <li><strong>MUA NGAY (Xu hướng Xanh)</strong>: Giá hiện tại thấp hơn giá trung bình lịch sử ít nhất 3%.</li>
-              <li><strong>CHỜ THÊM (Xu hướng Đỏ)</strong>: Giá hiện tại cao hơn giá trung bình lịch sử ít nhất 3%.</li>
-              <li><strong>MUA NGAY (Giá ổn định)</strong>: Giá hiện tại nằm trong khoảng 3% so với giá trung bình, cho thấy điều kiện đặt vé ổn định.</li>
-            </ul>
-          </div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span><i class="fa-solid fa-cloud-arrow-up"></i> Làm thế nào để đồng bộ cơ sở dữ liệu cục bộ với GitHub Pages?</span>
-            <i class="fa-solid fa-chevron-down faq-arrow"></i>
-          </summary>
-          <div class="faq-answer">
-            <p>Nếu bạn đang chạy công cụ quét cục bộ, bạn có thể dễ dàng đồng bộ cơ sở dữ liệu và cập nhật giao diện trực tuyến bằng cách đẩy tệp JSON mới lên GitHub:</p>
-            <pre><code>git add flights_db.json
-git commit -m "Cập nhật cơ sở dữ liệu giá vé"
-git push origin main</code></pre>
-            <p>Việc này sẽ tự động kích hoạt tiến trình triển khai GitHub Pages để cập nhật trang web hiển thị của bạn.</p>
-          </div>
-        </details>
-      </div>
-    </section>
+<!-- ── TOPBAR ─────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">
+      <i class="fa-solid fa-plane"></i>
+      VJTracker
+    </div>
+    <div class="topbar-sep"></div>
+    <span class="topbar-subtitle">Theo dõi giá vé máy bay · Cập nhật 3x/ngày · GitHub Actions</span>
   </div>
-  
-  <script src="app.js"></script>
+  <div class="topbar-right">
+    <span class="last-scan" id="last-scan-label">Đang tải...</span>
+    <a href="/" class="home-btn">← Trang chủ</a>
+    <button class="icon-btn" id="theme-toggle" title="Chuyển chế độ sáng/tối">
+      <i class="fa-solid fa-moon"></i>
+    </button>
+  </div>
+</header>
+
+<div class="app-wrap">
+
+  <!-- ── CONTROLS BAR ──────────────────────────────────────────── -->
+  <div class="controls-bar">
+    <span class="ctrl-label">Chặng</span>
+    <div class="route-selector">
+      <select class="sel" id="origin-select" onchange="onOriginChange(this.value)">
+        <option value="HAN">Hà Nội (HAN)</option>
+        <option value="SGN">TP. HCM (SGN)</option>
+        <option value="DAD">Đà Nẵng (DAD)</option>
+        <option value="CXR">Nha Trang (CXR)</option>
+        <option value="PQC">Phú Quốc (PQC)</option>
+        <option value="PXU">Pleiku (PXU)</option>
+        <option value="DLI">Đà Lạt (DLI)</option>
+        <option value="UIH">Quy Nhơn (UIH)</option>
+        <option value="HUI">Huế (HUI)</option>
+        <option value="VII">Vinh (VII)</option>
+        <option value="BMV">Buôn Ma Thuột (BMV)</option>
+        <option value="VCS">Côn Đảo (VCS)</option>
+        <option value="BKK">Bangkok (BKK)</option>
+      </select>
+      <span class="route-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+      <select class="sel" id="dest-select" onchange="onDestChange(this.value)">
+        <!-- populated by JS -->
+      </select>
+    </div>
+
+    <span class="ctrl-label">Mua trước</span>
+    <div class="pill-group" id="lead-pills">
+      <button class="pill" onclick="setLeadTime('7')" data-lead="7">7 ngày</button>
+      <button class="pill active" onclick="setLeadTime('14')" data-lead="14">14 ngày</button>
+      <button class="pill" onclick="setLeadTime('30')" data-lead="30">30 ngày</button>
+      <button class="pill" onclick="setLeadTime('all')" data-lead="all">Tất cả</button>
+    </div>
+
+    <div class="carrier-toggles" id="carrier-toggles">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- ── STATS ROW ──────────────────────────────────────────────── -->
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-box-label">Giá mới nhất</div>
+      <div class="stat-box-value" id="val-latest">—</div>
+      <div class="stat-box-sub" id="sub-latest">—</div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-box-label">Trung bình 7 ngày qua</div>
+      <div class="stat-box-value" id="val-avg7">—</div>
+      <div class="stat-box-sub" id="sub-avg7">—</div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-box-label">Thấp nhất lịch sử</div>
+      <div class="stat-box-value" id="val-min">—</div>
+      <div class="stat-box-sub" id="sub-min">—</div>
+    </div>
+
+    <div class="stat-box rec-box" id="rec-box">
+      <div class="stat-box-label">Khuyến nghị</div>
+      <div class="rec-verdict" id="rec-verdict">—</div>
+      <div class="stat-box-value" id="val-rec">—</div>
+      <div class="rec-reason" id="rec-reason">Đang tính toán...</div>
+    </div>
+  </div>
+
+  <!-- ── ANALYSIS CARDS ────────────────────────────────────────── -->
+  <div class="analysis-section">
+
+    <!-- Trend analysis -->
+    <div class="analysis-card">
+      <div class="analysis-card-title">
+        <i class="fa-solid fa-chart-line"></i>
+        Xu hướng giá (Vietjet · theo leadtime đang chọn)
+      </div>
+      <div id="trend-rows">
+        <div class="trend-row"><span class="trend-label">Đang tính...</span></div>
+      </div>
+    </div>
+
+    <!-- Price by lead time -->
+    <div class="analysis-card">
+      <div class="analysis-card-title">
+        <i class="fa-solid fa-clock"></i>
+        Giá trung bình theo khoảng mua trước (Vietjet)
+      </div>
+      <div class="lead-time-grid" id="lead-grid">
+        <div class="lt-cell"><div class="lt-cell-label">7 ngày</div><div class="lt-cell-value" id="lt-7">—</div></div>
+        <div class="lt-cell"><div class="lt-cell-label">14 ngày</div><div class="lt-cell-value" id="lt-14">—</div></div>
+        <div class="lt-cell"><div class="lt-cell-label">30 ngày</div><div class="lt-cell-value" id="lt-30">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHART ──────────────────────────────────────────────────── -->
+  <div class="chart-panel">
+    <div class="chart-panel-head">
+      <span class="chart-panel-title">Biểu đồ giá theo thời gian</span>
+      <span class="chart-panel-route" id="chart-route-label">HAN → SGN</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="priceChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ── RAW DATA TABLE ─────────────────────────────────────────── -->
+  <div class="data-section">
+    <div class="data-section-head">
+      <span class="data-section-title">Lịch sử quét gần đây</span>
+      <span class="data-count" id="table-count">—</span>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table" id="flights-table">
+        <thead>
+          <tr>
+            <th>Thời gian quét</th>
+            <th>Chặng</th>
+            <th>Hãng bay</th>
+            <th>Ngày bay</th>
+            <th>Mua trước</th>
+            <th>Giá thấp nhất</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr><td colspan="6" class="no-data">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── HOW IT WORKS ───────────────────────────────────────────── -->
+  <div class="info-section">
+    <details>
+      <summary class="info-toggle">
+        <span><i class="fa-solid fa-circle-info"></i> &nbsp;Cách hoạt động &amp; phương pháp tính gợi ý mua vé</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </summary>
+      <div class="info-body">
+        <p><strong>Dữ liệu được thu thập</strong> tự động 3 lần/ngày (08:00, 14:00, 20:00 giờ Việt Nam) từ Google Flights sử dụng Puppeteer + GitHub Actions. Mỗi lần quét ghi nhận giá thấp nhất của từng hãng bay trên từng chặng, cho các ngày bay cách thời điểm quét 7, 14 và 30 ngày.</p>
+        <p><strong>Phương pháp tính khuyến nghị:</strong></p>
+        <ul>
+          <li>So sánh giá mới nhất với <em>trung bình trượt 7 ngày</em> (rolling average) của cùng chặng và cùng khoảng mua trước — không dùng trung bình toàn lịch sử vì giá có xu hướng thay đổi theo mùa.</li>
+          <li>Phát hiện xu hướng tăng/giảm bằng cách so sánh trung bình 3 lần quét gần nhất với 3 lần quét trước đó.</li>
+          <li><strong>MUA NGAY</strong>: giá thấp hơn trung bình 7 ngày ≥ 5% và xu hướng không tăng mạnh.</li>
+          <li><strong>CHỜ THÊM</strong>: giá cao hơn trung bình 7 ngày ≥ 5% và xu hướng đang tăng.</li>
+          <li><strong>GIÁ ỔN</strong>: giá trong khoảng ±5% so với trung bình 7 ngày.</li>
+        </ul>
+        <p><em>Lưu ý: Đây là công cụ hỗ trợ tham khảo, không phải bảo đảm giá sẽ giảm.</em></p>
+      </div>
+    </details>
+  </div>
+
+</div><!-- /.app-wrap -->
+
+<script src="app.js"></script>
 </body>
 </html>
