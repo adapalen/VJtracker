@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,7 +28,7 @@
       VJTracker
     </div>
     <div class="topbar-sep"></div>
-    <span class="topbar-subtitle">Theo dõi giá vé máy bay · Cập nhật 3x/ngày · GitHub Actions</span>
+    <span class="topbar-subtitle">Theo dõi giá vé máy bay · Cập nhật 3x/ngày</span>
   </div>
   <div class="topbar-right">
     <span class="last-scan" id="last-scan-label">Đang tải...</span>
@@ -39,6 +40,17 @@
 </header>
 
 <div class="app-wrap">
+
+  <!-- ── FAVORITE ROUTES (quick access) ──────────────────────── -->
+  <div class="fav-bar" id="fav-bar">
+    <span class="ctrl-label">Chặng lưu</span>
+    <div class="fav-pills" id="fav-pills">
+      <!-- populated by JS from localStorage -->
+    </div>
+    <button class="fav-add-btn" id="fav-add-btn" title="Lưu chặng hiện tại">
+      <i class="fa-solid fa-star"></i> Lưu chặng
+    </button>
+  </div>
 
   <!-- ── CONTROLS BAR ──────────────────────────────────────────── -->
   <div class="controls-bar">
@@ -62,7 +74,7 @@
           <option value="VCS">Côn Đảo (VCS)</option>
           <option value="BKK">Bangkok (BKK)</option>
         </select>
-        <button class="reverse-btn" id="reverse-btn" onclick="reverseRoute()" title="Đảo chiều chặng bay">
+        <button class="reverse-btn" id="reverse-btn" onclick="reverseRoute()" title="Đảo chiều (phím R)">
           <i class="fa-solid fa-right-left"></i>
         </button>
         <select class="sel" id="dest-select" onchange="onDestChange(this.value)">
@@ -92,8 +104,9 @@
   <!-- ── STATS ROW ──────────────────────────────────────────────── -->
   <div class="stats-row">
     <div class="stat-box">
-      <div class="stat-box-label">Giá mới nhất</div>
+      <div class="stat-box-label">Giá mới nhất <span class="stat-carrier-tag" id="stat-carrier-tag">Vietjet</span></div>
       <div class="stat-box-value" id="val-latest">—</div>
+      <div class="stat-box-delta" id="delta-latest"></div>
       <div class="stat-box-sub" id="sub-latest">—</div>
     </div>
 
@@ -124,7 +137,7 @@
     <div class="analysis-card">
       <div class="analysis-card-title">
         <i class="fa-solid fa-chart-line"></i>
-        Xu hướng giá (Vietjet · theo leadtime đang chọn)
+        Xu hướng giá · <span id="trend-carrier-label">Vietjet</span>
       </div>
       <div id="trend-rows">
         <div class="trend-row"><span class="trend-label">Đang tính...</span></div>
@@ -135,18 +148,18 @@
     <div class="analysis-card">
       <div class="analysis-card-title">
         <i class="fa-solid fa-clock"></i>
-        Giá trung bình theo khoảng mua trước (Vietjet)
+        Giá TB theo khoảng mua trước · <span id="lt-carrier-label">Vietjet</span>
       </div>
       <div class="lead-time-grid" id="lead-grid">
-        <div class="lt-cell"><div class="lt-cell-label">7 ngày</div><div class="lt-cell-value" id="lt-7">—</div></div>
-        <div class="lt-cell"><div class="lt-cell-label">14 ngày</div><div class="lt-cell-value" id="lt-14">—</div></div>
-        <div class="lt-cell"><div class="lt-cell-label">30 ngày</div><div class="lt-cell-value" id="lt-30">—</div></div>
+        <div class="lt-cell" id="lt-cell-7"><div class="lt-cell-label">7 ngày</div><div class="lt-cell-value" id="lt-7">—</div></div>
+        <div class="lt-cell" id="lt-cell-14"><div class="lt-cell-label">14 ngày</div><div class="lt-cell-value" id="lt-14">—</div></div>
+        <div class="lt-cell" id="lt-cell-30"><div class="lt-cell-label">30 ngày</div><div class="lt-cell-value" id="lt-30">—</div></div>
       </div>
     </div>
   </div>
 
   <!-- ── CHART ──────────────────────────────────────────────────── -->
-  <div class="chart-panel">
+  <div class="chart-panel" id="chart-panel">
     <div class="chart-panel-head">
       <span class="chart-panel-title">Biểu đồ giá theo thời gian</span>
       <span class="chart-panel-route" id="chart-route-label">HAN → SGN</span>
@@ -204,6 +217,13 @@
         <p><em>Lưu ý: Đây là công cụ hỗ trợ tham khảo, không phải bảo đảm giá sẽ giảm.</em></p>
       </div>
     </details>
+  </div>
+
+  <!-- ── KEYBOARD HINTS ──────────────────────────────────────────── -->
+  <div class="kbd-hints">
+    <span><kbd>R</kbd> đảo chiều</span>
+    <span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>0</kbd> chọn mua trước</span>
+    <span><kbd>F</kbd> lưu chặng</span>
   </div>
 
 </div><!-- /.app-wrap -->

@@ -1,17 +1,19 @@
 'use strict';
 // ─── VJTracker app.js ──────────────────────────────────────────
-// Accurate flight price analytics dashboard.
-// Key improvements over previous version:
-//   • Rolling 7-day average instead of all-time average
-//   • Trend detection: last 3 scans vs prior 3 scans
-//   • Lead-time-aware stats (7/14/30 baselines shown separately)
-//   • Buy/Wait verdict uses 5% threshold + trend direction
-//   • Carrier chips auto-populate from DB data
+// Flight price analytics dashboard.
+// Features:
+//   • Rolling 7-day average + trend detection
+//   • Lead-time-aware stats (7/14/30 baselines)
+//   • Buy/Wait verdict: 5% threshold + trend direction
+//   • Favorite routes (localStorage)
+//   • Price delta badge (vs previous scan)
+//   • Chart annotation lines (avg + min)
+//   • Keyboard shortcuts (R/1/2/3/0/F)
 // ──────────────────────────────────────────────────────────────
 
 let db = [];
 let currentRoute    = 'HAN-SGN';
-let currentLeadTime = '14';        // '7'|'14'|'30'|'all'
+let currentLeadTime = '14';
 let selectedCarriers = [];
 let priceChart = null;
 
@@ -23,21 +25,13 @@ const CARRIER_COLORS = {
   'SunPhuquoc Airways':'#a970d9',
 };
 
-// Routes available per origin (mirrors scraper.js)
 const ROUTE_MAP = {
   HAN: ['SGN','DAD','CXR','PQC','PXU','DLI','UIH','HUI','VII','BMV','VCS','BKK'],
   SGN: ['HAN','DAD','CXR','PQC','PXU','DLI','UIH','HUI','VII','BMV','VCS','BKK'],
-  DAD: ['HAN','SGN'],
-  CXR: ['HAN','SGN'],
-  PQC: ['HAN','SGN'],
-  PXU: ['HAN','SGN'],
-  DLI: ['HAN','SGN'],
-  UIH: ['HAN','SGN'],
-  HUI: ['HAN','SGN'],
-  VII: ['HAN','SGN'],
-  BMV: ['HAN','SGN'],
-  VCS: ['HAN','SGN'],
-  BKK: ['HAN','SGN'],
+  DAD: ['HAN','SGN'], CXR: ['HAN','SGN'], PQC: ['HAN','SGN'],
+  PXU: ['HAN','SGN'], DLI: ['HAN','SGN'], UIH: ['HAN','SGN'],
+  HUI: ['HAN','SGN'], VII: ['HAN','SGN'], BMV: ['HAN','SGN'],
+  VCS: ['HAN','SGN'], BKK: ['HAN','SGN'],
 };
 
 const AIRPORT_NAMES = {
@@ -48,9 +42,12 @@ const AIRPORT_NAMES = {
   BKK:'Bangkok (BKK)',
 };
 
-// Carriers that never operate on BKK routes
+const AIRPORT_SHORT = {
+  HAN:'HAN', SGN:'SGN', DAD:'DAD', CXR:'CXR', PQC:'PQC', PXU:'PXU',
+  DLI:'DLI', UIH:'UIH', HUI:'HUI', VII:'VII', BMV:'BMV', VCS:'VCS', BKK:'BKK',
+};
+
 const BKK_BLOCKED = new Set(['Bamboo Airways','SunPhuquoc Airways']);
-// Carriers that never operate on these domestic small routes
 const SMALL_ROUTE_BLOCKED = new Set(['SunPhuquoc Airways']);
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -80,25 +77,35 @@ function avg(arr) {
   return arr.reduce((s, v) => s + v, 0) / arr.length;
 }
 
-// Cache: which carriers have actual DB records for current route (recomputed on each refresh)
+function timeAgo(date) {
+  const sec = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (sec < 60) return 'vừa xong';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} phút trước`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `${hr} giờ trước`;
+  const day = Math.floor(hr / 24);
+  return `${day} ngày trước`;
+}
+
+// Returns the primary carrier for stats (first selected, or Vietjet)
+function primaryCarrier() {
+  if (selectedCarriers.length && isCarrierAvailable(selectedCarriers[0])) return selectedCarriers[0];
+  return 'Vietjet';
+}
+
+// ── Carrier Availability ──────────────────────────────────────
 let _carriersWithData = new Set();
 
 function recomputeCarriersWithData() {
   _carriersWithData = new Set(
-    db
-      .filter(r => r.route === currentRoute && r.lowestPrice != null)
-      .map(r => r.carrier)
+    db.filter(r => r.route === currentRoute && r.lowestPrice != null).map(r => r.carrier)
   );
 }
 
-// ── Carrier Availability ──────────────────────────────────────
-// An airline is available only if the DB actually has price records for it
-// on the current route. Hardcoded blocklists are a secondary guard.
 function isCarrierAvailable(carrier) {
-  // Hardcoded structural blocks (routes the airline simply does not fly)
   if (currentRoute.includes('BKK') && BKK_BLOCKED.has(carrier)) return false;
   if (['PXU','VCS','BMV'].some(c => currentRoute.includes(c)) && SMALL_ROUTE_BLOCKED.has(carrier)) return false;
-  // Primary check: does the DB actually contain records?
   return _carriersWithData.has(carrier);
 }
 
@@ -106,9 +113,26 @@ function isCarrierAvailable(carrier) {
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   await loadDb();
-  populateDestinations('HAN');
+
+  // Restore last route from URL hash or localStorage
+  const hash = location.hash.replace('#','');
+  const savedRoute = hash || localStorage.getItem('vjt-last-route') || 'HAN-SGN';
+  const [o, d] = savedRoute.split('-');
+  if (o && d && ROUTE_MAP[o]) {
+    document.getElementById('origin-select').value = o;
+    populateDestinations(o);
+    if (ROUTE_MAP[o].includes(d)) {
+      document.getElementById('dest-select').value = d;
+    }
+    currentRoute = `${o}-${document.getElementById('dest-select').value}`;
+  } else {
+    populateDestinations('HAN');
+  }
+
   buildAirlineChecks();
+  buildFavorites();
   refreshAll();
+  initKeyboardShortcuts();
 
   // Auto-poll every 5 min
   setInterval(async () => {
@@ -152,6 +176,99 @@ function applyTheme(t) {
     : '<i class="fa-solid fa-sun"></i>';
 }
 
+// ── Keyboard Shortcuts ────────────────────────────────────────
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Don't trigger when typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+    switch (e.key.toLowerCase()) {
+      case 'r': reverseRoute(); break;
+      case '1': setLeadTime('7');  break;
+      case '2': setLeadTime('14'); break;
+      case '3': setLeadTime('30'); break;
+      case '0': setLeadTime('all'); break;
+      case 'f': toggleFavorite(); break;
+    }
+  });
+}
+
+// ── Favorite Routes ───────────────────────────────────────────
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem('vjt-favs') || '[]'); }
+  catch { return []; }
+}
+
+function saveFavorites(favs) {
+  localStorage.setItem('vjt-favs', JSON.stringify(favs));
+}
+
+function isFavorite(route) {
+  return getFavorites().includes(route);
+}
+
+function toggleFavorite() {
+  const favs = getFavorites();
+  const idx = favs.indexOf(currentRoute);
+  if (idx > -1) {
+    favs.splice(idx, 1);
+  } else {
+    favs.push(currentRoute);
+  }
+  saveFavorites(favs);
+  buildFavorites();
+}
+
+function buildFavorites() {
+  const wrap = document.getElementById('fav-pills');
+  const addBtn = document.getElementById('fav-add-btn');
+  const favBar = document.getElementById('fav-bar');
+  if (!wrap) return;
+
+  const favs = getFavorites();
+
+  // Update add button state
+  if (addBtn) {
+    const isSaved = isFavorite(currentRoute);
+    addBtn.classList.toggle('saved', isSaved);
+    addBtn.innerHTML = isSaved
+      ? '<i class="fa-solid fa-star"></i> Đã lưu'
+      : '<i class="fa-regular fa-star"></i> Lưu chặng';
+    addBtn.onclick = toggleFavorite;
+  }
+
+  wrap.innerHTML = '';
+  favs.forEach(route => {
+    const [o, d] = route.split('-');
+    const pill = document.createElement('button');
+    pill.className = 'fav-pill' + (route === currentRoute ? ' active' : '');
+    pill.innerHTML = `${o} → ${d} <span class="fav-remove" title="Xoá">✕</span>`;
+
+    pill.addEventListener('click', (e) => {
+      if (e.target.classList.contains('fav-remove')) {
+        const f = getFavorites().filter(r => r !== route);
+        saveFavorites(f);
+        buildFavorites();
+        return;
+      }
+      // Navigate to this route
+      document.getElementById('origin-select').value = o;
+      populateDestinations(o);
+      document.getElementById('dest-select').value = d;
+      currentRoute = route;
+      refreshAll();
+      buildFavorites();
+    });
+
+    wrap.appendChild(pill);
+  });
+
+  // Show/hide bar
+  if (favBar) {
+    favBar.classList.toggle('hidden', favs.length === 0 && !isFavorite(currentRoute));
+  }
+}
+
 // ── Route Controls ────────────────────────────────────────────
 function populateDestinations(origin) {
   const sel = document.getElementById('dest-select');
@@ -169,12 +286,14 @@ function onOriginChange(origin) {
   const dest = document.getElementById('dest-select').value;
   currentRoute = `${origin}-${dest}`;
   refreshAll();
+  buildFavorites();
 }
 
 function onDestChange(dest) {
   const origin = document.getElementById('origin-select').value;
   currentRoute = `${origin}-${dest}`;
   refreshAll();
+  buildFavorites();
 }
 
 function reverseRoute() {
@@ -182,18 +301,16 @@ function reverseRoute() {
   const destSel   = document.getElementById('dest-select');
   const oldOrigin = originSel.value;
   const oldDest   = destSel.value;
-  // Set origin to old dest
-  originSel.value = oldDest;
-  populateDestinations(oldDest);
-  // Set dest to old origin (if it exists in new dest list)
-  const opts = Array.from(destSel.options).map(o => o.value);
-  if (opts.includes(oldOrigin)) destSel.value = oldOrigin;
-  // Simpler: just swap and set
-  currentRoute = `${oldDest}-${oldOrigin}`;
+
+  // Check if reverse route exists
+  if (!ROUTE_MAP[oldDest] || !ROUTE_MAP[oldDest].includes(oldOrigin)) return;
+
   originSel.value = oldDest;
   populateDestinations(oldDest);
   destSel.value = oldOrigin;
+  currentRoute = `${oldDest}-${oldOrigin}`;
   refreshAll();
+  buildFavorites();
 }
 
 // ── Lead Time Pills ───────────────────────────────────────────
@@ -234,7 +351,6 @@ function syncAirlineChecks() {
     const isChecked = selectedCarriers.includes(carrier) && isAvail;
     label.classList.toggle('disabled', !isAvail);
     label.classList.toggle('checked',  isChecked);
-    // Tooltip: explain why disabled
     label.title = isAvail ? '' : 'Không có chuyến bay của hãng này trên chặng đang chọn';
   });
 }
@@ -243,25 +359,19 @@ function toggleCarrier(carrier) {
   if (!isCarrierAvailable(carrier)) return;
   const idx = selectedCarriers.indexOf(carrier);
   if (idx > -1) {
-    if (selectedCarriers.length === 1) return; // keep at least one
+    if (selectedCarriers.length === 1) return;
     selectedCarriers.splice(idx, 1);
   } else {
     selectedCarriers.push(carrier);
   }
   syncAirlineChecks();
-  renderChart();
-  renderTable();
+  refreshAll();
 }
 
 // ── Master Refresh ────────────────────────────────────────────
 function refreshAll() {
-  // 1. Recompute which carriers have real data for this route
   recomputeCarriersWithData();
-
-  // 2. Prune selected carriers that no longer have data
   selectedCarriers = selectedCarriers.filter(c => isCarrierAvailable(c));
-
-  // 3. Default: select Vietjet if available, otherwise first available carrier
   if (selectedCarriers.length === 0) {
     const avail = Object.keys(CARRIER_COLORS).filter(isCarrierAvailable);
     selectedCarriers = avail.includes('Vietjet') ? ['Vietjet'] : avail.slice(0, 1);
@@ -274,10 +384,25 @@ function refreshAll() {
   renderChart();
   renderTable();
 
+  // Persist last route
+  localStorage.setItem('vjt-last-route', currentRoute);
+  location.hash = currentRoute;
+
   // Update chart route label
   const [o, d] = currentRoute.split('-');
   const el = document.getElementById('chart-route-label');
   if (el) el.textContent = `${AIRPORT_NAMES[o] || o} → ${AIRPORT_NAMES[d] || d}`;
+
+  // Update analysis card carrier labels
+  const pc = primaryCarrier();
+  const trendLabel = document.getElementById('trend-carrier-label');
+  const ltLabel    = document.getElementById('lt-carrier-label');
+  if (trendLabel) trendLabel.textContent = pc;
+  if (ltLabel)    ltLabel.textContent = pc;
+
+  // Update stat carrier tag
+  const tag = document.getElementById('stat-carrier-tag');
+  if (tag) tag.textContent = pc;
 }
 
 // ── Last Scan ─────────────────────────────────────────────────
@@ -286,27 +411,49 @@ function updateLastScan() {
   if (!db.length) { el.textContent = 'Chưa có dữ liệu'; return; }
   const ts = db.map(r => new Date(r.crawlTimestamp).getTime());
   const latest = new Date(Math.max(...ts));
-  el.innerHTML = `Quét lúc <b>${fmtDT(latest.toISOString())}</b>`;
+  el.innerHTML = `Quét <b>${timeAgo(latest)}</b>`;
 }
 
 // ── Stats Row ─────────────────────────────────────────────────
 function updateStatsRow() {
-  // Focus on Vietjet for the headline stats
-  const recs = getFilteredRecords('Vietjet');
+  const pc = primaryCarrier();
+  const recs = getFilteredRecords(pc);
   const latest = recs[0] || null;
 
   // Latest price
   const valLatest = document.getElementById('val-latest');
   const subLatest = document.getElementById('sub-latest');
+  const deltaEl   = document.getElementById('delta-latest');
   if (latest) {
     valLatest.textContent = fmt(latest.lowestPrice);
     subLatest.textContent = `${fmtDT(latest.crawlTimestamp)} · bay ${latest.departureDate}`;
+
+    // Delta vs previous scan
+    if (recs.length >= 2 && deltaEl) {
+      const prev = recs[1].lowestPrice;
+      const diff = latest.lowestPrice - prev;
+      const pct  = ((diff / prev) * 100).toFixed(1);
+      if (Math.abs(diff) < 1000) {
+        deltaEl.className = 'stat-box-delta flat';
+        deltaEl.textContent = '~ không đổi';
+      } else if (diff > 0) {
+        deltaEl.className = 'stat-box-delta up';
+        deltaEl.innerHTML = `<i class="fa-solid fa-arrow-up"></i> +${pct}% (${fmt(diff)})`;
+      } else {
+        deltaEl.className = 'stat-box-delta down';
+        deltaEl.innerHTML = `<i class="fa-solid fa-arrow-down"></i> ${pct}% (${fmt(diff)})`;
+      }
+    } else if (deltaEl) {
+      deltaEl.className = 'stat-box-delta';
+      deltaEl.textContent = '';
+    }
   } else {
     valLatest.textContent = '—';
     subLatest.textContent = 'Chưa có dữ liệu cho chặng này';
+    if (deltaEl) { deltaEl.className = 'stat-box-delta'; deltaEl.textContent = ''; }
   }
 
-  // Rolling 7-day average (scans from the last 7 days)
+  // Rolling 7-day average
   const avg7Val = document.getElementById('val-avg7');
   const sub7Val = document.getElementById('sub-avg7');
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -340,7 +487,7 @@ function updateStatsRow() {
   updateRecommendation(recs, recent7);
 }
 
-// ── Recommendation (accurate) ─────────────────────────────────
+// ── Recommendation ────────────────────────────────────────────
 function updateRecommendation(recs, recent7) {
   const box     = document.getElementById('rec-box');
   const verdict = document.getElementById('rec-verdict');
@@ -356,51 +503,40 @@ function updateRecommendation(recs, recent7) {
   }
 
   const latestPrice = recs[0].lowestPrice;
-
-  // Baseline: rolling 7-day avg, or full history if < 3 recent
   const baselineRecs = recent7.length >= 3 ? recent7 : recs;
   const baseline = avg(baselineRecs.map(r => r.lowestPrice));
 
-  // Trend: compare last 3 scans vs prior 3 scans
   const last3  = recs.slice(0, 3).map(r => r.lowestPrice);
   const prior3 = recs.slice(3, 6).map(r => r.lowestPrice);
-  let trendDir = 0; // -1 falling, 0 flat, +1 rising
+  let trendDir = 0;
   if (prior3.length >= 2) {
-    const avgLast  = avg(last3);
-    const avgPrior = avg(prior3);
-    const pct = (avgLast - avgPrior) / avgPrior;
-    if (pct >  0.03) trendDir =  1; // rising >3%
-    if (pct < -0.03) trendDir = -1; // falling >3%
+    const pct = (avg(last3) - avg(prior3)) / avg(prior3);
+    if (pct >  0.03) trendDir =  1;
+    if (pct < -0.03) trendDir = -1;
   }
 
   const pctVsBaseline = (latestPrice - baseline) / baseline;
-  const THRESHOLD = 0.05; // 5%
-
+  const THRESHOLD = 0.05;
   let cls, icon, text, sub;
 
   if (pctVsBaseline < -THRESHOLD) {
-    // Price is below baseline: buy signal — but check if it's still falling
     if (trendDir < 0) {
-      cls  = 'flat';
-      icon = '<i class="fa-solid fa-arrow-trend-down"></i>';
+      cls = 'flat'; icon = '<i class="fa-solid fa-arrow-trend-down"></i>';
       text = 'Đang giảm – theo dõi thêm';
-      sub  = `Giá thấp hơn baseline ${Math.round(-pctVsBaseline * 100)}% và còn đang giảm. Có thể chờ thêm vài ngày.`;
+      sub = `Giá thấp hơn baseline ${Math.round(-pctVsBaseline * 100)}% và còn đang giảm. Có thể chờ thêm vài ngày.`;
     } else {
-      cls  = 'buy';
-      icon = '<i class="fa-solid fa-circle-check"></i>';
+      cls = 'buy'; icon = '<i class="fa-solid fa-circle-check"></i>';
       text = 'Mua ngay';
-      sub  = `Thấp hơn baseline ${Math.round(-pctVsBaseline * 100)}% (${fmt(Math.round(baseline - latestPrice))} so với TB 7 ngày).`;
+      sub = `Thấp hơn baseline ${Math.round(-pctVsBaseline * 100)}% (${fmt(Math.round(baseline - latestPrice))} so với TB 7 ngày).`;
     }
   } else if (pctVsBaseline > THRESHOLD) {
-    cls  = 'wait';
-    icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+    cls = 'wait'; icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
     text = 'Chờ thêm';
-    sub  = `Cao hơn baseline ${Math.round(pctVsBaseline * 100)}% (${fmt(Math.round(latestPrice - baseline))} so với TB 7 ngày). Xu hướng ${trendDir > 0 ? 'tiếp tục tăng' : 'có thể hồi phục'}.`;
+    sub = `Cao hơn baseline ${Math.round(pctVsBaseline * 100)}% (${fmt(Math.round(latestPrice - baseline))} so với TB 7 ngày). Xu hướng ${trendDir > 0 ? 'tiếp tục tăng' : 'có thể hồi phục'}.`;
   } else {
-    cls  = 'flat';
-    icon = '<i class="fa-solid fa-minus"></i>';
+    cls = 'flat'; icon = '<i class="fa-solid fa-minus"></i>';
     text = 'Giá ổn định';
-    sub  = `Trong khoảng ±5% so với baseline. ${trendDir > 0 ? 'Xu hướng tăng nhẹ.' : trendDir < 0 ? 'Xu hướng giảm nhẹ.' : 'Không có xu hướng rõ.'}`;
+    sub = `Trong khoảng ±5% so với baseline. ${trendDir > 0 ? 'Xu hướng tăng nhẹ.' : trendDir < 0 ? 'Xu hướng giảm nhẹ.' : 'Không có xu hướng rõ.'}`;
   }
 
   box.className     = `stat-box rec-box ${cls}`;
@@ -418,13 +554,13 @@ function updateAnalysisCards() {
 
 function updateTrendRows() {
   const container = document.getElementById('trend-rows');
-  const recs = getFilteredRecords('Vietjet');
+  const pc = primaryCarrier();
+  const recs = getFilteredRecords(pc);
   if (recs.length < 4) {
     container.innerHTML = '<div class="trend-row"><span class="trend-label">Chưa đủ dữ liệu để phân tích xu hướng.</span></div>';
     return;
   }
 
-  // Group by scan date (day), compute daily average price
   const byDay = {};
   recs.forEach(r => {
     const day = r.crawlTimestamp.slice(0, 10);
@@ -432,7 +568,7 @@ function updateTrendRows() {
     byDay[day].push(r.lowestPrice);
   });
 
-  const days = Object.keys(byDay).sort().reverse().slice(0, 7); // last 7 days
+  const days = Object.keys(byDay).sort().reverse().slice(0, 7);
   const rows = [];
 
   for (let i = 0; i < Math.min(days.length, 5); i++) {
@@ -459,21 +595,36 @@ function updateTrendRows() {
 }
 
 function updateLeadTimeGrid() {
+  const pc = primaryCarrier();
+  const prices = {};
+
   [7, 14, 30].forEach(lead => {
     const el = document.getElementById(`lt-${lead}`);
-    const sub = document.getElementById(`lt-${lead}-sub`);
     const recs = db.filter(r =>
       r.route === currentRoute &&
-      r.carrier === 'Vietjet' &&
+      r.carrier === pc &&
       r.leadDays === lead &&
       r.lowestPrice != null
     );
     if (recs.length) {
       const a = Math.round(avg(recs.map(r => r.lowestPrice)));
       if (el) el.textContent = fmt(a);
+      prices[lead] = a;
     } else {
       if (el) el.textContent = '—';
+      prices[lead] = null;
     }
+  });
+
+  // Highlight cheapest lead-time cell
+  const validPrices = Object.entries(prices).filter(([, v]) => v != null);
+  const minLead = validPrices.length
+    ? validPrices.reduce((a, b) => b[1] < a[1] ? b : a)[0]
+    : null;
+
+  [7, 14, 30].forEach(lead => {
+    const cell = document.getElementById(`lt-cell-${lead}`);
+    if (cell) cell.classList.toggle('cheapest', String(lead) === minLead);
   });
 }
 
@@ -539,6 +690,37 @@ function renderChart() {
 
   if (priceChart) priceChart.destroy();
 
+  // Compute annotation lines (avg + min for primary carrier)
+  const pc = primaryCarrier();
+  const pcRecs = recs.filter(r => r.carrier === pc);
+  const pcPrices = pcRecs.map(r => r.lowestPrice).filter(Boolean);
+  const avgPrice = pcPrices.length ? Math.round(avg(pcPrices)) : null;
+  const minPrice = pcPrices.length ? Math.min(...pcPrices) : null;
+
+  const annotations = {};
+  if (avgPrice) {
+    annotations.avgLine = {
+      type: 'line', yMin: avgPrice, yMax: avgPrice,
+      borderColor: 'rgba(158,163,184,0.35)', borderWidth: 1, borderDash: [6, 4],
+      label: {
+        display: true, content: `TB: ${(avgPrice / 1000).toFixed(0)}k`,
+        position: 'start', backgroundColor: 'transparent',
+        color: 'rgba(158,163,184,0.6)', font: { size: 10, family: 'JetBrains Mono' },
+      }
+    };
+  }
+  if (minPrice && minPrice !== avgPrice) {
+    annotations.minLine = {
+      type: 'line', yMin: minPrice, yMax: minPrice,
+      borderColor: 'rgba(61,187,126,0.3)', borderWidth: 1, borderDash: [4, 4],
+      label: {
+        display: true, content: `Min: ${(minPrice / 1000).toFixed(0)}k`,
+        position: 'start', backgroundColor: 'transparent',
+        color: 'rgba(61,187,126,0.5)', font: { size: 10, family: 'JetBrains Mono' },
+      }
+    };
+  }
+
   const c = chartColors();
   priceChart = new Chart(ctx, {
     type: 'line',
@@ -556,7 +738,7 @@ function renderChart() {
           }
         },
         tooltip: {
-          backgroundColor: 'var(--surface, #171922)',
+          backgroundColor: '#171922',
           titleColor: '#e8eaf2',
           bodyColor: '#9ea3b8',
           borderColor: 'rgba(255,255,255,0.08)',
@@ -567,11 +749,19 @@ function renderChart() {
             title: ctx => timestamps[ctx[0].dataIndex]
               ? fmtChartLabel(timestamps[ctx[0].dataIndex])
               : '',
-            label: ctx => ctx.parsed.y != null
-              ? ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`
-              : null,
+            label: ctx => {
+              if (ctx.parsed.y == null) return null;
+              const price = ctx.parsed.y;
+              let extra = '';
+              if (avgPrice) {
+                const pct = ((price - avgPrice) / avgPrice * 100).toFixed(1);
+                extra = pct > 0 ? ` (+${pct}% vs TB)` : ` (${pct}% vs TB)`;
+              }
+              return ` ${ctx.dataset.label}: ${fmt(price)}${extra}`;
+            },
           }
-        }
+        },
+        annotation: { annotations }
       },
       scales: {
         x: {
@@ -596,15 +786,16 @@ function renderTable() {
   const tbody = document.getElementById('table-body');
   const countEl = document.getElementById('table-count');
 
+  // Filter by current route AND selected carriers
   const rows = db
-    .filter(r => selectedCarriers.includes(r.carrier) && isCarrierAvailable(r.carrier))
+    .filter(r => r.route === currentRoute && selectedCarriers.includes(r.carrier) && isCarrierAvailable(r.carrier))
     .sort((a, b) => new Date(b.crawlTimestamp) - new Date(a.crawlTimestamp))
     .slice(0, 150);
 
-  if (countEl) countEl.textContent = `${rows.length} bản ghi gần nhất`;
+  if (countEl) countEl.textContent = `${rows.length} bản ghi`;
 
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="no-data">Không có dữ liệu.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="no-data">Không có dữ liệu cho chặng này.</td></tr>';
     return;
   }
 
