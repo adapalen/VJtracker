@@ -1,720 +1,1001 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cậu bị ngáo à?</title>
-    <meta name="description" content="Tính toán tỷ lệ phần trăm nam giới Việt Nam đáp ứng tiêu chuẩn của bạn. Kiểm tra mức độ thực tế hay ảo tưởng trong tiêu chuẩn tìm bạn đời!">
-    
-    <!-- Emoji Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤪</text></svg>">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cậu bị ngáo à? — Thước đo tiêu chuẩn bạn trai</title>
+<meta name="description" content="Bao nhiêu phần trăm nam giới Việt Nam thực sự đạt tiêu chuẩn của bạn? Bốn công cụ đo kỳ vọng, dựa trên số liệu GSO, WHO, MOLISA và VAMA.">
+<link rel="canonical" href="https://sincostan.id.vn/p/caubingaoa/">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- KaTeX CDN for TeX/LaTeX Mathematical Rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
-        delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false},
-            {left: '\\(', right: '\\)', display: false},
-            {left: '\\[', right: '\\]', display: true}
-        ],
-        throwOnError: false
-    });"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐈‍⬛</text></svg>">
 
-    <!-- Chart.js & Canvas Confetti -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Background Glow Blobs -->
-    <div class="bg-glow blob-1"></div>
-    <div class="bg-glow blob-2"></div>
-    <div class="bg-glow blob-3"></div>
 
-    <div class="app-container">
-        <!-- Header Section with Separate Top Page Navigation -->
-        <header class="main-header">
-            <div class="header-top-row">
-                <div class="brand-group">
-                    <div class="badge-tag">
-                        🤪 🤡 🐈‍⬛ 🐈 🤡 🤪
-                    </div>
-                    
-                    <!-- Clickable Top Header Sub-Pages Navigation Links -->
-                    <nav class="top-nav-links">
-                        <a href="index.html" class="top-nav-item active">
-                            <i data-lucide="calculator"></i> Thước Đo
-                        </a>
-                        <a href="so-keo-ban-than.html" class="top-nav-item">
-                            <i data-lucide="trophy"></i> So Kèo Bản Thân
-                        </a>
-                        <a href="net-dep-thong-ke.html" class="top-nav-item">
-                            <i data-lucide="bar-chart-2"></i> Nét Đẹp Thống Kê
-                        </a>
-                        <a href="thuoc-chua-benh.html" class="top-nav-item">
-                            <i data-lucide="pill"></i> Thuốc Chữa Bệnh
-                        </a>
-                    </nav>
-                </div>
+<!-- ══════════════════════════════════ TOP BAR ══════════════════════════════ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#thuoc-do">
+      <span class="brand-mark" aria-hidden="true">🐈‍⬛</span>
+      <span class="brand-name">
+        <b>Cậu bị ngáo à?</b>
+        <small>Máy đo kỳ vọng · Bản Việt Nam</small>
+      </span>
+    </a>
 
-                <button id="theme-toggle" class="btn-theme-toggle" title="Chuyển chế độ Sáng / Tối">
-                    <i data-lucide="sun" id="theme-icon"></i>
-                    <span id="theme-text">Giao diện Sáng</span>
-                </button>
+    <nav class="nav" id="section-nav" aria-label="Chuyển mục">
+      <button class="nav-tab active" data-target="thuoc-do" type="button">
+        <i data-lucide="sliders-horizontal"></i> Thước Đo
+      </button>
+      <button class="nav-tab" data-target="so-keo" type="button">
+        <i data-lucide="user-round-check"></i> So Kèo Bản Thân
+      </button>
+      <button class="nav-tab" data-target="thong-ke" type="button">
+        <i data-lucide="bar-chart-2"></i> Nét Đẹp Thống Kê
+      </button>
+      <button class="nav-tab" data-target="thuoc-chua" type="button">
+        <i data-lucide="pill"></i> Thuốc Chữa Bệnh
+      </button>
+    </nav>
 
-                <button id="sound-toggle" class="btn-theme-toggle" title="Bật / Tắt hiệu ứng âm thanh">
-                    <i data-lucide="volume-2" id="sound-icon"></i>
-                    <span id="sound-text">Âm thanh: Bật</span>
-                </button>
-            </div>
-            
-            <h1>THƯỚC ĐO TIÊU CHUẨN BẠN TRAI</h1>
-            <p class="subtitle">Bao nhiêu % nam giới Việt Nam thực sự đạt tiêu chuẩn "Hoàng Tử Trong Mộng" của bạn?</p>
-        </header>
-
-        <!-- MAIN CALCULATOR GRID -->
-        <main class="calculator-grid">
-            <!-- Left Side: Interactive Sliders & Options -->
-            <section class="card input-card">
-                <div class="card-header">
-                    <h2><i data-lucide="sliders"></i> Tiêu Chuẩn Bạn Mong Muốn</h2>
-                    <button id="btn-reset" class="btn-icon-text" title="Đặt lại về 100% cơ bản">
-                        <i data-lucide="rotate-ccw"></i> Đặt lại (100%)
-                    </button>
-                </div>
-
-                <form id="calculator-form" onsubmit="return false;">
-                    <!-- Age Range -->
-                    <div class="form-group">
-                        <div class="label-row">
-                            <label><i data-lucide="calendar"></i> Độ Tuổi Nam Giới</label>
-                            <span class="value-display" id="age-display">18 - 60 tuổi</span>
-                        </div>
-                        <div class="dual-range-container">
-                            <div class="dual-range-track"></div>
-                            <input type="range" id="age-min" min="18" max="60" value="18" step="1">
-                            <input type="range" id="age-max" min="18" max="60" value="60" step="1">
-                        </div>
-                        <div class="range-labels">
-                            <span>18 tuổi</span>
-                            <span>60 tuổi</span>
-                        </div>
-                    </div>
-
-                    <!-- Height Slider -->
-                    <div class="form-group">
-                        <div class="label-row">
-                            <label><i data-lucide="ruler"></i> Chiều Cao Tối Thiểu</label>
-                            <span class="value-display" id="height-display">≥ 150 cm (Bất kỳ)</span>
-                        </div>
-                        <input type="range" id="height-slider" min="150" max="190" value="150" step="1">
-                        <div class="preset-chips" id="height-presets">
-                            <button type="button" class="chip active" data-val="150">Bất kỳ</button>
-                            <button type="button" class="chip" data-val="165">1m65</button>
-                            <button type="button" class="chip" data-val="170">1m70</button>
-                            <button type="button" class="chip" data-val="175">1m75</button>
-                            <button type="button" class="chip" data-val="180">1m80+</button>
-                        </div>
-                    </div>
-
-                    <!-- Weight Range Dropdown Selection (5kg Intervals) -->
-                    <div class="form-group">
-                        <label for="weight-select"><i data-lucide="scale"></i> Khoảng Cân Nặng (Khoảng 5kg)</label>
-                        <div class="select-wrapper">
-                            <select id="weight-select" class="custom-select">
-                                <option value="any" selected>Bất kỳ cân nặng nào (100% Nam giới)</option>
-                                <option value="under_50">Dưới 50 kg (~4.2% Nam giới)</option>
-                                <option value="50_55">50 - 55 kg (~9.9% Nam giới)</option>
-                                <option value="55_60">55 - 60 kg (~18.4% Nam giới)</option>
-                                <option value="60_65">60 - 65 kg (~24.6% Nam giới - Phổ biến nhất)</option>
-                                <option value="65_70">65 - 70 kg (~22.0% Nam giới)</option>
-                                <option value="70_75">70 - 75 kg (~13.1% Nam giới)</option>
-                                <option value="75_80">75 - 80 kg (~5.2% Nam giới)</option>
-                                <option value="80_85">80 - 85 kg (~1.4% Nam giới)</option>
-                                <option value="85_90">85 - 90 kg (~0.25% Nam giới)</option>
-                                <option value="above_90">Trên 90 kg (~0.04% Nam giới)</option>
-                            </select>
-                            <i data-lucide="chevron-down" class="select-icon"></i>
-                        </div>
-                    </div>
-
-                    <!-- Pure Vietnamese Live Auto BMI Calculation Card -->
-                    <div class="bmi-calc-card" id="bmi-calc-card">
-                        <div class="bmi-header">
-                            <span class="bmi-title"><i data-lucide="activity"></i> BMI Tự Động</span>
-                            <span class="bmi-val-badge" id="bmi-val-display">BMI = --</span>
-                        </div>
-                        <p class="bmi-status-text" id="bmi-status-desc">Chọn khoảng cân nặng để tính BMI tự động</p>
-                    </div>
-
-                    <!-- Satirical Mockery Box when BMI >= 25.0 or BMI < 18.5 -->
-                    <div class="bmi-mockery-box hidden" id="bmi-mockery-box">
-                        <i data-lucide="alert-triangle" class="mockery-icon" id="mockery-icon"></i>
-                        <span class="mockery-text" id="mockery-text">Thế m đã nhìn lại mình chưa? 🤪</span>
-                    </div>
-
-                    <!-- Salary Slider -->
-                    <div class="form-group">
-                        <div class="label-row">
-                            <label><i data-lucide="banknote"></i> Thu Nhập Hàng Tháng</label>
-                            <span class="value-display highlight-gold" id="salary-display">Bất kỳ (≥ 0 Tr)</span>
-                        </div>
-                        <input type="range" id="salary-slider" min="0" max="150" value="0" step="2.5">
-                        <div class="preset-chips" id="salary-presets">
-                            <button type="button" class="chip active" data-val="0">Bất kỳ</button>
-                            <button type="button" class="chip" data-val="10">10 Tr</button>
-                            <button type="button" class="chip" data-val="15">15 Tr</button>
-                            <button type="button" class="chip" data-val="30">30 Tr</button>
-                            <button type="button" class="chip" data-val="50">50 Tr</button>
-                            <button type="button" class="chip" data-val="100">100 Tr+</button>
-                        </div>
-                    </div>
-
-                    <!-- Job / Occupation Dropdown Selection -->
-                    <div class="form-group">
-                        <label for="job-select"><i data-lucide="briefcase"></i> Ngành Nghề / Nghề Nghiệp</label>
-                        <div class="select-wrapper">
-                            <select id="job-select" class="custom-select">
-                                <option value="any" selected>Bất kỳ ngành nghề nào (100% Nam giới)</option>
-                                <option value="unemployed">🚫 Thất nghiệp / Không có việc làm</option>
-                                <option value="police">👮‍♂️ Công an Nhân dân</option>
-                                <option value="army">🎖️ Quân đội (Bộ đội / Sĩ quan)</option>
-                                <option value="doctor">👨‍⚕️ Bác sĩ / Dược sĩ / Y tế</option>
-                                <option value="lawyer">⚖️ Luật sư / Công chứng / Pháp lý</option>
-                                <option value="teacher">👨‍🏫 Giáo viên / Giảng viên Đại học</option>
-                                <option value="it">💻 Kỹ sư IT / Lập trình viên / Công nghệ</option>
-                                <option value="finance">🏦 Tài chính / Ngân hàng / Chứng khoán</option>
-                                <option value="pilot_aviation">✈️ Phi công / Hàng không</option>
-                                <option value="engineer_construction">🏗️ Kỹ sư Xây dựng / Kiến trúc sư</option>
-                                <option value="ceo">👔 Doanh nhân / Chủ doanh nghiệp / CEO</option>
-                                <option value="civil_servant">🏛️ Công chức / Viên chức nhà nước</option>
-                                <option value="freelance_gig">🛵 Tài xế công nghệ / Freelancer / Giao hàng</option>
-                                <option value="factory_worker">🏭 Công nhân nhà máy / KCN / Lao động phổ thông</option>
-                            </select>
-                            <i data-lucide="chevron-down" class="select-icon"></i>
-                        </div>
-                    </div>
-
-                    <!-- Unified Vehicle Ownership Section -->
-                    <div class="form-group">
-                        <label><i data-lucide="car"></i> Yêu Cầu Phương Tiện Sở Hữu (Tối thiểu)</label>
-                        <div class="radio-grid grid-vehicle">
-                            <label class="radio-card active">
-                                <input type="radio" name="vehicle" value="any" checked>
-                                <span>Bất kỳ / Không yêu cầu</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="wave_sirius">
-                                <span>Xe số phổ thông (Wave / Sirius) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="future_jupiter">
-                                <span>Xe số cao cấp/Côn tay (Future / Exciter) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="vision_ab">
-                                <span>Tay ga tầm trung (Vision / Air Blade) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="sh_vespa">
-                                <span>Tay ga cao cấp (Honda SH / Vespa) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="pkl">
-                                <span>Mô tô Phân khối lớn (PKL > 200cc) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="car_hatchback_a">
-                                <span>Ô tô Hạng A Đô thị (i10 / VF 5) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="car_sedan_bc">
-                                <span>Ô tô Sedan B-C (Vios / City / Mazda 3) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="car_suv_bc">
-                                <span>SUV B-C (CX-5 / Tucson / CR-V) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="car_suv_de">
-                                <span>SUV 7 Chỗ D-E (Everest / Fortuner) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="car_luxury_mid">
-                                <span>Ô tô Hạng Sang (Mercedes / BMW / Lexus) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="vehicle" value="car_superluxury">
-                                <span>Siêu xe / G63 / Rolls-Royce trở lên</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Multi-tier Real Estate / House Ownership Section -->
-                    <div class="form-group">
-                        <label><i data-lucide="home"></i> Sở Hữu Bất Động Sản & Nhà Ở (Tối thiểu)</label>
-                        <div class="radio-grid grid-house">
-                            <label class="radio-card active">
-                                <input type="radio" name="house" value="any" checked>
-                                <span>Bất kỳ / Không yêu cầu đứng tên BĐS</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="house" value="apartment_budget">
-                                <span>Chung cư phổ thông / Nhà tập thể trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="house" value="apartment_luxury">
-                                <span>Chung cư trung & cao cấp (Vinhomes / Masteri) trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="house" value="grounded_alley">
-                                <span>Nhà đất ngõ nhỏ / Nhà phố hẻm trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="house" value="street_front">
-                                <span>Nhà mặt phố / Biệt thự Shophouse trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="house" value="mansion_villa">
-                                <span>Biệt thự đơn lập / Dinh thự xa xỉ</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Education Level (5 Levels) -->
-                    <div class="form-group">
-                        <label><i data-lucide="graduation-cap"></i> Trình Độ Học Vấn Tối Thiểu</label>
-                        <div class="radio-grid grid-5">
-                            <label class="radio-card active">
-                                <input type="radio" name="education" value="any" checked>
-                                <span>Bất kỳ</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="education" value="thpt">
-                                <span>THPT trở lên</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="education" value="bachelor">
-                                <span>Cử nhân / CĐ</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="education" value="master">
-                                <span>Thạc sĩ</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="education" value="phd">
-                                <span>Tiến sĩ</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Religion Filter -->
-                    <div class="form-group">
-                        <label><i data-lucide="church"></i> Tôn Giáo</label>
-                        <div class="radio-grid grid-4">
-                            <label class="radio-card active">
-                                <input type="radio" name="religion" value="any" checked>
-                                <span>Bất kỳ</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="religion" value="none">
-                                <span>Không tôn giáo / Đạo Ông Bà</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="religion" value="buddhism">
-                                <span>Phật giáo</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="religion" value="catholic">
-                                <span>Công giáo</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Regional / Provincial Distribution Selection -->
-                    <div class="form-group">
-                        <label><i data-lucide="map-pin"></i> Khu Vực Sống / Vùng Miền (Tỉnh Thành)</label>
-                        <div class="radio-grid grid-4">
-                            <label class="radio-card active">
-                                <input type="radio" name="region" value="any" checked>
-                                <span>Bất kỳ / Toàn quốc</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="region" value="hanoi">
-                                <span>Nghìn năm văn hiến (HN)</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="region" value="hcm">
-                                <span>Hào sảng (HCM)</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="region" value="province">
-                                <span>Tỉnh lẻ (Các tỉnh khác)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Ethnicity Filter -->
-                    <div class="form-group">
-                        <label><i data-lucide="globe"></i> Dân Tộc</label>
-                        <div class="radio-grid grid-3">
-                            <label class="radio-card active">
-                                <input type="radio" name="ethnicity" value="any" checked>
-                                <span>Bất kỳ</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="ethnicity" value="kinh">
-                                <span>Dân tộc Kinh</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="ethnicity" value="minority">
-                                <span>Dân tộc thiểu số</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Sexual Orientation (LGBT Selection) -->
-                    <div class="form-group">
-                        <label><i data-lucide="compass"></i> Xu Hướng Tính Dục (Orientation)</label>
-                        <div class="radio-grid grid-3">
-                            <label class="radio-card active">
-                                <input type="radio" name="orientation" value="any" checked>
-                                <span>Bất kỳ (Tất cả)</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="orientation" value="straight">
-                                <span>Nam Dị Tính (Thẳng)</span>
-                            </label>
-                            <label class="radio-card">
-                                <input type="radio" name="orientation" value="lgbt">
-                                <span>LGBT+ (Gay / Bi)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Lifestyle Filters: Smoke & Drink -->
-                    <div class="lifestyle-grid">
-                        <div class="form-group">
-                            <label><i data-lucide="cigarette"></i> Thói Quên Hút Thuốc</label>
-                            <div class="radio-grid grid-3">
-                                <label class="radio-card active">
-                                    <input type="radio" name="smoke" value="any" checked>
-                                    <span>Bất kỳ</span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="smoke" value="no_smoke">
-                                    <span>Không hút thuốc</span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="smoke" value="smoke">
-                                    <span>Có hút thuốc</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label><i data-lucide="wine"></i> Thói Quên Uống Rượu Bia</label>
-                            <div class="radio-grid grid-3">
-                                <label class="radio-card active">
-                                    <input type="radio" name="drink" value="any" checked>
-                                    <span>Bất kỳ</span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="drink" value="no_drink">
-                                    <span>Không / Hiếm khi</span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="drink" value="drink">
-                                    <span>Có uống rượu bia</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Toggles Grid: iPhone, Single -->
-                    <div class="toggles-grid">
-                        <div class="toggle-card">
-                            <div class="toggle-info">
-                                <i data-lucide="smartphone"></i>
-                                <span>Bắt buộc dùng iPhone (iOS)</span>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="toggle-iphone">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-
-                        <div class="toggle-card">
-                            <div class="toggle-info">
-                                <i data-lucide="heart-off"></i>
-                                <span>Bắt buộc chưa từng kết hôn</span>
-                            </div>
-                            <label class="switch">
-                                <input type="checkbox" id="toggle-single">
-                                <span class="slider round"></span>
-                            </label>
-                        </div>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Right Side: Results & Satire Gauge -->
-            <section class="results-section">
-                <!-- Big Counter Card -->
-                <div class="card result-card">
-                    <div class="result-header">
-                        <span class="result-title-tag">KẾT QUẢ THỐNG KÊ</span>
-                        <div class="live-pulse">
-                            <span class="dot"></span> Dữ liệu GSO Sim 2026
-                        </div>
-                    </div>
-
-                    <div class="main-stat">
-                        <div class="percentage-container">
-                            <span id="percentage-val">100.00</span>
-                            <span class="unit">%</span>
-                        </div>
-                        <p class="stat-subtitle">Nam giới Việt Nam đáp ứng đủ tiêu chuẩn</p>
-                    </div>
-
-                    <!-- Estimated Count Pill -->
-                    <div class="count-pill">
-                        <i data-lucide="users"></i>
-                        <span>Khoảng <strong id="count-val">35.200.000</strong> / 35.2 triệu nam giới (18-60t)</span>
-                    </div>
-
-                    <!-- Delusion Meter Gauge -->
-                    <div class="delusion-meter-wrapper">
-                        <div class="meter-label-row">
-                            <span>Chỉ Số "Ảo Tưởng"</span>
-                            <span id="delusion-score-text">Độ khó: TRUNG BÌNH</span>
-                        </div>
-                        <div class="meter-bar-outer">
-                            <div class="meter-bar-inner" id="meter-bar"></div>
-                        </div>
-                        <div class="meter-ticks">
-                            <span>Thực tế</span>
-                            <span>Hợp lý</span>
-                            <span>Hiếm</span>
-                            <span>Ảo tưởng</span>
-                            <span>Vô cực</span>
-                        </div>
-                    </div>
-
-                    <!-- Satirical Verdict Banner -->
-                    <div class="verdict-card" id="verdict-box">
-                        <div class="verdict-badge" id="verdict-badge">🔥 ĐÃ TÌM THẤY!</div>
-                        <h3 id="verdict-title">Bạch Mã Hoàng Tử Trong Truyền Thuyết</h3>
-                        <p id="verdict-desc">Tiêu chuẩn của bạn rất ấn tượng. Hãy chuẩn bị tinh thần cạnh tranh với hàng triệu cô gái khác!</p>
-                    </div>
-
-                    <!-- Oval Stadium Oval-Ring Dot Visualizer (Pure Oval Dot Stadium Illustration) -->
-                    <div class="oval-stadium-card">
-                        <div class="oval-stadium-header">
-                            <span class="oval-stadium-title"><i data-lucide="landmark"></i> Mô Phỏng Khán Đài Sân Vận Động Trống Đồng (135.000 Chỗ Ngồi)</span>
-                            <span class="oval-stadium-badge" id="stadium-seat-badge">135.000 / 135.000 chỗ phát sáng</span>
-                        </div>
-                        <p class="oval-stadium-subtext">Sơ đồ 1.350 điểm ghế xếp theo vành đai oval Sân vận động Trống Đồng (135.000 chỗ, 1 điểm = 100 ghế). Các ghế phát sáng lấp đầy sân theo tiêu chuẩn của bạn:</p>
-                        
-                        <!-- Oval Stadium Ring Container -->
-                        <div class="oval-stadium-wrapper">
-                            <!-- 1,350 Seat Dots Arranged in Concentric Oval Rings -->
-                            <div class="oval-seats-ring-container" id="oval-seats-ring"></div>
-                        </div>
-
-                        <div class="stadium-satire-banner" id="stadium-satire-box">
-                            <i data-lucide="flame" class="satire-icon"></i>
-                            <span id="stadium-satire-text">Đang lấp đầy chỗ ngồi Sân vận động Trống Đồng...</span>
-                        </div>
-                    </div>
-
-                    <!-- Filter Breakdown Chart -->
-                    <div class="breakdown-wrapper">
-                        <h4><i data-lucide="bar-chart-3"></i> Phân Tích Tỷ Lệ Theo Tiêu Chí</h4>
-                        <div class="chart-container">
-                            <canvas id="breakdown-chart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Actions Row -->
-                    <div class="actions-row">
-                        <button id="btn-share" class="btn-primary">
-                            <i data-lucide="share-2"></i> Chia Sẻ Kết Quả
-                        </button>
-                        <button id="btn-copy-link" class="btn-secondary">
-                            <i data-lucide="copy"></i> Sao Chép Kết Quả
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- FAQs & Data Sources Section -->
-        <section class="card faq-section">
-            <div class="card-header">
-                <h2><i data-lucide="help-circle"></i> Câu Hỏi Thường Gặp (FAQs) & Nguồn Dữ Liệu Thống Kê</h2>
-            </div>
-            
-            <div class="faq-grid">
-                <div class="faq-item faq-item-highlight">
-                    <h4><i data-lucide="calculator"></i> Mốc Mặc Định 100% Baseline Được Tính Như Thế Nào?</h4>
-                    <p>Mốc <strong>100% Baseline</strong> của ứng dụng đại diện cho toàn bộ <strong>35.2 triệu nam giới Việt Nam trong độ tuổi lao động & trưởng thành (18 - 60 tuổi)</strong> theo số liệu thống kê dân số chính thức của GSO. 
-                    <br><br>Khi bạn chọn tùy chọn <strong>"Bất kỳ"</strong> hoặc không đặt yêu cầu bắt buộc ở tất cả các mục (Tuổi 18-60, Chiều cao ≥ 150cm, Cân nặng Bất kỳ, Lương ≥ 0 VNĐ, Học vấn Bất kỳ, Ngành nghề Bất kỳ, Phương tiện Bất kỳ, BĐS Bất kỳ, Không bắt buộc iPhone / Độc thân), xác suất tích hợp đạt $P = 1.0$ (tương ứng <strong>100.00% / 35.200.000 người</strong>). Mỗi bộ lọc bạn thắt chặt thêm sẽ nhân với tỷ lệ phần trăm tương ứng theo mô hình phân bố xác suất đồng thời Bayesian.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="book-open"></i> 1. Nguồn dữ liệu chiều cao nam giới Việt Nam lấy từ đâu?</h4>
-                    <p>Dữ liệu chiều cao được tính dựa trên <strong>Tổng điều tra Dinh dưỡng Quốc gia (Viện Dinh dưỡng Quốc gia & Bộ Y tế)</strong>. Chiều cao trung bình của nam thanh niên Việt Nam hiện đạt khoảng <strong>168.1 cm – 168.9 cm</strong> với độ lệch chuẩn $\sigma \approx 6.2\text{ cm}$. Nam giới cao trên 1m75 chỉ chiếm khoảng 13%, và trên 1m80 chỉ chiếm ~2.5% dân số.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="scale"></i> 11. Phân bố cân nặng nam giới Việt Nam theo khoảng 5kg?</h4>
-                    <p>Dựa trên <strong>Tổng điều tra Dinh dưỡng Quốc gia (Viện Dinh dưỡng Quốc gia & Bộ Y tế 2020–2026)</strong> với $N = 35.2\text{ triệu}$ nam giới (trung bình $\mu = 63.5\text{ kg}$, độ lệch chuẩn $\sigma = 7.8\text{ kg}$):
-                    <br>• Dưới 50 kg: <strong>~4.2%</strong> (Nam giới gầy / nhẹ cân)
-                    <br>• 50 – 55 kg: <strong>~9.9%</strong>
-                    <br>• 55 – 60 kg: <strong>~18.4%</strong>
-                    <br>• 60 – 65 kg: <strong>~24.6%</strong> (Khoảng cân nặng chuẩn phổ biến nhất)
-                    <br>• 65 – 70 kg: <strong>~22.0%</strong>
-                    <br>• 70 – 75 kg: <strong>~13.1%</strong>
-                    <br>• 75 – 80 kg: <strong>~5.2%</strong>
-                    <br>• 80 – 85 kg: <strong>~1.4%</strong>
-                    <br>• 85 – 90 kg: <strong>~0.25%</strong>
-                    <br>• Trên 90 kg: <strong>~0.04%</strong> (Nam giới béo phì / thừa cân nhiều)
-                    </p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="dollar-sign"></i> 2. Phân bố thu nhập hàng tháng được tính thế nào?</h4>
-                    <p>Dựa theo báo cáo từ <strong>Tổng cục Thống kê (GSO) & Tổ chức Lao động Quốc tế (ILO)</strong>. Thu nhập bình quân của nam giới làm công hưởng lương tại Việt Nam dao động quanh mức <strong>9.3 triệu VNĐ/tháng</strong>. Nam giới đạt thu nhập ≥ 20 triệu VNĐ/tháng thuộc top 14%, ≥ 50 triệu VNĐ/tháng thuộc top 2.2%, và ≥ 100 triệu VNĐ/tháng thuộc top 0.45% lực lượng lao động.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="award"></i> 3. Trình độ học vấn phân bổ ra sao?</h4>
-                    <p>Theo dữ liệu <strong>Tổng điều tra Dân số và Nhà ở Việt Nam (GSO)</strong>: Tỷ lệ nam giới có trình độ Cử nhân / Cao đẳng đạt khoảng <strong>24.5%</strong>; Thạc sĩ đạt khoảng <strong>2.8%</strong>; và Tiến sĩ chỉ chiếm khoảng <strong>0.35%</strong> trong độ tuổi từ 18 - 60.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="briefcase"></i> 4. Nguồn dữ liệu ngành nghề & việc làm tại Việt Nam?</h4>
-                    <p>Dựa trên <strong>Báo cáo Lực lượng Lao động Q1/2026 (GSO) & Bộ LĐ-TB&XH (MOLISA)</strong>:
-                    <br>• Thất nghiệp / Không có việc làm: <strong>~2.2%</strong>
-                    <br>• Công an Nhân dân: <strong>~1.4%</strong> | Quân đội (Bộ đội/Sĩ quan): <strong>~1.8%</strong>
-                    <br>• Bác sĩ / Y tế: <strong>~1.1%</strong> | Luật sư / Pháp lý: <strong>~0.45%</strong>
-                    <br>• Giáo viên / Giảng viên: <strong>~2.1%</strong> | Kỹ sư IT / Lập trình: <strong>~1.9%</strong>
-                    <br>• Tài chính / Ngân hàng: <strong>~1.6%</strong> | Phi công / Hàng không: <strong>~0.12%</strong>
-                    <br>• Kỹ sư Xây dựng / Kiến trúc: <strong>~3.2%</strong> | Doanh nhân / CEO: <strong>~2.2%</strong>
-                    <br>• Công chức nhà nước: <strong>~4.5%</strong> | Tài xế công nghệ / Freelancer: <strong>~6.8%</strong>
-                    <br>• Công nhân KCN / Lao động phổ thông: <strong>~68.5%</strong>
-                    </p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="heart"></i> 5. Nguồn dữ liệu về xu hướng tính dục LGBT+?</h4>
-                    <p>Ước tính từ các nghiên cứu cộng đồng của <strong>Viện Nghiên cứu Xã hội, Kinh tế và Môi trường (iSEE) & Bộ Y tế (MOH) / UNAIDS</strong>: Tỷ lệ nam giới đồng tính, song tính và MSM tại Việt Nam chiếm khoảng <strong>4.5% – 5.5%</strong> tổng dân số nam.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="church"></i> 6. Phân bố tôn giáo và dân tộc tại Việt Nam?</h4>
-                    <p>Theo dữ liệu <strong>Tổng điều tra Dân số (GSO)</strong>: Khoảng <strong>86.3%</strong> dân số Việt Nam không đăng ký tôn giáo chính thức; Phật giáo chiếm <strong>~4.8%</strong>; Công giáo chiếm <strong>~6.1%</strong>. Về dân tộc: Dân tộc Kinh chiếm <strong>85.3%</strong> và các dân tộc thiểu số chiếm <strong>14.7%</strong>.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="cigarette"></i> 7. Tỷ lệ nam giới hút thuốc và uống rượu bia?</h4>
-                    <p>Theo <strong>Điều tra Y tế STEPS (Bộ Y tế & WHO Việt Nam)</strong>: Nam giới trưởng thành hút thuốc lá chiếm khoảng <strong>42.3%</strong>; thói quen tiêu thụ rượu bia thường xuyên chiếm khoảng <strong>77.0%</strong>.</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="smartphone"></i> 8. Tỷ lệ nam giới dùng iPhone (iOS)?</h4>
-                    <p>Dựa trên báo cáo thị trường smartphone của <strong>Statcounter & IDC Vietnam (2024–2026)</strong>: Tỷ lệ người dùng iPhone (iOS) tại Việt Nam chiếm khoảng <strong>33.0%</strong> tổng số người dùng smartphone (Android chiếm ~67.0%).</p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="car"></i> 9. Nguồn dữ liệu phân hạng phương tiện di chuyển (Xe máy & Ô tô)?</h4>
-                    <p>Dựa trên báo cáo doanh số từ <strong>VAMM, VAMA & Cục Đăng kiểm Việt Nam (2024–2026)</strong>:
-                    <br>• Không có phương tiện riêng: <strong>~1.8%</strong> | Xe số phổ thông (Wave): <strong>~38.0%</strong>
-                    <br>• Xe số cao cấp (Future): <strong>~19.0%</strong> | Tay ga tầm trung (Vision/AB): <strong>~22.0%</strong>
-                    <br>• Tay ga cao cấp (SH/Vespa): <strong>~5.5%</strong> | Mô tô PKL: <strong>~1.2%</strong>
-                    <br>• Ô tô Hạng A (i10/Morning): <strong>~0.9%</strong> | Ô tô Sedan B-C (Vios/City): <strong>~1.8%</strong>
-                    <br>• SUV B-C (CX-5/Tucson): <strong>~1.2%</strong> | SUV D-E (Everest/SantaFe): <strong>~0.7%</strong>
-                    <br>• Ô tô Hạng Sang (Mercedes/BMW): <strong>~0.35%</strong> | Siêu xe/G63: <strong>~0.05%</strong>
-                    </p>
-                </div>
-
-                <div class="faq-item">
-                    <h4><i data-lucide="home"></i> 10. Nguồn dữ liệu phân hạng sở hữu Bất động sản & Nhà ở?</h4>
-                    <p>Dựa trên báo cáo từ <strong>Bộ Xây dựng (MOC), VNREA, GSO & CBRE / Savills Vietnam</strong>:
-                    <br>• Chưa tự đứng tên BĐS riêng (Ở trọ / Cùng bố mẹ): <strong>~89.5%</strong>
-                    <br>• Chung cư phổ thông / Nhà tập thể: <strong>~4.2%</strong>
-                    <br>• Chung cư trung & cao cấp (Vinhomes / Masteri): <strong>~2.8%</strong>
-                    <br>• Nhà đất ngõ nhỏ / Nhà phố hẻm: <strong>~2.5%</strong>
-                    <br>• Nhà mặt phố / Biệt thự liền kề Shophouse: <strong>~0.8%</strong>
-                    <br>• Biệt thự đơn lập / Dinh thự xa xỉ: <strong>~0.2%</strong>
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Satirical Footer -->
-        <footer class="app-footer card">
-            <div class="footer-content">
-                <div class="footer-info">
-                    <h4><i data-lucide="shield-check"></i> Cam Kết Dữ Liệu & Bản Quyền</h4>
-                    <p>Công cụ mô phỏng toán học dựa trên phân bố xác suất độc lập & có điều kiện (Bayesian Joint Probability). Mọi dữ liệu được đối chiếu với các nguồn thống kê chính thức tại Việt Nam (GSO, Viện Dinh Dưỡng, iSEE, Cục Đăng kiểm, WHO/Bộ Y tế, IDC, VAMM, VAMA, MOC, VNREA, MOLISA).</p>
-                </div>
-                <div class="footer-copyright">
-                    © 2026 Male Delusion Calculator Vietnam Edition. Made with <i data-lucide="heart" class="heart-icon"></i> for reality checks.
-                </div>
-            </div>
-        </footer>
+    <div class="topbar-actions">
+      <button id="sound-toggle" class="btn-icon" type="button" title="Bật / tắt âm thanh">
+        <i data-lucide="volume-2" id="sound-icon"></i>
+        <span class="visually-hidden" id="sound-text">Âm thanh: Bật</span>
+      </button>
+      <button id="theme-toggle" class="btn-icon" type="button" title="Đổi nền sáng / tối">
+        <i data-lucide="sun" id="theme-icon"></i>
+        <span class="visually-hidden" id="theme-text">Giao diện Sáng</span>
+      </button>
     </div>
+  </div>
+</header>
 
-    <!-- 0% Delusion Overdrive Modal Overlay -->
-    <div id="delusion-modal-overlay" class="modal-overlay hidden">
-        <div class="modal-card delusion-modal">
-            <div class="modal-header-banner">
-                <span class="jumping-emoji">🤪</span>
-                <h2>0% NAM GIỚI ĐẠT CHUẨN!</h2>
-                <span class="jumping-emoji">🤪</span>
-            </div>
-            
-            <div class="delusion-modal-body">
-                <div class="zero-stat-badge">M BỊ NGÁO RỒI! 🤪</div>
-                <h3>ẢO TƯỞNG CỰC ĐẠI CỦA CHỊ EM!</h3>
-                <p>Cả 35.200.000 nam giới Việt Nam từ 18-60 tuổi không có nổi <strong>01 NGƯỜI</strong> đáp ứng nổi bộ tiêu chuẩn này! Cả siêu Sân vận động Trống Đồng 135.000 khán giả tắt đèn tối thui!</p>
-                
-                <div class="mockery-quote-box">
-                    <p>"Alo em ơi tỉnh mộng giùm! Hoàng tử trong mộng của em chỉ tồn tại trong truyện cổ tích hoặc phim Hàn Quốc thôi nhé! Khuyên em chân thành nên nuôi thêm 3 con mèo hoặc hạ bớt tiêu chuẩn xuống ngay!" 🐈🐈‍⬛🐈</p>
-                </div>
+<main class="shell">
 
-                <div class="floating-emojis-container" id="floating-emojis"></div>
-            </div>
+<!-- ═══════════════════════════ 1. THƯỚC ĐO ════════════════════════════════ -->
+<section class="subpage-view active-view" id="thuoc-do">
 
-            <div class="modal-footer">
-                <button id="btn-close-modal" class="btn-primary btn-modal-reset">
-                    <i data-lucide="rotate-ccw"></i> Hạ Tiêu Chuẩn Xuống (Reset 100%)
-                </button>
-            </div>
+  <div class="section-head">
+    <p class="eyebrow"><i data-lucide="sliders-horizontal"></i> Công cụ chính</p>
+    <h1>Thước đo tiêu chuẩn bạn trai</h1>
+    <p class="lede">
+      Đặt ra tiêu chuẩn của bạn, rồi xem còn lại bao nhiêu người trong 35,2 triệu nam giới
+      Việt Nam từ 18 đến 60 tuổi. Mỗi điều kiện bạn thêm vào đều nhân với nhau — và phép nhân
+      thì không biết nể nang ai.
+    </p>
+  </div>
+
+  <div class="calc-grid">
+
+    <!-- ── Inputs ─────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <h2><i data-lucide="list-checks"></i> Tiêu chuẩn của bạn</h2>
+        <button id="btn-reset" class="btn btn-ghost btn-sm" type="button">
+          <i data-lucide="rotate-ccw"></i> Đặt lại
+        </button>
+      </div>
+
+      <form id="calculator-form" onsubmit="return false;">
+
+        <div class="field">
+          <div class="field-head">
+            <span class="field-label"><i data-lucide="calendar"></i> Độ tuổi</span>
+            <span class="value-display" id="age-display">18 – 60 tuổi</span>
+          </div>
+          <div class="dual-range">
+            <div class="dual-range-track"></div>
+            <input type="range" id="age-min" min="18" max="60" value="18" step="1" aria-label="Tuổi tối thiểu">
+            <input type="range" id="age-max" min="18" max="60" value="60" step="1" aria-label="Tuổi tối đa">
+          </div>
+          <div class="range-scale"><span>18</span><span>60</span></div>
         </div>
+
+        <div class="field">
+          <div class="field-head">
+            <span class="field-label"><i data-lucide="ruler"></i> Chiều cao tối thiểu</span>
+            <span class="value-display" id="height-display">Bất kỳ</span>
+          </div>
+          <input type="range" id="height-slider" min="150" max="190" value="150" step="1" aria-label="Chiều cao tối thiểu">
+          <div class="chips" id="height-presets">
+            <button type="button" class="chip active" data-val="150">Bất kỳ</button>
+            <button type="button" class="chip" data-val="165">1m65</button>
+            <button type="button" class="chip" data-val="170">1m70</button>
+            <button type="button" class="chip" data-val="175">1m75</button>
+            <button type="button" class="chip" data-val="180">1m80+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="weight-select"><i data-lucide="scale"></i> Khoảng cân nặng</label>
+          <div class="select-wrap">
+            <select id="weight-select" class="select">
+              <option value="any" selected>Bất kỳ cân nặng nào</option>
+              <option value="under_50">Dưới 50 kg — 4,2%</option>
+              <option value="50_55">50 – 55 kg — 9,9%</option>
+              <option value="55_60">55 – 60 kg — 18,4%</option>
+              <option value="60_65">60 – 65 kg — 24,6% (phổ biến nhất)</option>
+              <option value="65_70">65 – 70 kg — 22,0%</option>
+              <option value="70_75">70 – 75 kg — 13,1%</option>
+              <option value="75_80">75 – 80 kg — 5,2%</option>
+              <option value="80_85">80 – 85 kg — 1,4%</option>
+              <option value="85_90">85 – 90 kg — 0,25%</option>
+              <option value="above_90">Trên 90 kg — 0,04%</option>
+            </select>
+            <i data-lucide="chevron-down" class="select-icon"></i>
+          </div>
+          <div class="bmi-row">
+            <span class="bmi-label"><i data-lucide="activity"></i> BMI ước tính</span>
+            <span class="bmi-value" id="bmi-val-display">—</span>
+          </div>
+          <p class="bmi-status" id="bmi-status-desc">Chọn khoảng cân nặng để tính BMI.</p>
+          <div class="bmi-quip hidden" id="bmi-mockery-box">
+            <i data-lucide="alert-triangle" id="mockery-icon"></i>
+            <span id="mockery-text">Thế m đã nhìn lại mình chưa?</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <span class="field-label"><i data-lucide="banknote"></i> Thu nhập tối thiểu</span>
+            <span class="value-display is-gold" id="salary-display">Bất kỳ</span>
+          </div>
+          <input type="range" id="salary-slider" min="0" max="150" value="0" step="2.5" aria-label="Thu nhập tối thiểu">
+          <div class="chips" id="salary-presets">
+            <button type="button" class="chip active" data-val="0">Bất kỳ</button>
+            <button type="button" class="chip" data-val="10">10 Tr</button>
+            <button type="button" class="chip" data-val="15">15 Tr</button>
+            <button type="button" class="chip" data-val="30">30 Tr</button>
+            <button type="button" class="chip" data-val="50">50 Tr</button>
+            <button type="button" class="chip" data-val="100">100 Tr+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="job-select"><i data-lucide="briefcase"></i> Ngành nghề</label>
+          <div class="select-wrap">
+            <select id="job-select" class="select">
+              <option value="any" selected>Bất kỳ ngành nghề nào</option>
+              <option value="factory_worker">Công nhân / Lao động phổ thông</option>
+              <option value="freelance_gig">Tài xế công nghệ / Freelancer</option>
+              <option value="civil_servant">Công chức / Viên chức nhà nước</option>
+              <option value="engineer_construction">Kỹ sư xây dựng / Kiến trúc sư</option>
+              <option value="teacher">Giáo viên / Giảng viên</option>
+              <option value="it">Kỹ sư IT / Lập trình viên</option>
+              <option value="ceo">Doanh nhân / Chủ doanh nghiệp</option>
+              <option value="unemployed">Đang thất nghiệp</option>
+              <option value="army">Quân đội</option>
+              <option value="finance">Tài chính / Ngân hàng</option>
+              <option value="police">Công an nhân dân</option>
+              <option value="doctor">Bác sĩ / Dược sĩ / Y tế</option>
+              <option value="lawyer">Luật sư / Pháp lý</option>
+              <option value="pilot_aviation">Phi công / Hàng không</option>
+            </select>
+            <i data-lucide="chevron-down" class="select-icon"></i>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><i data-lucide="car"></i> Phương tiện tối thiểu</label>
+          <div class="radio-grid grid-wide">
+            <label class="radio-card active"><input type="radio" name="vehicle" value="any" checked><span>Không yêu cầu</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="wave_sirius"><span>Xe số phổ thông trở lên</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="future_jupiter"><span>Xe số cao cấp / côn tay</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="vision_ab"><span>Tay ga tầm trung</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="sh_vespa"><span>Tay ga cao cấp</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="pkl"><span>Mô tô phân khối lớn</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="car_hatchback_a"><span>Ô tô hạng A</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="car_sedan_bc"><span>Sedan hạng B–C</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="car_suv_bc"><span>SUV hạng B–C</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="car_suv_de"><span>SUV 7 chỗ hạng D–E</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="car_luxury_mid"><span>Ô tô hạng sang</span></label>
+            <label class="radio-card"><input type="radio" name="vehicle" value="car_superluxury"><span>Siêu xe</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><i data-lucide="home"></i> Bất động sản đứng tên</label>
+          <div class="radio-grid grid-wide">
+            <label class="radio-card active"><input type="radio" name="house" value="any" checked><span>Không yêu cầu</span></label>
+            <label class="radio-card"><input type="radio" name="house" value="apartment_budget"><span>Chung cư phổ thông trở lên</span></label>
+            <label class="radio-card"><input type="radio" name="house" value="apartment_luxury"><span>Chung cư cao cấp trở lên</span></label>
+            <label class="radio-card"><input type="radio" name="house" value="grounded_alley"><span>Nhà đất ngõ hẻm trở lên</span></label>
+            <label class="radio-card"><input type="radio" name="house" value="street_front"><span>Nhà mặt phố trở lên</span></label>
+            <label class="radio-card"><input type="radio" name="house" value="mansion_villa"><span>Biệt thự / dinh thự</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><i data-lucide="graduation-cap"></i> Học vấn tối thiểu</label>
+          <div class="radio-grid grid-5">
+            <label class="radio-card active"><input type="radio" name="education" value="any" checked><span>Bất kỳ</span></label>
+            <label class="radio-card"><input type="radio" name="education" value="thpt"><span>THPT</span></label>
+            <label class="radio-card"><input type="radio" name="education" value="bachelor"><span>Cử nhân / CĐ</span></label>
+            <label class="radio-card"><input type="radio" name="education" value="master"><span>Thạc sĩ</span></label>
+            <label class="radio-card"><input type="radio" name="education" value="phd"><span>Tiến sĩ</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><i data-lucide="map-pin"></i> Khu vực sinh sống</label>
+          <div class="radio-grid grid-4">
+            <label class="radio-card active"><input type="radio" name="region" value="any" checked><span>Toàn quốc</span></label>
+            <label class="radio-card"><input type="radio" name="region" value="hanoi"><span>Hà Nội</span></label>
+            <label class="radio-card"><input type="radio" name="region" value="hcm"><span>TP. Hồ Chí Minh</span></label>
+            <label class="radio-card"><input type="radio" name="region" value="province"><span>Các tỉnh khác</span></label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><i data-lucide="church"></i> Tôn giáo</label>
+          <div class="radio-grid grid-4">
+            <label class="radio-card active"><input type="radio" name="religion" value="any" checked><span>Bất kỳ</span></label>
+            <label class="radio-card"><input type="radio" name="religion" value="none"><span>Không tôn giáo</span></label>
+            <label class="radio-card"><input type="radio" name="religion" value="buddhism"><span>Phật giáo</span></label>
+            <label class="radio-card"><input type="radio" name="religion" value="catholic"><span>Công giáo</span></label>
+          </div>
+        </div>
+
+        <div class="pair-grid">
+          <div class="field">
+            <label><i data-lucide="globe"></i> Dân tộc</label>
+            <div class="radio-grid grid-3">
+              <label class="radio-card active"><input type="radio" name="ethnicity" value="any" checked><span>Bất kỳ</span></label>
+              <label class="radio-card"><input type="radio" name="ethnicity" value="kinh"><span>Kinh</span></label>
+              <label class="radio-card"><input type="radio" name="ethnicity" value="minority"><span>Thiểu số</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label><i data-lucide="compass"></i> Xu hướng tính dục</label>
+            <div class="radio-grid grid-3">
+              <label class="radio-card active"><input type="radio" name="orientation" value="any" checked><span>Bất kỳ</span></label>
+              <label class="radio-card"><input type="radio" name="orientation" value="straight"><span>Dị tính</span></label>
+              <label class="radio-card"><input type="radio" name="orientation" value="lgbt"><span>LGBT+</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="pair-grid">
+          <div class="field">
+            <label><i data-lucide="cigarette"></i> Thói quen hút thuốc</label>
+            <div class="radio-grid grid-3">
+              <label class="radio-card active"><input type="radio" name="smoke" value="any" checked><span>Bất kỳ</span></label>
+              <label class="radio-card"><input type="radio" name="smoke" value="no_smoke"><span>Không hút</span></label>
+              <label class="radio-card"><input type="radio" name="smoke" value="smoke"><span>Có hút</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label><i data-lucide="wine"></i> Thói quen rượu bia</label>
+            <div class="radio-grid grid-3">
+              <label class="radio-card active"><input type="radio" name="drink" value="any" checked><span>Bất kỳ</span></label>
+              <label class="radio-card"><input type="radio" name="drink" value="no_drink"><span>Không / hiếm khi</span></label>
+              <label class="radio-card"><input type="radio" name="drink" value="drink"><span>Có uống</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label><i data-lucide="check-check"></i> Điều kiện thêm</label>
+          <div class="switch-list">
+            <div class="switch-row">
+              <span class="switch-text"><i data-lucide="smartphone"></i> Bắt buộc dùng iPhone</span>
+              <label class="switch"><input type="checkbox" id="toggle-iphone"><span class="switch-track"></span></label>
+            </div>
+            <div class="switch-row">
+              <span class="switch-text"><i data-lucide="heart-off"></i> Bắt buộc chưa từng kết hôn</span>
+              <label class="switch"><input type="checkbox" id="toggle-single"><span class="switch-track"></span></label>
+            </div>
+          </div>
+        </div>
+
+      </form>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden">
-        <i data-lucide="check-circle"></i> <span id="toast-message">Đã sao chép kết quả!</span>
+    <!-- ── Results ────────────────────────────────────────────────────── -->
+    <aside class="results-col" id="results-section">
+      <div class="card result-stack">
+
+        <div class="result-top">
+          <span class="result-kicker">Kết quả</span>
+          <span class="result-source">Mô phỏng GSO 2026</span>
+        </div>
+
+        <div class="headline-stat">
+          <div class="num"><span id="percentage-val">100</span><span class="unit">%</span></div>
+          <p class="caption">nam giới Việt Nam đáp ứng đủ tiêu chuẩn</p>
+        </div>
+
+        <p class="count-line">
+          Khoảng <strong id="count-val">35.200.000</strong> trên tổng số 35,2 triệu nam giới 18–60 tuổi
+        </p>
+
+        <div class="meter">
+          <div class="meter-head">
+            <span>Chỉ số ảo tưởng</span>
+            <span id="delusion-score-text">Độ khó: 0%</span>
+          </div>
+          <div class="meter-track"><div class="meter-fill" id="meter-bar"></div></div>
+          <div class="meter-scale">
+            <span>Thực tế</span><span>Hợp lý</span><span>Hiếm</span><span>Ảo tưởng</span><span>Vô cực</span>
+          </div>
+        </div>
+
+        <div class="verdict" id="verdict-box">
+          <p class="verdict-badge" id="verdict-badge">100% THỰC TẾ</p>
+          <h3 id="verdict-title">Tất cả nam giới Việt Nam</h3>
+          <p id="verdict-desc">Yêu cầu quá dễ dãi. Toàn bộ 35,2 triệu người đều lọt lưới.</p>
+        </div>
+
+        <div class="panel">
+          <div class="stadium-head">
+            <span class="panel-title" style="margin:0"><i data-lucide="landmark"></i> Sân Trống Đồng</span>
+            <span class="stadium-badge" id="stadium-seat-badge">135.000 / 135.000</span>
+          </div>
+          <p class="stadium-note">
+            1.350 điểm ghế xếp theo vành đai sân 135.000 chỗ — mỗi điểm bằng 100 ghế.
+          </p>
+          <div class="stadium-field"><div id="oval-seats-ring"></div></div>
+          <p class="stadium-quip" id="stadium-satire-text">Đang lấp đầy chỗ ngồi…</p>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title"><i data-lucide="bar-chart-3"></i> Tỷ lệ đạt theo từng tiêu chí</p>
+          <div class="chart-box"><canvas id="breakdown-chart"></canvas></div>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-share" class="btn btn-primary" type="button"><i data-lucide="share-2"></i> Chia sẻ</button>
+          <button id="btn-copy-link" class="btn btn-ghost" type="button"><i data-lucide="copy"></i> Sao chép</button>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 2. SO KÈO BẢN THÂN ═════════════════════════ -->
+<section class="subpage-view" id="so-keo">
+
+  <div class="section-head">
+    <p class="eyebrow"><i data-lucide="user-round-check"></i> Tự chấm điểm</p>
+    <h1>So kèo bản thân</h1>
+    <p class="lede">
+      Đủ công bằng rồi — giờ đến lượt bạn. Nhập chỉ số của chính mình và xem bạn đứng ở đâu
+      trong 35,2 triệu nam giới Việt Nam. Thang điểm dùng trung bình nhân, nên một điểm mạnh
+      thật sự vẫn kéo được cả bảng lên.
+    </p>
+  </div>
+
+  <div class="calc-grid">
+
+    <!-- ── Inputs ─────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="card-head">
+        <h2><i data-lucide="clipboard-list"></i> Chỉ số của bạn</h2>
+        <button id="sk-reset" class="btn btn-ghost btn-sm" type="button">
+          <i data-lucide="rotate-ccw"></i> Đặt lại
+        </button>
+      </div>
+
+      <div class="field">
+        <span class="preset-label">Nạp nhanh một hồ sơ mẫu</span>
+        <div class="chips">
+          <button class="chip sk-profile" data-profile="freshman" type="button">Sinh viên mới ra trường</button>
+          <button class="chip sk-profile" data-profile="office" type="button">Dân văn phòng 28 tuổi</button>
+          <button class="chip sk-profile" data-profile="dev" type="button">Kỹ sư IT senior</button>
+          <button class="chip sk-profile" data-profile="boss" type="button">Doanh nhân 42 tuổi</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-head">
+          <span class="field-label"><i data-lucide="calendar"></i> Tuổi</span>
+          <span class="value-display" id="sk-age-out">25 tuổi</span>
+        </div>
+        <input type="range" id="sk-age" min="18" max="60" value="25" step="1" aria-label="Tuổi của bạn">
+        <div class="range-scale"><span>18</span><span>60</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-head">
+          <span class="field-label"><i data-lucide="ruler"></i> Chiều cao</span>
+          <span class="value-display" id="sk-height-out">170 cm</span>
+        </div>
+        <input type="range" id="sk-height" min="150" max="195" value="170" step="1" aria-label="Chiều cao của bạn">
+        <div class="range-scale"><span>150 cm</span><span>195 cm</span></div>
+      </div>
+
+      <div class="field">
+        <label for="sk-weight"><i data-lucide="scale"></i> Cân nặng</label>
+        <div class="select-wrap">
+          <select id="sk-weight" class="select">
+            <option value="under_50">Dưới 50 kg</option>
+            <option value="50_55">50 – 55 kg</option>
+            <option value="55_60">55 – 60 kg</option>
+            <option value="60_65" selected>60 – 65 kg</option>
+            <option value="65_70">65 – 70 kg</option>
+            <option value="70_75">70 – 75 kg</option>
+            <option value="75_80">75 – 80 kg</option>
+            <option value="80_85">80 – 85 kg</option>
+            <option value="85_90">85 – 90 kg</option>
+            <option value="above_90">Trên 90 kg</option>
+          </select>
+          <i data-lucide="chevron-down" class="select-icon"></i>
+        </div>
+        <div class="bmi-row">
+          <span class="bmi-label"><i data-lucide="activity"></i> BMI</span>
+          <span class="bmi-value" id="sk-bmi">—</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-head">
+          <span class="field-label"><i data-lucide="banknote"></i> Thu nhập hàng tháng</span>
+          <span class="value-display is-gold" id="sk-salary-out">10 Tr</span>
+        </div>
+        <input type="range" id="sk-salary" min="0" max="150" value="10" step="2.5" aria-label="Thu nhập của bạn">
+        <div class="chips" id="sk-salary-presets">
+          <button type="button" class="chip" data-val="5">5 Tr</button>
+          <button type="button" class="chip active" data-val="10">10 Tr</button>
+          <button type="button" class="chip" data-val="15">15 Tr</button>
+          <button type="button" class="chip" data-val="30">30 Tr</button>
+          <button type="button" class="chip" data-val="50">50 Tr</button>
+          <button type="button" class="chip" data-val="100">100 Tr+</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="sk-job"><i data-lucide="briefcase"></i> Nghề nghiệp</label>
+        <div class="select-wrap">
+          <select id="sk-job" class="select">
+            <option value="factory_worker" selected>Công nhân / Lao động phổ thông</option>
+            <option value="freelance_gig">Tài xế công nghệ / Freelancer</option>
+            <option value="civil_servant">Công chức / Viên chức nhà nước</option>
+            <option value="teacher">Giáo viên / Giảng viên</option>
+            <option value="engineer_construction">Kỹ sư xây dựng / Kiến trúc sư</option>
+            <option value="finance">Tài chính / Ngân hàng</option>
+            <option value="it">Kỹ sư IT / Lập trình viên</option>
+            <option value="doctor">Bác sĩ / Y tế</option>
+            <option value="army">Quân đội</option>
+            <option value="police">Công an nhân dân</option>
+            <option value="lawyer">Luật sư / Pháp lý</option>
+            <option value="ceo">Doanh nhân / CEO</option>
+            <option value="pilot_aviation">Phi công / Hàng không</option>
+            <option value="unemployed">Đang thất nghiệp</option>
+          </select>
+          <i data-lucide="chevron-down" class="select-icon"></i>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><i data-lucide="graduation-cap"></i> Học vấn cao nhất</label>
+        <div class="radio-grid grid-5">
+          <label class="radio-card active"><input type="radio" name="sk-edu" value="below_thpt" checked><span>Dưới THPT</span></label>
+          <label class="radio-card"><input type="radio" name="sk-edu" value="thpt"><span>THPT / TC</span></label>
+          <label class="radio-card"><input type="radio" name="sk-edu" value="bachelor"><span>Cử nhân / CĐ</span></label>
+          <label class="radio-card"><input type="radio" name="sk-edu" value="master"><span>Thạc sĩ</span></label>
+          <label class="radio-card"><input type="radio" name="sk-edu" value="phd"><span>Tiến sĩ</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><i data-lucide="car"></i> Phương tiện đang sở hữu</label>
+        <div class="radio-grid grid-wide">
+          <label class="radio-card active"><input type="radio" name="sk-vehicle" value="none" checked><span>Chưa có</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="wave_sirius"><span>Xe số phổ thông</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="future_jupiter"><span>Xe số cao cấp / côn tay</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="vision_ab"><span>Tay ga tầm trung</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="sh_vespa"><span>Tay ga cao cấp</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="pkl"><span>Mô tô phân khối lớn</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="car_hatchback_a"><span>Ô tô hạng A</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="car_sedan_bc"><span>Sedan hạng B–C</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="car_suv_bc"><span>SUV hạng B–C</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="car_suv_de"><span>SUV hạng D–E</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="car_luxury_mid"><span>Ô tô hạng sang</span></label>
+          <label class="radio-card"><input type="radio" name="sk-vehicle" value="car_superluxury"><span>Siêu xe</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><i data-lucide="home"></i> Bất động sản đứng tên</label>
+        <div class="radio-grid grid-wide">
+          <label class="radio-card active"><input type="radio" name="sk-house" value="none" checked><span>Chưa có</span></label>
+          <label class="radio-card"><input type="radio" name="sk-house" value="apartment_budget"><span>Chung cư phổ thông</span></label>
+          <label class="radio-card"><input type="radio" name="sk-house" value="apartment_luxury"><span>Chung cư cao cấp</span></label>
+          <label class="radio-card"><input type="radio" name="sk-house" value="grounded_alley"><span>Nhà đất ngõ hẻm</span></label>
+          <label class="radio-card"><input type="radio" name="sk-house" value="street_front"><span>Nhà mặt phố</span></label>
+          <label class="radio-card"><input type="radio" name="sk-house" value="mansion_villa"><span>Biệt thự / dinh thự</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><i data-lucide="map-pin"></i> Khu vực sinh sống</label>
+        <div class="radio-grid grid-3">
+          <label class="radio-card active"><input type="radio" name="sk-region" value="province" checked><span>Tỉnh lẻ</span></label>
+          <label class="radio-card"><input type="radio" name="sk-region" value="hanoi"><span>Hà Nội</span></label>
+          <label class="radio-card"><input type="radio" name="sk-region" value="hcm"><span>TP. Hồ Chí Minh</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label><i data-lucide="check-check"></i> Lối sống &amp; trạng thái</label>
+        <div class="switch-list">
+          <div class="switch-row">
+            <span class="switch-text"><i data-lucide="cigarette-off"></i>
+              <span>Không hút thuốc lá<small>Chỉ 57,7% nam giới không hút</small></span>
+            </span>
+            <label class="switch"><input type="checkbox" id="sk-nosmoke"><span class="switch-track"></span></label>
+          </div>
+          <div class="switch-row">
+            <span class="switch-text"><i data-lucide="wine-off"></i>
+              <span>Không uống rượu bia<small>Chỉ 23% — hiếm hơn bạn tưởng</small></span>
+            </span>
+            <label class="switch"><input type="checkbox" id="sk-nodrink"><span class="switch-track"></span></label>
+          </div>
+          <div class="switch-row">
+            <span class="switch-text"><i data-lucide="smartphone"></i>
+              <span>Dùng iPhone<small>33% thị phần smartphone</small></span>
+            </span>
+            <label class="switch"><input type="checkbox" id="sk-iphone"><span class="switch-track"></span></label>
+          </div>
+          <div class="switch-row">
+            <span class="switch-text"><i data-lucide="heart-off"></i>
+              <span>Hiện đang độc thân<small>Tỷ lệ thay đổi theo tuổi</small></span>
+            </span>
+            <label class="switch"><input type="checkbox" id="sk-single"><span class="switch-track"></span></label>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <script src="app.js"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+    <!-- ── Results ────────────────────────────────────────────────────── -->
+    <aside class="results-col">
+      <div class="card result-stack">
+
+        <div class="result-top">
+          <span class="result-kicker">Xếp hạng của bạn</span>
+          <span class="result-source">Trung bình nhân</span>
+        </div>
+
+        <div class="sk-score">
+          <div class="rank" id="sk-rank">—</div>
+          <p class="caption">nam giới Việt Nam, 18 – 60 tuổi</p>
+          <span class="sk-tier ts-E" id="sk-tier">Đang tính</span>
+        </div>
+
+        <p class="sk-blurb" id="sk-blurb">Đang phân tích chỉ số của bạn…</p>
+
+        <div class="sk-nudge" id="sk-nudge"><span id="sk-nudge-text"></span></div>
+
+        <div class="sk-rarity">
+          <div class="sk-rarity-head"><span>Phổ biến</span><span>Cực hiếm</span></div>
+          <div class="meter-track"><div class="meter-fill" id="sk-rarity-fill" style="width:12%"></div></div>
+        </div>
+
+        <div class="sk-callouts">
+          <div class="sk-callout is-best">
+            <p class="label">Mạnh nhất</p>
+            <p class="value" id="sk-best-name">—</p>
+            <p class="sub" id="sk-best-pct"></p>
+          </div>
+          <div class="sk-callout is-worst">
+            <p class="label">Nên cải thiện</p>
+            <p class="value" id="sk-worst-name">—</p>
+            <p class="sub" id="sk-worst-pct"></p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title"><i data-lucide="list-ordered"></i> Từng tiêu chí</p>
+          <div class="sk-breakdown" id="sk-breakdown"></div>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title"><i data-lucide="radar"></i> Biểu đồ độ hiếm</p>
+          <div class="sk-radar"><canvas id="sk-radar-chart"></canvas></div>
+        </div>
+
+        <p class="count-line" id="sk-summary">Đang tính kết quả…</p>
+
+        <div class="btn-row">
+          <button id="sk-copy" class="btn btn-primary" type="button"><i data-lucide="copy"></i> Sao chép kết quả</button>
+          <button id="sk-challenge" class="btn btn-ghost" type="button"><i data-lucide="swords"></i> Thách bạn bè</button>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 3. NÉT ĐẸP THỐNG KÊ ════════════════════════ -->
+<section class="subpage-view" id="thong-ke">
+
+  <div class="section-head">
+    <p class="eyebrow"><i data-lucide="bar-chart-2"></i> Nền tảng số liệu</p>
+    <h1>Nét đẹp thống kê</h1>
+    <p class="lede">
+      Trang này giải thích vì sao con số ở hai công cụ kia lại rơi nhanh đến vậy, và
+      toàn bộ nguồn dữ liệu đứng sau chúng. Không có phép màu nào cả — chỉ là phép nhân.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2><i data-lucide="sigma"></i> Vì sao tiêu chuẩn càng thêm thì người càng biến mất</h2>
+    </div>
+
+    <div class="prose-grid">
+
+      <article class="prose-card">
+        <h3><span class="n">01</span> Quy luật số lớn</h3>
+        <p>
+          Với cỡ mẫu 35,2 triệu người, những biến số như chiều cao hay thu nhập đều tụ lại
+          quanh giá trị trung bình theo hình chuông quen thuộc. Nam giới Việt Nam cao trung bình
+          168,5 cm với độ lệch chuẩn 6,2 cm.
+        </p>
+        <p>
+          Hệ quả: phần lớn dân số nằm sát mức trung bình, còn những người "hoàn hảo toàn diện"
+          không phải hiếm vì họ đặc biệt — họ hiếm vì phần đuôi của phân bố vốn dĩ rất mỏng.
+        </p>
+      </article>
+
+      <article class="prose-card">
+        <h3><span class="n">02</span> Phép nhân xác suất</h3>
+        <p>
+          Mỗi tiêu chuẩn độc lập bạn thêm vào không cộng thêm độ khó — nó nhân lên:
+        </p>
+        <p style="text-align:center;margin:0.8rem 0">$P = P_1 \times P_2 \times \dots \times P_n$</p>
+        <p>
+          Cao trên 1m75 (13%), lương trên 30 triệu (8,5%), có ô tô (12,5%) và chưa từng kết hôn —
+          bốn điều kiện nghe đều "bình thường" — nhân lại chỉ còn khoảng bốn phần vạn.
+          Đó không phải là bạn khó tính; đó là số học.
+        </p>
+      </article>
+
+      <article class="prose-card">
+        <h3><span class="n">03</span> Giới hạn của mô hình</h3>
+        <p>
+          Mô hình này giả định các tiêu chí độc lập với nhau, và thực tế thì không hẳn:
+          người có thu nhập cao thường cũng học vấn cao và có ô tô. Nghĩa là con số thật
+          có thể rộng rãi hơn kết quả bạn thấy đôi chút.
+        </p>
+        <p>
+          Nhưng chiều của kết luận thì không đổi. Dù có tính đến tương quan, một danh sách
+          tám gạch đầu dòng vẫn đủ sức xoá sổ gần hết một quốc gia.
+        </p>
+      </article>
+
+      <article class="prose-card">
+        <h3><span class="n">04</span> Điều thống kê không đo được</h3>
+        <p>
+          Tất cả những gì đo được ở đây — centimet, triệu đồng, biển số xe — đều là thứ dễ
+          đếm nhất và ít liên quan nhất đến việc hai người có sống chung được lâu dài hay không.
+        </p>
+        <p>
+          Cái quyết định thì không có trong bộ dữ liệu nào của Tổng cục Thống kê: cách một người
+          cư xử lúc mệt mỏi, lúc thất bại, lúc bạn ốm. Trang web này không đo được điều đó,
+          và cũng không nên tin trang web nào bảo rằng nó đo được.
+        </p>
+      </article>
+
+    </div>
+
+    <div class="figure-row">
+      <div class="figure"><p class="big">168,5 cm</p><p class="cap">Chiều cao trung bình</p></div>
+      <div class="figure"><p class="big">9,3 Tr</p><p class="cap">Thu nhập trung bình / tháng</p></div>
+      <div class="figure"><p class="big">24,5%</p><p class="cap">Có bằng cử nhân trở lên</p></div>
+      <div class="figure"><p class="big">10,5%</p><p class="cap">Tự đứng tên bất động sản</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2><i data-lucide="book-open"></i> Nguồn dữ liệu chi tiết</h2>
+      <span class="result-source">Bấm để mở từng mục</span>
+    </div>
+
+    <div class="sources">
+
+      <details class="source" open>
+        <summary>Mốc 100% được tính như thế nào?</summary>
+        <div class="source-body">
+          <p>
+            Mốc <strong>100%</strong> tương ứng toàn bộ <strong>35,2 triệu nam giới Việt Nam
+            từ 18 đến 60 tuổi</strong> theo số liệu dân số của Tổng cục Thống kê. Khi mọi mục
+            đều để ở "Bất kỳ", xác suất tổng hợp bằng 1,0. Mỗi lần bạn siết một bộ lọc,
+            con số đó được nhân với tỷ lệ tương ứng của bộ lọc ấy.
+          </p>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Chiều cao</summary>
+        <div class="source-body">
+          <p>
+            Nguồn: <strong>Tổng điều tra Dinh dưỡng Quốc gia</strong> (Viện Dinh dưỡng &amp; Bộ Y tế).
+            Trung bình 168,1 – 168,9 cm, độ lệch chuẩn khoảng 6,2 cm. Mô hình dùng phân bố
+            chuẩn với trung bình 168,5 cm.
+          </p>
+          <dl class="dl">
+            <dt>Cao từ 1m75 trở lên</dt><dd>~13%</dd>
+            <dt>Cao từ 1m80 trở lên</dt><dd>~2,5%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Cân nặng &amp; BMI</summary>
+        <div class="source-body">
+          <p>Nguồn: <strong>Tổng điều tra Dinh dưỡng Quốc gia 2020–2026</strong>. Trung bình 63,5 kg, độ lệch chuẩn 7,8 kg.</p>
+          <dl class="dl">
+            <dt>Dưới 50 kg</dt><dd>4,2%</dd>
+            <dt>50 – 55 kg</dt><dd>9,9%</dd>
+            <dt>55 – 60 kg</dt><dd>18,4%</dd>
+            <dt>60 – 65 kg</dt><dd>24,6%</dd>
+            <dt>65 – 70 kg</dt><dd>22,0%</dd>
+            <dt>70 – 75 kg</dt><dd>13,1%</dd>
+            <dt>75 – 80 kg</dt><dd>5,2%</dd>
+            <dt>80 – 85 kg</dt><dd>1,4%</dd>
+            <dt>85 – 90 kg</dt><dd>0,25%</dd>
+            <dt>Trên 90 kg</dt><dd>0,04%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Thu nhập</summary>
+        <div class="source-body">
+          <p>Nguồn: <strong>Tổng cục Thống kê (GSO)</strong> và <strong>Tổ chức Lao động Quốc tế (ILO)</strong>. Thu nhập bình quân của nam giới làm công hưởng lương khoảng 9,3 triệu đồng/tháng.</p>
+          <dl class="dl">
+            <dt>Từ 20 triệu/tháng</dt><dd>Top 14%</dd>
+            <dt>Từ 50 triệu/tháng</dt><dd>Top 2,2%</dd>
+            <dt>Từ 100 triệu/tháng</dt><dd>Top 0,45%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Học vấn</summary>
+        <div class="source-body">
+          <p>Nguồn: <strong>Tổng điều tra Dân số và Nhà ở (GSO)</strong>, nhóm tuổi 18–60.</p>
+          <dl class="dl">
+            <dt>Cử nhân / Cao đẳng</dt><dd>24,5%</dd>
+            <dt>Thạc sĩ</dt><dd>2,8%</dd>
+            <dt>Tiến sĩ</dt><dd>0,35%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Ngành nghề</summary>
+        <div class="source-body">
+          <p>Nguồn: <strong>Báo cáo Lực lượng Lao động Q1/2026 (GSO)</strong> và <strong>Bộ LĐ-TB&amp;XH</strong>.</p>
+          <dl class="dl">
+            <dt>Công nhân / lao động phổ thông</dt><dd>68,5%</dd>
+            <dt>Tài xế công nghệ / freelancer</dt><dd>6,8%</dd>
+            <dt>Công chức nhà nước</dt><dd>4,5%</dd>
+            <dt>Kỹ sư xây dựng / kiến trúc</dt><dd>3,2%</dd>
+            <dt>Doanh nhân / CEO</dt><dd>2,2%</dd>
+            <dt>Thất nghiệp</dt><dd>2,2%</dd>
+            <dt>Giáo viên / giảng viên</dt><dd>2,1%</dd>
+            <dt>Kỹ sư IT</dt><dd>1,9%</dd>
+            <dt>Quân đội</dt><dd>1,8%</dd>
+            <dt>Tài chính / ngân hàng</dt><dd>1,6%</dd>
+            <dt>Công an nhân dân</dt><dd>1,4%</dd>
+            <dt>Bác sĩ / y tế</dt><dd>1,1%</dd>
+            <dt>Luật sư / pháp lý</dt><dd>0,45%</dd>
+            <dt>Phi công / hàng không</dt><dd>0,12%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Phương tiện</summary>
+        <div class="source-body">
+          <p>Nguồn: <strong>VAMM, VAMA</strong> và <strong>Cục Đăng kiểm Việt Nam</strong> (2024–2026).</p>
+          <dl class="dl">
+            <dt>Xe số phổ thông</dt><dd>38,0%</dd>
+            <dt>Tay ga tầm trung</dt><dd>22,0%</dd>
+            <dt>Xe số cao cấp</dt><dd>19,0%</dd>
+            <dt>Tay ga cao cấp</dt><dd>5,5%</dd>
+            <dt>Sedan hạng B–C</dt><dd>1,8%</dd>
+            <dt>SUV hạng B–C</dt><dd>1,2%</dd>
+            <dt>Mô tô phân khối lớn</dt><dd>1,2%</dd>
+            <dt>Ô tô hạng A</dt><dd>0,9%</dd>
+            <dt>SUV hạng D–E</dt><dd>0,7%</dd>
+            <dt>Ô tô hạng sang</dt><dd>0,35%</dd>
+            <dt>Siêu xe</dt><dd>0,05%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Bất động sản</summary>
+        <div class="source-body">
+          <p>Nguồn: <strong>Bộ Xây dựng, VNREA, GSO</strong> và <strong>CBRE / Savills Vietnam</strong>.</p>
+          <dl class="dl">
+            <dt>Chưa tự đứng tên</dt><dd>89,5%</dd>
+            <dt>Chung cư phổ thông</dt><dd>4,2%</dd>
+            <dt>Chung cư cao cấp</dt><dd>2,8%</dd>
+            <dt>Nhà đất ngõ hẻm</dt><dd>2,5%</dd>
+            <dt>Nhà mặt phố</dt><dd>0,8%</dd>
+            <dt>Biệt thự / dinh thự</dt><dd>0,2%</dd>
+          </dl>
+        </div>
+      </details>
+
+      <details class="source">
+        <summary>Lối sống, tôn giáo, dân tộc, xu hướng tính dục</summary>
+        <div class="source-body">
+          <p>
+            Lối sống theo <strong>Điều tra Y tế STEPS</strong> (Bộ Y tế &amp; WHO Việt Nam);
+            thị phần điện thoại theo <strong>Statcounter &amp; IDC Vietnam</strong>;
+            xu hướng tính dục ước tính từ nghiên cứu của <strong>iSEE</strong> và <strong>UNAIDS</strong>;
+            tôn giáo và dân tộc theo <strong>Tổng điều tra Dân số (GSO)</strong>.
+          </p>
+          <dl class="dl">
+            <dt>Hút thuốc lá</dt><dd>42,3%</dd>
+            <dt>Uống rượu bia thường xuyên</dt><dd>77,0%</dd>
+            <dt>Dùng iPhone (iOS)</dt><dd>33,0%</dd>
+            <dt>Không đăng ký tôn giáo</dt><dd>86,3%</dd>
+            <dt>Công giáo</dt><dd>6,1%</dd>
+            <dt>Phật giáo</dt><dd>4,8%</dd>
+            <dt>Dân tộc Kinh</dt><dd>85,3%</dd>
+            <dt>Dân tộc thiểu số</dt><dd>14,7%</dd>
+            <dt>LGBT+ (nam)</dt><dd>4,5 – 5,5%</dd>
+          </dl>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 4. THUỐC CHỮA BỆNH ═════════════════════════ -->
+<section class="subpage-view" id="thuoc-chua">
+
+  <div class="section-head">
+    <p class="eyebrow"><i data-lucide="pill"></i> Kê đơn</p>
+    <h1>Thuốc chữa bệnh ảo tưởng</h1>
+    <p class="lede">
+      Nếu Thước Đo vừa trả về 0% và bạn vẫn thấy mình hoàn toàn hợp lý, mời đọc tiếp.
+      Đơn thuốc dưới đây không có tác dụng phụ, trừ việc phải nhìn thẳng vào sự thật.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2><i data-lucide="stethoscope"></i> Bốn liệu trình cơ bản</h2>
+      <span class="result-source">Không cần toa bác sĩ</span>
+    </div>
+
+    <div class="rx-grid">
+
+      <article class="rx">
+        <p class="rx-no">Đơn thuốc 01</p>
+        <h3>Bỏ bớt một gạch đầu dòng</h3>
+        <dl>
+          <dt>Liều dùng</dt>
+          <dd>Mỗi tuần bỏ đúng một tiêu chí khỏi danh sách. Chỉ một. Bắt đầu bằng cái mà bạn
+            khó giải thích nhất khi có người hỏi "vì sao lại cần điều đó?".</dd>
+          <dt>Tác dụng</dt>
+          <dd>Vì các điều kiện nhân với nhau, gỡ một tiêu chí hiếm thường làm tỷ lệ tăng gấp
+            hàng chục lần. Bỏ yêu cầu ô tô thôi đã nhân số ứng viên lên khoảng tám lần.</dd>
+        </dl>
+      </article>
+
+      <article class="rx">
+        <p class="rx-no">Đơn thuốc 02</p>
+        <h3>Hạ 5 cm, giảm 15 triệu</h3>
+        <dl>
+          <dt>Liều dùng</dt>
+          <dd>Giảm chiều cao mong muốn xuống 5 cm và mức lương tối thiểu xuống 15 triệu.
+            Uống kèm một ly nước lọc và ba phút soi gương.</dd>
+          <dt>Tác dụng</dt>
+          <dd>Từ 1m75 xuống 1m70, nhóm ứng viên nở ra gấp gần ba lần. Từ 30 triệu xuống 15 triệu,
+            gấp hơn ba lần nữa. Hai thay đổi nhỏ, kết quả gần gấp mười.</dd>
+        </dl>
+      </article>
+
+      <article class="rx">
+        <p class="rx-no">Đơn thuốc 03</p>
+        <h3>Thử So Kèo Bản Thân</h3>
+        <dl>
+          <dt>Liều dùng</dt>
+          <dd>Mở mục <a href="#so-keo" data-jump="so-keo" style="color:var(--accent)">So Kèo Bản Thân</a>
+            và nhập chỉ số của chính mình, trung thực, một lần duy nhất.</dd>
+          <dt>Tác dụng</dt>
+          <dd>Đây là liều đắng nhất trong bốn đơn. Phần lớn người dùng sau khi thử xong đều
+            tự nguyện giảm tiêu chuẩn mà không cần ai khuyên.</dd>
+        </dl>
+      </article>
+
+      <article class="rx">
+        <p class="rx-no">Đơn thuốc 04</p>
+        <h3>Liệu pháp nuôi mèo dài hạn</h3>
+        <dl>
+          <dt>Chỉ định</dt>
+          <dd>Dành cho trường hợp đã dùng hết ba đơn trên mà vẫn kiên quyết giữ nguyên
+            1m85, lương 100 triệu, xe G63 và biệt thự.</dd>
+          <dt>Hướng dẫn</dt>
+          <dd>Chuẩn bị ba con mèo. Chúng cũng có tiêu chuẩn rất cao về bạn, nhưng khác bạn ở chỗ
+            chúng sẵn sàng hạ xuống nếu bạn cho ăn đúng giờ. 🐈‍⬛</dd>
+        </dl>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ FOOTER ═════════════════════════════════ -->
+<footer class="site-footer">
+  <h4><i data-lucide="shield-check"></i> Về dữ liệu</h4>
+  <p>
+    Đây là công cụ mô phỏng dựa trên phép nhân xác suất, làm ra để cười và để suy nghĩ, không
+    phải để đánh giá con người. Số liệu đối chiếu từ GSO, Viện Dinh dưỡng, Bộ Y tế / WHO, iSEE,
+    Cục Đăng kiểm, MOLISA, Bộ Xây dựng, VNREA, VAMM, VAMA và IDC. Mô hình giả định các tiêu chí
+    độc lập, nên kết quả chỉ mang tính tham khảo.
+  </p>
+  <div class="footer-meta">
+    <span>© 2026 · Cậu bị ngáo à?</span>
+    <span>Làm ở Việt Nam, cho những buổi trà đá tranh luận về tiêu chuẩn.</span>
+  </div>
+</footer>
+
+</main>
+
+<!-- ══════════════════════════ 0% MODAL ══════════════════════════════════ -->
+<div id="delusion-modal-overlay" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="floating-emojis" id="floating-emojis"></div>
+    <p class="modal-emoji">🤪</p>
+    <h2>0 người đạt chuẩn</h2>
+    <p class="modal-sub">Trên tổng số 35.200.000 nam giới Việt Nam.</p>
+    <p>
+      Không phải là ít. Là không có ai. Cả sân Trống Đồng 135.000 chỗ tắt đèn tối thui,
+      không sáng nổi một ghế.
+    </p>
+    <blockquote class="modal-quote">
+      Tiêu chuẩn này chỉ tồn tại trong phim, hoặc trong một người đã có gia đình rồi.
+      Bỏ bớt một gạch đầu dòng thôi — hoặc nuôi mèo, mèo dễ tính hơn nhiều.
+    </blockquote>
+    <button id="btn-close-modal" class="btn btn-primary" type="button">
+      <i data-lucide="rotate-ccw"></i> Hạ tiêu chuẩn xuống
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════ TOAST + MOBILE BAR ════════════════════════ -->
+<div id="toast" class="toast hidden">
+  <i data-lucide="check-circle"></i> <span id="toast-message">Đã sao chép</span>
+</div>
+
+<div class="mobile-bar" id="mobile-result-bar">
+  <div>
+    <p class="label" id="mobile-bar-label">Đáp ứng tiêu chuẩn</p>
+    <p class="pct" id="mobile-bar-pct">100%</p>
+  </div>
+  <button type="button" id="mobile-bar-jump" class="btn btn-ghost btn-sm">
+    <i data-lucide="arrow-up"></i> Xem kết quả
+  </button>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>

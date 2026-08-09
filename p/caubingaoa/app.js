@@ -74,6 +74,11 @@ const btnCopyLink = document.getElementById('btn-copy-link');
 const toast = document.getElementById('toast');
 const toastMessage = document.getElementById('toast-message');
 
+const resultsSection = document.getElementById('results-section');
+const mobileBarPct = document.getElementById('mobile-bar-pct');
+const mobileBarLabel = document.getElementById('mobile-bar-label');
+const mobileBarJumpBtn = document.getElementById('mobile-bar-jump');
+
 // Modal Elements
 const delusionModalOverlay = document.getElementById('delusion-modal-overlay');
 const btnCloseModal = document.getElementById('btn-close-modal');
@@ -83,27 +88,84 @@ let breakdownChart = null;
 let modalHasBeenTriggered = false; // Prevent repetitive popup modal spam while tweaking
 let ovalDotElements = []; // Store references for fast color updates
 
-// Sub-Page Navigation Switcher
-function initSubpageNavigation() {
+// ============================================================
+// Section Router — the four former sub-pages live in this page now
+// ============================================================
+const SECTIONS = ['thuoc-do', 'so-keo', 'thong-ke', 'thuoc-chua'];
+let currentSection = 'thuoc-do';
+
+function showSection(id, { updateHash = true } = {}) {
+    if (!SECTIONS.includes(id)) id = SECTIONS[0];
+    currentSection = id;
+
+    subpageViews.forEach(view => view.classList.toggle('active-view', view.id === id));
+    navTabs.forEach(tab => tab.classList.toggle('active', tab.dataset.target === id));
+
+    if (updateHash && window.location.hash.slice(1) !== id) {
+        history.replaceState(null, '', '#' + id);
+    }
+
+    // Chart.js bakes width/height onto the canvas when the chart is constructed.
+    // Built inside a display:none section it locks to 0x0 and no later resize()
+    // recovers it — so charts are created lazily on first reveal, and only
+    // resized on subsequent ones.
+    const revealCharts = () => {
+        if (id === 'thuoc-do') {
+            if (breakdownChart) breakdownChart.resize();
+            else renderUI();
+        }
+        if (id === 'so-keo') {
+            if (skRadarChart) skRadarChart.resize();
+            else skRender();
+        }
+    };
+    revealCharts();
+    requestAnimationFrame(revealCharts);
+
+    syncMobileBar();
+    // 'instant', not 'auto': 'auto' defers to html{scroll-behavior:smooth} and
+    // switching tabs would glide down the old section instead of jumping.
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (window.lucide) lucide.createIcons();
+}
+
+function initRouter() {
     navTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const targetId = tab.dataset.target;
-            
-            navTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
+        tab.addEventListener('click', () => showSection(tab.dataset.target));
+    });
 
-            subpageViews.forEach(view => {
-                if (view.id === targetId) {
-                    view.classList.add('active-view');
-                } else {
-                    view.classList.remove('active-view');
-                }
-            });
-
-            // Re-render icons if needed
-            if (window.lucide) lucide.createIcons();
+    // In-copy links such as the "thử So Kèo Bản Thân" prescription
+    document.querySelectorAll('[data-jump]').forEach(el => {
+        el.addEventListener('click', event => {
+            event.preventDefault();
+            showSection(el.dataset.jump);
         });
     });
+
+    window.addEventListener('hashchange', () => {
+        showSection(window.location.hash.slice(1), { updateHash: false });
+    });
+
+    showSection(window.location.hash.slice(1) || SECTIONS[0], { updateHash: false });
+}
+
+// Mobile summary bar mirrors whichever calculator is on screen
+let lastCalcPct = '100%';
+let lastSkRank = '—';
+
+function syncMobileBar() {
+    const bar = document.getElementById('mobile-result-bar');
+    if (!bar) return;
+
+    const onCalc = currentSection === 'thuoc-do';
+    const onSoKeo = currentSection === 'so-keo';
+
+    // '' hands control back to the stylesheet, which only shows the bar ≤760px
+    bar.style.display = (onCalc || onSoKeo) ? '' : 'none';
+    if (!onCalc && !onSoKeo) return;
+
+    if (mobileBarLabel) mobileBarLabel.textContent = onSoKeo ? 'Bạn thuộc nhóm' : 'Đáp ứng tiêu chuẩn';
+    if (mobileBarPct) mobileBarPct.textContent = onSoKeo ? lastSkRank : lastCalcPct;
 }
 
 // Theme Switcher Handler
@@ -157,11 +219,50 @@ function setTheme(theme) {
     }
     if (window.lucide) lucide.createIcons();
 
+    restyleCharts();
+}
+
+// Charts read their colours from the same CSS tokens as everything else,
+// so a theme switch never leaves them stranded on the old palette.
+function cssVar(name) {
+    return getComputedStyle(htmlElement).getPropertyValue(name).trim();
+}
+
+function chartPalette() {
+    return {
+        tick: cssVar('--ink-3'),
+        label: cssVar('--ink-2'),
+        grid: cssVar('--line'),
+        accent: cssVar('--accent'),
+        gold: cssVar('--gold'),
+        danger: cssVar('--danger'),
+        surface: cssVar('--surface')
+    };
+}
+
+function restyleCharts() {
+    const p = chartPalette();
+
     if (breakdownChart) {
-        const isDark = theme === 'dark';
-        breakdownChart.options.scales.x.ticks.color = isDark ? '#cbd5e1' : '#475569';
-        breakdownChart.options.scales.y.ticks.color = isDark ? '#9ca3af' : '#64748b';
-        breakdownChart.update();
+        breakdownChart.options.scales.x.ticks.color = p.label;
+        breakdownChart.options.scales.y.ticks.color = p.tick;
+        breakdownChart.options.scales.y.grid.color = p.grid;
+        breakdownChart.data.datasets[0].backgroundColor = p.accent;
+        breakdownChart.data.datasets[0].borderColor = p.accent;
+        breakdownChart.update('none');
+    }
+
+    if (skRadarChart) {
+        const scale = skRadarChart.options.scales.r;
+        scale.ticks.color = p.tick;
+        scale.grid.color = p.grid;
+        scale.angleLines.color = p.grid;
+        scale.pointLabels.color = p.label;
+        const ds = skRadarChart.data.datasets[0];
+        ds.borderColor = p.accent;
+        ds.pointBackgroundColor = p.accent;
+        ds.pointBorderColor = p.surface;
+        skRadarChart.update('none');
     }
 }
 
@@ -539,78 +640,81 @@ function calculateMatches() {
     };
 }
 
-// Satirical verdict generation with dating reality-check mockery
+// Satirical verdict. Colours come from the theme tokens so both themes hold up.
 function getSatiricalVerdict(percent, estimatedCount) {
     let verdict;
+
     if (estimatedCount === 0 || percent === 0) {
         verdict = {
             meterPercent: 100,
-            scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI (0 NGƯỜI)',
-            badge: '💔 0 NGƯỜI ĐẠT TIÊU CHUẨN',
-            title: 'M BỊ NGÁO RỒI! 🤪',
-            desc: 'M bị ngáo rồi! Tiêu chuẩn của m ảo tưởng đến mức cả 35.2 triệu nam giới Việt Nam không có nổi 1 người đáp ứng được. Tỉnh mộng ngay em ơi!',
-            color: '#ef4444',
+            scoreText: 'Độ khó: không tồn tại',
+            badge: 'KHÔNG CÓ AI',
+            title: 'Chúc mừng, bạn vừa xoá sổ cả nước',
+            desc: 'Cả 35,2 triệu nam giới Việt Nam không có nổi một người lọt qua bộ lọc này. Không phải hiếm — là bằng không.',
+            color: cssVar('--danger'),
             isZero: true
         };
     } else if (percent >= 90) {
         verdict = {
             meterPercent: 5,
-            scoreText: 'Độ khó: 0% (TẤT CẢ NAM GIỚI)',
-            badge: '💚 100% THỰC TẾ',
-            title: 'Tất Cả Nam Giới Việt Nam (18 - 60 Tuổi)',
-            desc: 'Yêu cầu quá dễ dãi! Toàn bộ 35.2 triệu nam giới Việt Nam đều sẵn sàng. Ra đầu ngõ vẫy tay nhẹ là có bạn trai ngay!',
-            color: '#10b981'
+            scoreText: 'Độ khó: gần như bằng không',
+            badge: 'HOÀN TOÀN THỰC TẾ',
+            title: 'Tất cả nam giới Việt Nam',
+            desc: 'Bộ lọc gần như chưa loại ai. Ra đầu ngõ vẫy tay là gặp, vấn đề còn lại chỉ là bạn có muốn hay không.',
+            color: cssVar('--accent')
         };
     } else if (percent >= 35) {
         verdict = {
             meterPercent: 20,
-            scoreText: 'Độ khó: RẤT DỄ (Chàng Trai Bình Dân)',
-            badge: '💚 THỰC TẾ & BÌNH DÂN',
-            title: 'Chàng Trai Bình Dân Hàng Xóm',
-            desc: 'Tiêu chuẩn vô cùng thực tế! Anh ấy xuất hiện ở mọi quán cà phê vỉa hè hay trà đá. Chỉ cần em mở lòng là chốt đơn!',
-            color: '#10b981'
+            scoreText: 'Độ khó: thấp',
+            badge: 'THỰC TẾ',
+            title: 'Anh hàng xóm bình thường',
+            desc: 'Tiêu chuẩn rất dễ chịu. Mẫu người này ngồi đầy ở mọi quán trà đá từ Bắc vào Nam.',
+            color: cssVar('--accent')
         };
     } else if (percent >= 12) {
         verdict = {
             meterPercent: 40,
-            scoreText: 'Độ khó: HỢP LÝ (Mẫu Bạn Trai Tiêu Chuẩn)',
-            badge: '💙 TIÊU CHUẨN HỢP LÝ',
-            title: 'Mẫu Người Bạn Trai Tiêu Chuẩn',
-            desc: 'Yêu cầu rất hợp lý và thực tế. Tỷ lệ cạnh tranh vừa phải, anh ấy hoàn toàn nằm trong tầm tay em đấy!',
-            color: '#3b82f6'
+            scoreText: 'Độ khó: vừa phải',
+            badge: 'HỢP LÝ',
+            title: 'Mẫu bạn trai tiêu chuẩn',
+            desc: 'Yêu cầu cân bằng: đủ chọn lọc để có ý nghĩa, đủ rộng để thực sự tìm được. Đây là vùng nên dừng lại.',
+            color: cssVar('--info')
         };
     } else if (percent >= 2.5) {
         verdict = {
             meterPercent: 60,
-            scoreText: 'Độ khó: KHÁ CAO (Cạnh Tranh Gay Gắt)',
-            badge: '💛 HOÀNG TỬ PHỐ THỊ',
-            title: 'Hotboy Phố Thị Thu Nhập Tốt',
-            desc: 'Tiêu chuẩn tương đối cao! Mẫu nam giới này thu hút rất nhiều chị em. Muốn giữ chân anh ấy thì em phải có chiêu cực đỉnh!',
-            color: '#f59e0b'
+            scoreText: 'Độ khó: cao',
+            badge: 'CẠNH TRANH',
+            title: 'Hàng hiếm của phố thị',
+            desc: 'Cứ khoảng hai mươi tới bốn mươi người mới có một người phù hợp. Và bạn không phải người duy nhất đang tìm.',
+            color: cssVar('--gold')
         };
     } else if (percent >= 0.4) {
         verdict = {
             meterPercent: 80,
-            scoreText: 'Độ khó: CỰC CAO (Hiếm Như Vé Số)',
-            badge: '🧡 BẠCH MÃ HOÀNG TỬ',
-            title: 'Bạch Mã Hoàng Tử Trong Truyền Thuyết',
-            desc: 'Vài trăm người mới có 1 người đáp ứng! Anh ấy đẹp trai, có điều kiện lại độc thân. Khuyên em chuẩn bị tinh thần cạnh tranh khốc liệt!',
-            color: '#f97316'
+            scoreText: 'Độ khó: rất cao',
+            badge: 'CỰC HIẾM',
+            title: 'Bạch mã hoàng tử trong truyền thuyết',
+            desc: 'Vài trăm người mới có một. Ở mức này, phần lớn thời gian của bạn sẽ dành cho việc chờ đợi chứ không phải hẹn hò.',
+            color: cssVar('--warn')
         };
     } else {
         verdict = {
             meterPercent: 95,
-            scoreText: 'Độ khó: ẢO TƯỞNG CỰC ĐẠI',
-            badge: '💜 TỶ PHÚ NAM THẦN',
-            title: 'CEO Tổng Tài Trong Phim Ngôn Tình',
-            desc: 'Tỷ lệ gặp anh ấy còn khó hơn trúng Vietlott Jackpot! Lời khuyên chân thành: Hãy nuôi thêm 3 chú mèo hoặc giảm bớt tiêu chuẩn ngay!',
-            color: '#a855f7'
+            scoreText: 'Độ khó: ảo tưởng',
+            badge: 'GẦN NHƯ KHÔNG TỒN TẠI',
+            title: 'Nhân vật chính phim ngôn tình',
+            desc: 'Tỷ lệ gặp được thấp hơn trúng Vietlott. Thử bỏ đúng một tiêu chí xem con số nhảy thế nào.',
+            color: cssVar('--danger')
         };
     }
-    // Override description when fewer than 100 men meet the criteria
+
+    // Fewer than 100 people left country-wide deserves its own punchline
     if (estimatedCount > 0 && estimatedCount < 100) {
-        verdict.desc = `Chắc ${estimatedCount.toLocaleString('vi-VN')} người này đang trốn khỏi m đó con ơi`;
+        verdict.desc = `Còn đúng ${estimatedCount.toLocaleString('vi-VN')} người trên cả nước. Nhiều khả năng họ đang trốn bạn.`;
     }
+
     return verdict;
 }
 
@@ -623,7 +727,7 @@ function renderOvalStadiumSeatGrid(percent, estimatedCount) {
     if (percent === 0 || estimatedCount === 0) matchedDots = 0;
 
     const estimatedSeats = Math.round((percent / 100) * TRONG_DONG_STADIUM_SEATS);
-    stadiumSeatBadge.textContent = `${estimatedSeats.toLocaleString('vi-VN')} / 135.000 chỗ phát sáng (${formatPercentage(percent)}%)`;
+    stadiumSeatBadge.textContent = `${estimatedSeats.toLocaleString('vi-VN')} / 135.000 ghế`;
 
     let activeClass = 'active-emerald';
     if (percent < 0.1) activeClass = 'active-pink';
@@ -637,20 +741,21 @@ function renderOvalStadiumSeatGrid(percent, estimatedCount) {
         }
     }
 
-    // Satirical mockery commentary referencing Trống Đồng Stadium (135,000 seats)
-    let satireMsg = '';
+    const seats = estimatedSeats.toLocaleString('vi-VN');
+    let satireMsg;
+
     if (estimatedCount === 0 || percent === 0) {
-        satireMsg = '🚨 Cả vành đai Sân vận động Trống Đồng 135.000 khán giả tắt đèn tối thui! KHÔNG CÓ NỔI 1 NGƯỜI ĐỦ TIÊU CHUẨN ĐỂ LẤY ĐẦY 1 GHẾ! Tỉnh mộng ngay em ơi! 🤪';
+        satireMsg = 'Cả sân tắt đèn. Không sáng nổi một ghế trên tổng số 135.000 chỗ.';
     } else if (percent >= 99.9) {
-        satireMsg = '✨ 135.000/135.000 ghế vành đai Sân Trống Đồng bừng sáng 100%! Yêu cầu dễ dãi như thế này thì chắc em chỉ cần ra đầu ngõ vẫy tay là có ngay!';
+        satireMsg = 'Sân đầy kín 135.000 chỗ. Bộ lọc của bạn về cơ bản chưa loại ai cả.';
     } else if (percent < 0.1) {
-        satireMsg = `🔥 Giữa 135.000 chỗ ngồi Sân Trống Đồng, chỉ có lơ thơ lăm ba ghế phát sáng (~${estimatedSeats} chỗ)! Muốn tìm anh ấy chắc em phải mang kính hiển vi đi soi!`;
+        satireMsg = `Đúng ${seats} ghế sáng giữa một sân vận động trống. Muốn tìm ra thì phải soi từng hàng.`;
     } else if (percent < 1.0) {
-        satireMsg = `⚡ Sân Trống Đồng 135.000 ghế nhưng tiêu chuẩn của em chỉ lấp vừa 1 góc ban công VIP (~${estimatedSeats} chỗ)! Tỷ lệ chọi khốc liệt hơn cả mua vé concert!`;
+        satireMsg = `Khoảng ${seats} ghế sáng — vừa đủ một góc khán đài VIP, không hơn.`;
     } else if (percent < 10.0) {
-        satireMsg = `🌟 Anh ấy lấp đầy được 1 khán đài nhỏ trong Sân Trống Đồng (~${estimatedSeats.toLocaleString('vi-VN')} chỗ)! Hoàng tử trong mộng của em hiếm lắm đấy, chuẩn bị tuyệt chiêu giữ chân đi!`;
+        satireMsg = `Khoảng ${seats} ghế sáng, tức là một khán đài nhỏ trong sân. Hiếm, nhưng vẫn có thật.`;
     } else {
-        satireMsg = `💚 Khán đài Sân Trống Đồng bừng sáng sắc xanh với ~${estimatedSeats.toLocaleString('vi-VN')} chỗ phát sáng! Tiêu chuẩn của em rất rộng mở & thực tế!`;
+        satireMsg = `Khoảng ${seats} ghế sáng. Sân vẫn còn rất đông — tiêu chuẩn của bạn đang rộng mở.`;
     }
 
     stadiumSatireText.textContent = satireMsg;
@@ -884,6 +989,9 @@ function animateValue(targetVal) {
     const startVal = animatedPercent;
     const startTime = performance.now();
 
+    // Same reasoning as skAnimateRank: land the real value before animating.
+    percentageVal.textContent = formatPercentage(targetVal);
+
     function update(now) {
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
@@ -903,10 +1011,14 @@ function animateValue(targetVal) {
 function updateChart(breakdown) {
     const chartElem = document.getElementById('breakdown-chart');
     if (!chartElem) return;
-    const ctx = chartElem.getContext('2d');
-    const isDark = htmlElement.getAttribute('data-theme') === 'dark';
 
-    const labels = ['Tuổi', 'Cao', 'Nặng', 'Lương', 'Khu vực', 'Học vấn', 'Nghề nghiệp', 'Phương tiện', 'BĐS / Nhà', 'iPhone', 'Tôn giáo', 'Dân tộc', 'Tính dục', 'Thuốc', 'Rượu', 'Độc thân'];
+    // Same hidden-container caveat as the So Kèo radar (see skRenderRadar)
+    if (!breakdownChart && !chartElem.parentElement.clientWidth) return;
+
+    const ctx = chartElem.getContext('2d');
+    const p = chartPalette();
+
+    const labels = ['Tuổi', 'Cao', 'Nặng', 'Lương', 'Khu vực', 'Học vấn', 'Nghề', 'Xe', 'Nhà', 'iPhone', 'Tôn giáo', 'Dân tộc', 'Tính dục', 'Thuốc', 'Rượu', 'Độc thân'];
     const data = [
         breakdown.age,
         breakdown.height,
@@ -928,57 +1040,34 @@ function updateChart(breakdown) {
 
     if (breakdownChart) {
         breakdownChart.data.datasets[0].data = data;
-        breakdownChart.options.scales.x.ticks.color = isDark ? '#a6c4b2' : '#3d5e4d';
-        breakdownChart.options.scales.y.ticks.color = isDark ? '#6d8e7c' : '#6c8a7b';
         breakdownChart.update();
         return;
     }
 
+    // One colour for every bar: the comparison is between heights, not hues.
     breakdownChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: '% Đạt tiêu chí',
+                label: '% đạt tiêu chí',
                 data: data,
-                backgroundColor: [
-                    'rgba(45, 106, 79, 0.75)',
-                    'rgba(82, 183, 136, 0.75)',
-                    'rgba(116, 198, 157, 0.75)',
-                    'rgba(233, 196, 106, 0.75)',
-                    'rgba(100, 160, 220, 0.75)',
-                    'rgba(194, 142, 93, 0.75)',
-                    'rgba(212, 163, 115, 0.75)',
-                    'rgba(82, 183, 136, 0.75)',
-                    'rgba(45, 106, 79, 0.75)',
-                    'rgba(231, 111, 81, 0.75)',
-                    'rgba(244, 162, 97, 0.75)',
-                    'rgba(116, 198, 157, 0.75)',
-                    'rgba(194, 142, 93, 0.75)',
-                    'rgba(233, 196, 106, 0.75)',
-                    'rgba(230, 57, 70, 0.75)',
-                    'rgba(45, 106, 79, 0.75)'
-                ],
-                borderColor: [
-                    '#2d6a4f', '#52b788', '#74c69d', '#e9c46a', '#64a0dc',
-                    '#c28e5d', '#d4a373', '#52b788', '#2d6a4f',
-                    '#e76f51', '#f4a261', '#74c69d', '#c28e5d', '#e9c46a', '#e63946',
-                    '#2d6a4f'
-                ],
-                borderWidth: 1,
-                borderRadius: 6
+                backgroundColor: p.accent,
+                borderColor: p.accent,
+                borderWidth: 0,
+                borderRadius: 3,
+                maxBarThickness: 22
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: { duration: 300 },
             plugins: {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
-                            return `Đạt tiêu chí: ${formatPercentage(context.parsed.y)}%`;
-                        }
+                        label: context => `Đạt tiêu chí: ${formatPercentage(context.parsed.y)}%`
                     }
                 }
             },
@@ -986,15 +1075,14 @@ function updateChart(breakdown) {
                 y: {
                     beginAtZero: true,
                     max: 100,
-                    ticks: {
-                        color: isDark ? '#9ca3af' : '#64748b',
-                        callback: value => value + '%'
-                    },
-                    grid: { color: 'rgba(150, 150, 150, 0.1)' }
+                    ticks: { color: p.tick, font: { size: 10 }, callback: value => value + '%' },
+                    grid: { color: p.grid, drawTicks: false },
+                    border: { display: false }
                 },
                 x: {
-                    ticks: { color: isDark ? '#cbd5e1' : '#475569', font: { size: 7.5 } },
-                    grid: { display: false }
+                    ticks: { color: p.label, font: { size: 9 }, maxRotation: 60, minRotation: 45 },
+                    grid: { display: false },
+                    border: { display: false }
                 }
             }
         }
@@ -1011,10 +1099,10 @@ function renderUI() {
         ageMin = parseInt(ageMinInput.value);
         ageMax = parseInt(ageMaxInput.value);
     }
-    ageDisplay.textContent = `${ageMin} - ${ageMax} tuổi`;
+    ageDisplay.textContent = `${ageMin} – ${ageMax} tuổi`;
 
     const heightVal = parseInt(heightInput.value);
-    heightDisplay.textContent = heightVal <= 150 ? '≥ 150 cm (Bất kỳ)' : `≥ ${heightVal} cm`;
+    heightDisplay.textContent = heightVal <= 150 ? 'Bất kỳ' : `≥ ${heightVal} cm`;
     updatePresetActive(heightPresets, heightVal);
 
     // Pure Vietnamese Auto BMI Calculation
@@ -1022,44 +1110,37 @@ function renderUI() {
     const avgWeightKg = getAverageWeightForRange(selectedWeightVal);
 
     if (avgWeightKg === null) {
-        bmiValDisplay.textContent = 'BMI = --';
-        bmiStatusDesc.textContent = 'Chọn khoảng cân nặng để tính BMI tự động';
-        bmiMockeryBox.style.setProperty('display', 'none', 'important');
+        bmiValDisplay.textContent = '—';
+        bmiStatusDesc.textContent = 'Chọn khoảng cân nặng để tính BMI.';
         bmiMockeryBox.classList.add('hidden');
     } else {
         const selectedHeightM = (heightVal <= 150 ? 168.5 : heightVal) / 100;
         const bmiScore = avgWeightKg / (selectedHeightM * selectedHeightM);
 
-        bmiValDisplay.textContent = `BMI = ${bmiScore.toFixed(1)}`;
+        bmiValDisplay.textContent = bmiScore.toFixed(1);
 
-        let bmiStatusText = '';
-        if (bmiScore < 18.5) {
-            bmiStatusText = 'Gầy';
-        } else if (bmiScore < 23.0) {
-            bmiStatusText = 'Cân đối';
-        } else if (bmiScore < 25.0) {
-            bmiStatusText = 'Thừa cân';
-        } else {
-            bmiStatusText = 'Béo phì';
-        }
-        bmiStatusDesc.textContent = bmiStatusText;
+        let bmiStatusText;
+        if (bmiScore < 18.5) bmiStatusText = 'Gầy';
+        else if (bmiScore < 23.0) bmiStatusText = 'Cân đối';
+        else if (bmiScore < 25.0) bmiStatusText = 'Thừa cân';
+        else bmiStatusText = 'Béo phì';
+
+        const heightNote = heightVal <= 150 ? ' (tính theo chiều cao trung bình 168,5 cm)' : '';
+        bmiStatusDesc.textContent = bmiStatusText + heightNote;
 
         if (bmiScore < 18.5) {
-            mockeryText.textContent = 'M iu hoàng kim cốt à? 💀';
-            bmiMockeryBox.style.setProperty('display', 'flex', 'important');
+            mockeryText.textContent = 'Tiêu chuẩn này gầy hơn cả mức khuyến nghị của WHO đấy.';
             bmiMockeryBox.classList.remove('hidden');
         } else if (bmiScore >= 25.0) {
-            mockeryText.textContent = 'Thế m đã nhìn lại mình chưa? 🤪';
-            bmiMockeryBox.style.setProperty('display', 'flex', 'important');
+            mockeryText.textContent = 'Thế m đã nhìn lại mình chưa?';
             bmiMockeryBox.classList.remove('hidden');
         } else {
-            bmiMockeryBox.style.setProperty('display', 'none', 'important');
             bmiMockeryBox.classList.add('hidden');
         }
     }
 
     const salaryVal = parseFloat(salaryInput.value);
-    salaryDisplay.textContent = salaryVal === 0 ? 'Bất kỳ (≥ 0 Tr)' : `≥ ${salaryVal} Triệu VNĐ`;
+    salaryDisplay.textContent = salaryVal === 0 ? 'Bất kỳ' : `≥ ${salaryVal} Tr`;
     updatePresetActive(salaryPresets, salaryVal);
 
     [regionRadios, eduRadios, vehicleRadios, houseRadios, religionRadios, ethnicityRadios, orientationRadios, smokeRadios, drinkRadios].forEach(group => {
@@ -1077,13 +1158,18 @@ function renderUI() {
     animateValue(result.percent);
     countVal.textContent = result.estimatedCount.toLocaleString('vi-VN');
 
+    lastCalcPct = `${formatPercentage(result.percent)}%`;
+    if (currentSection === 'thuoc-do') syncMobileBar();
+
     const verdict = getSatiricalVerdict(result.percent, result.estimatedCount);
     meterBar.style.width = `${verdict.meterPercent}%`;
+    meterBar.style.backgroundColor = verdict.color;
     delusionScoreText.textContent = verdict.scoreText;
     delusionScoreText.style.color = verdict.color;
 
     verdictBadge.textContent = verdict.badge;
-    verdictBadge.style.background = verdict.color;
+    verdictBadge.style.color = verdict.color;
+    verdictBox.style.borderLeftColor = verdict.color;
     verdictTitle.textContent = verdict.title;
     verdictDesc.textContent = verdict.desc;
 
@@ -1139,8 +1225,10 @@ function initListeners() {
         r => r.addEventListener('change', renderUI)
     );
 
-    // Direct click handler on all radio cards for guaranteed cross-browser clickability
-    document.querySelectorAll('.radio-card').forEach(card => {
+    // Direct click handler for guaranteed cross-browser clickability.
+    // Scoped to this section: So Kèo binds its own, and an unscoped query here
+    // would tick the radio first and leave that handler with nothing to do.
+    document.querySelectorAll('#thuoc-do .radio-card').forEach(card => {
         card.addEventListener('click', () => {
             const radio = card.querySelector('input[type="radio"]');
             if (radio && !radio.checked) {
@@ -1185,8 +1273,17 @@ function initListeners() {
         resetToBaseline();
     });
 
-    btnShare.addEventListener('click', copyResultsSummary);
+    btnShare.addEventListener('click', shareResults);
     btnCopyLink.addEventListener('click', copyResultsSummary);
+
+    if (mobileBarJumpBtn) {
+        mobileBarJumpBtn.addEventListener('click', () => {
+            const target = currentSection === 'so-keo'
+                ? document.querySelector('#so-keo .results-col')
+                : resultsSection;
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
 }
 
 function resetToBaseline() {
@@ -1209,25 +1306,44 @@ function resetToBaseline() {
     toggleSingle.checked = false;
     modalHasBeenTriggered = false;
     renderUI();
-    showToast('Đã đặt lại về 100% cơ bản!');
+    showToast('Đã đặt lại về 100%');
+}
+
+// Link back to whichever section produced the result
+function sectionUrl(section) {
+    return `${location.origin}${location.pathname}#${section}`;
+}
+
+function buildResultsSummary() {
+    return `Thước đo tiêu chuẩn bạn trai\n\n` +
+        `• Tỷ lệ nam giới đáp ứng: ${percentageVal.textContent}%\n` +
+        `• Ước tính: ~${countVal.textContent} người (18–60 tuổi)\n` +
+        `• Đánh giá: ${verdictTitle.textContent}\n\n` +
+        `Thử tiêu chuẩn của bạn: ${sectionUrl('thuoc-do')}`;
+}
+
+function copyText(text, okMessage) {
+    if (!navigator.clipboard) {
+        showToast('Trình duyệt không cho phép sao chép');
+        return;
+    }
+    navigator.clipboard.writeText(text)
+        .then(() => showToast(okMessage))
+        .catch(() => showToast('Không sao chép được'));
 }
 
 function copyResultsSummary() {
-    const percent = percentageVal.textContent;
-    const count = countVal.textContent;
-    const title = verdictTitle.textContent;
+    copyText(buildResultsSummary(), 'Đã sao chép kết quả');
+}
 
-    const summaryText = `🎯 THƯỚC ĐO TIÊU CHUẨN BẠN TRAI VIỆT NAM\n\n` +
-        `• Tỷ lệ nam giới đáp ứng: ${percent}%\n` +
-        `• Ước tính: ~${count} người (18-60t)\n` +
-        `• Đánh giá: ${title}\n\n` +
-        `Kiểm tra tiêu chuẩn của bạn tại Male Delusion Calculator VN! 🚀`;
-
-    navigator.clipboard.writeText(summaryText).then(() => {
-        showToast('Đã sao chép kết quả vào bộ nhớ tạm!');
-    }).catch(() => {
-        showToast('Không thể sao chép kết quả!');
-    });
+// Native share sheet where it exists, clipboard everywhere else
+function shareResults() {
+    const text = buildResultsSummary();
+    if (navigator.share) {
+        navigator.share({ title: 'Cậu bị ngáo à?', text }).catch(() => {});
+        return;
+    }
+    copyText(text, 'Đã sao chép — dán vào chỗ bạn muốn chia sẻ');
 }
 
 function showToast(msg) {
@@ -1238,11 +1354,415 @@ function showToast(msg) {
     }, 2800);
 }
 
+// ============================================================
+// So Kèo Bản Thân — the self-rating calculator
+//
+// Same data as the main tool, read the other way round: instead of "how many
+// men clear your bar", it asks "how rare is this particular man". Scores are
+// combined with a geometric mean so one genuine strength still lifts the whole
+// board, which is the point the section is trying to make.
+// ============================================================
+
+let skRadarChart = null;
+const sk = {};
+
+function skCacheElements() {
+    const id = x => document.getElementById(x);
+    Object.assign(sk, {
+        age: id('sk-age'), ageOut: id('sk-age-out'),
+        height: id('sk-height'), heightOut: id('sk-height-out'),
+        weight: id('sk-weight'), bmi: id('sk-bmi'),
+        salary: id('sk-salary'), salaryOut: id('sk-salary-out'), salaryPresets: id('sk-salary-presets'),
+        job: id('sk-job'),
+        rank: id('sk-rank'), tier: id('sk-tier'), blurb: id('sk-blurb'),
+        nudge: id('sk-nudge'), nudgeText: id('sk-nudge-text'),
+        rarityFill: id('sk-rarity-fill'),
+        bestName: id('sk-best-name'), bestPct: id('sk-best-pct'),
+        worstName: id('sk-worst-name'), worstPct: id('sk-worst-pct'),
+        breakdown: id('sk-breakdown'), summary: id('sk-summary'),
+        copy: id('sk-copy'), challenge: id('sk-challenge'), reset: id('sk-reset'),
+        edu: document.querySelectorAll('input[name="sk-edu"]'),
+        vehicle: document.querySelectorAll('input[name="sk-vehicle"]'),
+        house: document.querySelectorAll('input[name="sk-house"]'),
+        region: document.querySelectorAll('input[name="sk-region"]'),
+        noSmoke: id('sk-nosmoke'), noDrink: id('sk-nodrink'),
+        iphone: id('sk-iphone'), single: id('sk-single')
+    });
+}
+
+// "Top N%" — smaller is rarer, so these are the inverse of the main tool's odds
+const SK_TOP = {
+    edu:     { below_thpt: 100, thpt: 85, bachelor: 27.6, master: 3.15, phd: 0.35 },
+    vehicle: { none: 100, wave_sirius: 98.2, future_jupiter: 60.2, vision_ab: 41.2, sh_vespa: 19.2,
+               pkl: 13.7, car_hatchback_a: 12.5, car_sedan_bc: 11.6, car_suv_bc: 9.8,
+               car_suv_de: 8.6, car_luxury_mid: 7.9, car_superluxury: 0.05 },
+    house:   { none: 100, apartment_budget: 10.5, apartment_luxury: 6.3, grounded_alley: 3.5,
+               street_front: 1.0, mansion_villa: 0.2 },
+    job:     { unemployed: 97.8, factory_worker: 31.5, freelance_gig: 25, civil_servant: 20,
+               teacher: 18, engineer_construction: 15, army: 13, police: 11, finance: 9,
+               it: 7, doctor: 5, ceo: 3, lawyer: 2, pilot_aviation: 0.5 },
+    region:  { province: 81.8, hanoi: 8.5, hcm: 9.7 }
+};
+
+function skHeightTop(h) {
+    if (h <= 150) return 100;
+    if (h >= 195) return 0.01;
+    const z = (h - 168.5) / (6.2 * Math.SQRT2);
+    return Math.max(0.01, Math.min(100, 0.5 * (1 - erf(z)) * 100));
+}
+
+function skSalaryTop(s) {
+    if (s <= 0) return 100;
+    if (s <= 5) return 85;
+    if (s <= 10) return 45;
+    if (s <= 15) return 28;
+    if (s <= 20) return 16;
+    if (s <= 30) return 8.5;
+    if (s <= 50) return 3.2;
+    if (s <= 100) return 0.8;
+    return 0.25;
+}
+
+const SK_TIERS = [
+    { max: 0.5, key: 'S', label: 'Hạng S · siêu hiếm', meter: 97 },
+    { max: 2,   key: 'A', label: 'Hạng A · cực hiếm',  meter: 87 },
+    { max: 8,   key: 'B', label: 'Hạng B · rất tốt',   meter: 71 },
+    { max: 20,  key: 'C', label: 'Hạng C · khá',       meter: 50 },
+    { max: 50,  key: 'D', label: 'Hạng D · trung bình', meter: 28 },
+    { max: Infinity, key: 'E', label: 'Hạng E · phổ biến', meter: 10 }
+];
+
+function skTierFor(composite) {
+    return SK_TIERS.find(t => composite <= t.max);
+}
+
+function skRadio(list, fallback) {
+    let value = fallback;
+    list.forEach(r => { if (r.checked) value = r.value; });
+    return value;
+}
+
+function skLabelOf(list, value) {
+    const el = Array.from(list).find(r => r.value === value);
+    return el ? el.closest('.radio-card').querySelector('span').textContent : '—';
+}
+
+function skCompute() {
+    const age = parseInt(sk.age.value);
+    const height = parseInt(sk.height.value);
+    const salary = parseFloat(sk.salary.value);
+    const job = sk.job.value;
+    const edu = skRadio(sk.edu, 'below_thpt');
+    const vehicle = skRadio(sk.vehicle, 'none');
+    const house = skRadio(sk.house, 'none');
+    const region = skRadio(sk.region, 'province');
+
+    const cats = [
+        { name: 'Chiều cao',      value: `${height} cm`, topPct: skHeightTop(height) },
+        { name: 'Thu nhập',       value: salary === 0 ? 'Chưa có' : `${salary} Tr/tháng`, topPct: skSalaryTop(salary) },
+        { name: 'Học vấn',        value: skLabelOf(sk.edu, edu),         topPct: SK_TOP.edu[edu] ?? 100 },
+        { name: 'Nghề nghiệp',    value: sk.job.options[sk.job.selectedIndex].text, topPct: SK_TOP.job[job] ?? 50 },
+        { name: 'Phương tiện',    value: skLabelOf(sk.vehicle, vehicle), topPct: SK_TOP.vehicle[vehicle] ?? 100 },
+        { name: 'Bất động sản',   value: skLabelOf(sk.house, house),     topPct: SK_TOP.house[house] ?? 100 },
+        { name: 'Khu vực',        value: skLabelOf(sk.region, region),   topPct: SK_TOP.region[region] ?? 100 }
+    ];
+
+    if (sk.noSmoke.checked) cats.push({ name: 'Không hút thuốc', value: 'Không hút', topPct: 57.7 });
+    if (sk.noDrink.checked) cats.push({ name: 'Không rượu bia',  value: 'Không uống', topPct: 23.0 });
+    if (sk.iphone.checked)  cats.push({ name: 'Dùng iPhone',     value: 'iOS', topPct: 33.0 });
+    if (sk.single.checked) {
+        const p = age <= 22 ? 92 : age <= 28 ? 62 : age <= 35 ? 28 : age <= 45 ? 12 : 5;
+        cats.push({ name: 'Độc thân', value: 'Đang độc thân', topPct: p });
+    }
+
+    // Geometric mean: a single outstanding score still moves the needle,
+    // which an arithmetic mean would flatten away.
+    const product = cats.reduce((acc, c) => acc * c.topPct, 1);
+    return { cats, composite: Math.pow(product, 1 / cats.length) };
+}
+
+function skBlurbFor(tierKey, composite, best) {
+    const t = composite.toFixed(1);
+    switch (tierKey) {
+        case 'S': return `Top ${t}%. Trong 35,2 triệu người, rất ít hồ sơ chạm được mức này.`;
+        case 'A': return `Top ${t}%. Điểm sáng nhất của bạn là ${best.name.toLowerCase()}.`;
+        case 'B': return `Top ${t}%. Bạn vượt phần lớn nam giới cùng lứa, rõ nhất ở ${best.name.toLowerCase()}.`;
+        case 'C': return `Top ${t}%. Trên trung bình, và còn dư địa để lên hạng B.`;
+        case 'D': return `Top ${t}%. Đúng mức trung bình của cả nước.`;
+        default:  return `Top ${t}%. Hồ sơ phổ biến — mọi thứ đều bắt đầu từ đâu đó.`;
+    }
+}
+
+function skRenderBreakdown(cats) {
+    sk.breakdown.innerHTML = '';
+    [...cats].sort((a, b) => a.topPct - b.topPct).forEach(cat => {
+        const p = cat.topPct;
+        const grade = p <= 1 ? 'S' : p <= 5 ? 'A' : p <= 15 ? 'B' : p <= 35 ? 'C' : p <= 65 ? 'D' : 'E';
+        const row = document.createElement('div');
+        row.className = 'sk-row';
+        row.innerHTML =
+            `<span class="name">${cat.name}</span>` +
+            `<span class="rule"></span>` +
+            `<span class="pct">${p >= 99.5 ? 'Phổ biến' : 'Top ' + p.toFixed(1) + '%'}</span>` +
+            `<span class="grade">${grade}</span>`;
+        sk.breakdown.appendChild(row);
+    });
+}
+
+function skRenderRadar(cats) {
+    const canvas = document.getElementById('sk-radar-chart');
+    if (!canvas) return;
+
+    // Don't construct while the section is hidden: the chart would be stuck at
+    // 0x0 forever. showSection calls skRender again once the section is shown.
+    if (!skRadarChart && !canvas.parentElement.clientWidth) return;
+
+    const labels = cats.map(c => c.name);
+    const data = cats.map(c => Math.max(0, Math.min(100, 100 - c.topPct)));
+
+    if (skRadarChart) {
+        skRadarChart.data.labels = labels;
+        skRadarChart.data.datasets[0].data = data;
+        skRadarChart.update();
+        return;
+    }
+
+    const p = chartPalette();
+    skRadarChart = new Chart(canvas.getContext('2d'), {
+        type: 'radar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Độ hiếm',
+                data,
+                backgroundColor: 'transparent',
+                borderColor: p.accent,
+                borderWidth: 1.5,
+                pointBackgroundColor: p.accent,
+                pointBorderColor: p.surface,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 300 },
+            plugins: { legend: { display: false } },
+            scales: {
+                r: {
+                    min: 0, max: 100,
+                    ticks: { stepSize: 25, color: p.tick, backdropColor: 'transparent', font: { size: 9 } },
+                    grid: { color: p.grid },
+                    angleLines: { color: p.grid },
+                    pointLabels: { color: p.label, font: { size: 10 } }
+                }
+            }
+        }
+    });
+}
+
+let skDisplayed = 0;
+let skCountupFrame = null;
+
+function skAnimateRank(target) {
+    if (skCountupFrame) cancelAnimationFrame(skCountupFrame);
+    const start = skDisplayed;
+    const diff = target - start;
+    const startTime = performance.now();
+
+    // Write the destination first: rAF is paused while the tab is hidden, and
+    // the number must still be correct for anyone reading the DOM before then.
+    sk.rank.textContent = `Top ${target.toFixed(1)}%`;
+
+    function tick(now) {
+        const progress = Math.min((now - startTime) / 320, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        sk.rank.textContent = `Top ${(start + diff * eased).toFixed(1)}%`;
+        if (progress < 1) {
+            skCountupFrame = requestAnimationFrame(tick);
+        } else {
+            skDisplayed = target;
+            sk.rank.textContent = `Top ${target.toFixed(1)}%`;
+            skCountupFrame = null;
+        }
+    }
+    skCountupFrame = requestAnimationFrame(tick);
+}
+
+function skRender() {
+    const age = parseInt(sk.age.value);
+    const height = parseInt(sk.height.value);
+    const salary = parseFloat(sk.salary.value);
+
+    sk.ageOut.textContent = `${age} tuổi`;
+    sk.heightOut.textContent = `${height} cm`;
+    sk.salaryOut.textContent = salary === 0 ? 'Chưa có' : `${salary} Tr`;
+    updatePresetActive(sk.salaryPresets, salary);
+
+    const kg = getAverageWeightForRange(sk.weight.value);
+    if (kg) {
+        const bmi = kg / Math.pow(height / 100, 2);
+        const status = bmi < 18.5 ? 'gầy' : bmi < 23 ? 'cân đối' : bmi < 25 ? 'thừa cân' : 'béo phì';
+        sk.bmi.textContent = `${bmi.toFixed(1)} · ${status}`;
+    } else {
+        sk.bmi.textContent = '—';
+    }
+
+    document.querySelectorAll('#so-keo .radio-card').forEach(card => {
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) card.classList.toggle('active', radio.checked);
+    });
+
+    const { cats, composite } = skCompute();
+    const tier = skTierFor(composite);
+    const sorted = [...cats].sort((a, b) => a.topPct - b.topPct);
+    const best = sorted[0];
+    const worst = sorted[sorted.length - 1];
+
+    skAnimateRank(composite);
+    sk.tier.textContent = tier.label;
+    sk.tier.className = `sk-tier ts-${tier.key}`;
+    sk.blurb.textContent = skBlurbFor(tier.key, composite, best);
+    sk.rarityFill.style.width = `${tier.meter}%`;
+
+    // Distance to the next tier up, if there is one
+    const nextTier = SK_TIERS.filter(t => t.max < composite).pop();
+    if (nextTier) {
+        sk.nudgeText.innerHTML =
+            `Còn <b>${(composite - nextTier.max).toFixed(1)}%</b> nữa là lên ${nextTier.label.split(' · ')[0]}.`;
+        sk.nudge.classList.add('show');
+    } else {
+        sk.nudge.classList.remove('show');
+    }
+
+    sk.bestName.textContent = best.name;
+    sk.bestPct.textContent = best.topPct >= 99.5 ? 'Phổ biến' : `Top ${best.topPct.toFixed(1)}%`;
+    sk.worstName.textContent = worst.name;
+    sk.worstPct.textContent = worst.topPct >= 99.5 ? 'Phổ biến nhất' : `Top ${worst.topPct.toFixed(1)}%`;
+
+    skRenderBreakdown(cats);
+    skRenderRadar(cats);
+
+    sk.summary.innerHTML = `Bạn thuộc <strong>Top ${composite.toFixed(1)}%</strong> · ${tier.label}`;
+
+    lastSkRank = `Top ${composite.toFixed(1)}%`;
+    if (currentSection === 'so-keo') syncMobileBar();
+}
+
+const SK_PROFILES = {
+    freshman: { age: 23, height: 168, weight: '60_65', salary: 7.5, edu: 'bachelor', job: 'civil_servant',
+                vehicle: 'wave_sirius', house: 'none', region: 'province',
+                noSmoke: true, noDrink: false, iphone: false, single: true },
+    office:   { age: 28, height: 170, weight: '65_70', salary: 15, edu: 'bachelor', job: 'finance',
+                vehicle: 'vision_ab', house: 'none', region: 'hcm',
+                noSmoke: false, noDrink: false, iphone: true, single: false },
+    dev:      { age: 30, height: 172, weight: '70_75', salary: 40, edu: 'bachelor', job: 'it',
+                vehicle: 'car_sedan_bc', house: 'apartment_budget', region: 'hcm',
+                noSmoke: true, noDrink: true, iphone: true, single: true },
+    boss:     { age: 42, height: 171, weight: '80_85', salary: 100, edu: 'master', job: 'ceo',
+                vehicle: 'car_luxury_mid', house: 'mansion_villa', region: 'hanoi',
+                noSmoke: true, noDrink: false, iphone: true, single: false }
+};
+
+function skApplyProfile(key) {
+    const p = SK_PROFILES[key];
+    if (!p) return;
+
+    sk.age.value = p.age;
+    sk.height.value = p.height;
+    sk.weight.value = p.weight;
+    sk.salary.value = p.salary;
+    sk.job.value = p.job;
+
+    const check = (name, value) => {
+        const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (el) el.checked = true;
+    };
+    check('sk-edu', p.edu);
+    check('sk-vehicle', p.vehicle);
+    check('sk-house', p.house);
+    check('sk-region', p.region);
+
+    sk.noSmoke.checked = p.noSmoke;
+    sk.noDrink.checked = p.noDrink;
+    sk.iphone.checked = p.iphone;
+    sk.single.checked = p.single;
+
+    skDisplayed = 0;
+    skRender();
+    showToast('Đã nạp hồ sơ mẫu');
+}
+
+function initSoKeo() {
+    skCacheElements();
+    if (!sk.age) return;
+
+    [sk.age, sk.height, sk.salary].forEach(el => el.addEventListener('input', skRender));
+    [sk.weight, sk.job].forEach(el => el.addEventListener('change', skRender));
+    [...sk.edu, ...sk.vehicle, ...sk.house, ...sk.region].forEach(r => r.addEventListener('change', skRender));
+    [sk.noSmoke, sk.noDrink, sk.iphone, sk.single].forEach(el => el.addEventListener('change', skRender));
+
+    document.querySelectorAll('#so-keo .radio-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio && !radio.checked) {
+                radio.checked = true;
+                skRender();
+            }
+        });
+    });
+
+    sk.salaryPresets.addEventListener('click', event => {
+        if (!event.target.classList.contains('chip')) return;
+        sk.salary.value = event.target.dataset.val;
+        skRender();
+    });
+
+    document.querySelectorAll('.sk-profile').forEach(btn => {
+        btn.addEventListener('click', () => skApplyProfile(btn.dataset.profile));
+    });
+
+    sk.reset.addEventListener('click', () => {
+        sk.age.value = 25;
+        sk.height.value = 170;
+        sk.weight.value = '60_65';
+        sk.salary.value = 10;
+        sk.job.value = 'factory_worker';
+        document.querySelector('input[name="sk-edu"][value="below_thpt"]').checked = true;
+        document.querySelector('input[name="sk-vehicle"][value="none"]').checked = true;
+        document.querySelector('input[name="sk-house"][value="none"]').checked = true;
+        document.querySelector('input[name="sk-region"][value="province"]').checked = true;
+        sk.noSmoke.checked = sk.noDrink.checked = sk.iphone.checked = sk.single.checked = false;
+        skDisplayed = 0;
+        skRender();
+        showToast('Đã đặt lại');
+    });
+
+    sk.copy.addEventListener('click', () => {
+        copyText(
+            `So kèo bản thân\n\n• ${sk.rank.textContent} nam giới Việt Nam\n• ${sk.tier.textContent}\n\n` +
+            `Tự đo thử: ${sectionUrl('so-keo')}`,
+            'Đã sao chép kết quả'
+        );
+    });
+
+    sk.challenge.addEventListener('click', () => {
+        copyText(
+            `Tao thuộc ${sk.rank.textContent} nam giới Việt Nam. Mày được bao nhiêu?\n${sectionUrl('so-keo')}`,
+            'Đã sao chép lời thách đấu'
+        );
+    });
+
+    skRender();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initSound();
-    initSubpageNavigation();
     initOvalStadiumSeats();
     initListeners();
     renderUI();
+    initSoKeo();
+    initRouter();
+    if (window.lucide) lucide.createIcons();
 });
