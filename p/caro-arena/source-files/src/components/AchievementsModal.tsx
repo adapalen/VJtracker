@@ -52,7 +52,8 @@ export default function AchievementsModal({
         );
         return winSing ? 1 : 0;
       }
-      case "solve_puzzles_3": {
+      case "solve_puzzles_3":
+      case "solve_puzzles_8": {
         const count = profile.completedPuzzles?.length || 0;
         return Math.min(ach.maxProgress, count);
       }
