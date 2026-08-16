@@ -903,6 +903,13 @@ export default function App() {
     synth.playTick();
   };
 
+  const handleToggleMute = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    localStorage.setItem(STORAGE_KEYS.MUTED, String(nextMuted));
+    synth.toggleMute();
+  };
+
   const handleToggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
@@ -1933,7 +1940,9 @@ export default function App() {
 
             {activeTab === "LEADERBOARD" && (
               <Leaderboard
-                leaderboard={leaderboard}
+                entries={leaderboard}
+                playerElo={profile.elo}
+                playerName={profile.name}
                 theme={theme}
               />
             )}
