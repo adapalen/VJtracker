@@ -21,6 +21,7 @@ interface InfiniteBoardProps {
   theme?: "light" | "dark";
   activeBoardTheme?: string;
   activeMarkingStyle?: string;
+  hintPosition?: Position | null;
 }
 
 export default function InfiniteBoard({
@@ -35,6 +36,7 @@ export default function InfiniteBoard({
   theme = "dark",
   activeBoardTheme = "classic",
   activeMarkingStyle = "classic",
+  hintPosition = null,
 }: InfiniteBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const isDark = theme === "dark";
@@ -479,6 +481,22 @@ export default function InfiniteBoard({
               height: `${currentCellSize}px`,
             }}
           />
+        )}
+
+        {/* AI Hint highlight indicator with amber pulse and target cross */}
+        {hintPosition && (
+          <div
+            id="ai-hint-marker"
+            className="absolute border-2 border-amber-400 bg-amber-400/20 rounded-lg pointer-events-none z-20 flex items-center justify-center animate-pulse shadow-[0_0_15px_rgba(251,191,36,0.6)]"
+            style={{
+              left: `${hintPosition.x * currentCellSize + pan.x}px`,
+              top: `${hintPosition.y * currentCellSize + pan.y}px`,
+              width: `${currentCellSize}px`,
+              height: `${currentCellSize}px`,
+            }}
+          >
+            <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          </div>
         )}
 
         {/* Render Placed Tokens */}

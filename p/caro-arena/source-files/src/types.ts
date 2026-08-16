@@ -10,11 +10,21 @@ export interface Position {
   y: number;
 }
 
-export type GameMode = "PVP" | "AI" | "ONLINE";
+export type GameMode = "PVP" | "AI" | "ONLINE" | "PUZZLE";
 
 export type AIDifficulty = "NOVICE" | "SENTINEL" | "OVERLORD" | "SINGULARITY";
 
 export type GameStatus = "MENU" | "PLAYING" | "WON" | "DRAW";
+
+export type GameRule = "FREE" | "VN_BLOCKED_ENDS";
+
+export interface MoveStep {
+  x: number;
+  y: number;
+  symbol: PlayerSymbol;
+  step: number;
+  timestamp?: number;
+}
 
 export interface MatchRecord {
   id: string;
@@ -31,6 +41,56 @@ export interface MatchRecord {
   isTimeout?: boolean;
   oldElo?: number;
   newElo?: number;
+  movesList?: MoveStep[];
+  ruleUsed?: GameRule;
+}
+
+export interface EmoteItem {
+  id: string;
+  sender: "PLAYER" | "OPPONENT" | "AI";
+  type: "EMOJI" | "TEXT";
+  content: string;
+  x?: number;
+  y?: number;
+  timestamp: number;
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  rewardCoins: number;
+  maxProgress: number;
+  category: "COMBAT" | "MASTERY" | "COLLECTION";
+}
+
+export interface DailyQuest {
+  id: string;
+  title: string;
+  description: string;
+  rewardCoins: number;
+  targetCount: number;
+  currentCount: number;
+  isCompleted: boolean;
+  isClaimed: boolean;
+}
+
+export interface CaroPuzzle {
+  id: string;
+  title: string;
+  difficulty: "EASY" | "MEDIUM" | "HARD" | "MASTER";
+  description: string;
+  playerSymbol: PlayerSymbol;
+  initialBoard: Record<string, PlayerSymbol>;
+  initialLastMove?: Position;
+  // sequence of player and opponent moves to win
+  solutionSteps: Array<{
+    playerMove: Position;
+    opponentResponse?: Position;
+    explanation?: string;
+  }>;
+  rewardCoins: number;
 }
 
 export interface PlayerProfile {
@@ -45,6 +105,11 @@ export interface PlayerProfile {
   unlockedMarkings?: string[]; // IDs of unlocked markings
   activeTheme?: string; // ID of active board theme
   activeMarking?: string; // ID of active marking style
+  claimedAchievements?: string[];
+  completedPuzzles?: string[];
+  puzzleStars?: number;
+  dailyQuestsDate?: string;
+  dailyQuests?: DailyQuest[];
 }
 
 export interface LeaderboardEntry {

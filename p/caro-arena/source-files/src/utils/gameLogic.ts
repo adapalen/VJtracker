@@ -3,21 +3,25 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { PlayerSymbol, Position, AIDifficulty } from "../types";
+import { PlayerSymbol, Position, AIDifficulty, GameRule, CaroPuzzle, Achievement, DailyQuest } from "../types";
 
-// Check if there is a win of 5-in-a-row passing through the last placed cell (lastX, lastY)
+// Check if there is a win passing through the last placed cell (lastX, lastY)
+// Supports standard FREE gomoku (5 in a row) & VN_BLOCKED_ENDS (5 in a row blocked by opponent on both ends is not a win)
 export function checkWin(
   board: Record<string, PlayerSymbol>,
   lastX: number,
   lastY: number,
-  symbol: PlayerSymbol
+  symbol: PlayerSymbol,
+  rule: GameRule = "FREE"
 ): Position[] | null {
   const directions = [
     { dx: 1, dy: 0 },   // Horizontal
     { dx: 0, dy: 1 },   // Vertical
-    { dx: 1, dy: 1 },   // Diagonal Down-Right (or Up-Right depending on grid coordinates)
+    { dx: 1, dy: 1 },   // Diagonal Down-Right
     { dx: 1, dy: -1 },  // Diagonal Up-Right
   ];
+
+  const opponent = symbol === "X" ? "O" : "X";
 
   for (const { dx, dy } of directions) {
     const winningCells: Position[] = [{ x: lastX, y: lastY }];
@@ -40,10 +44,23 @@ export function checkWin(
       by -= dy;
     }
 
-    // If we have 5 or more in a row, it's a win!
+    // If we have 5 or more in a row
     if (winningCells.length >= 5) {
-      // Sort winning cells to have clean laser draw lines
-      return winningCells.sort((a, b) => a.x !== b.x ? a.x - b.x : a.y - b.y);
+      if (rule === "VN_BLOCKED_ENDS" && winningCells.length === 5) {
+        // In Vietnamese blocked ends rule:
+        // fx, fy is the cell immediately following the forward end
+        // bx, by is the cell immediately preceding the backward end
+        const forwardBlocked = board[`${fx},${fy}`] === opponent;
+        const backwardBlocked = board[`${bx},${by}`] === opponent;
+
+        // If BOTH ends are blocked by opponent pieces, this 5-chain is NOT a win
+        if (forwardBlocked && backwardBlocked) {
+          continue;
+        }
+      }
+
+      // Sort winning cells for clean laser draw line
+      return winningCells.sort((a, b) => (a.x !== b.x ? a.x - b.x : a.y - b.y));
     }
   }
 
@@ -59,7 +76,6 @@ export function getCandidates(
   const keys = Object.keys(board);
 
   if (keys.length === 0) {
-    // If the board is completely empty, the center (0,0) is the candidate
     return [{ x: 0, y: 0 }];
   }
 
@@ -86,30 +102,27 @@ export function getCandidates(
 }
 
 // Heuristic score for a window of 5 cells
-// countMine: number of our pieces
-// countOpponent: number of opponent pieces
 function evaluateWindow(countMine: number, countOpponent: number): number {
   if (countOpponent > 0) {
-    // Opponent blocks this window, so it cannot form 5-in-a-row
     return 0;
   }
   switch (countMine) {
     case 4:
-      return 100000; // 4 of our pieces: placing 5th wins instantly
+      return 100000;
     case 3:
-      return 6000;   // 3 of our pieces: placing 4th creates a huge threat
+      return 6000;
     case 2:
-      return 500;    // 2 of our pieces: placing 3rd forms active 3
+      return 500;
     case 1:
-      return 40;     // 1 of our pieces: placing 2nd forms active 2
+      return 40;
     case 0:
-      return 3;      // Empty window
+      return 3;
     default:
       return 0;
   }
 }
 
-// Evaluate a candidate move (x, y) for a player symbol
+// Evaluate a candidate move (cx, cy) for a player symbol
 export function evaluateMove(
   board: Record<string, PlayerSymbol>,
   cx: number,
@@ -120,19 +133,15 @@ export function evaluateMove(
   let totalScore = 0;
 
   const directions = [
-    { dx: 1, dy: 0 },   // Horizontal
-    { dx: 0, dy: 1 },   // Vertical
-    { dx: 1, dy: 1 },   // Diagonal Down-Right
-    { dx: 1, dy: -1 },  // Diagonal Up-Right
+    { dx: 1, dy: 0 },
+    { dx: 0, dy: 1 },
+    { dx: 1, dy: 1 },
+    { dx: 1, dy: -1 },
   ];
 
-  // For each direction, check all 5 windows of length 5 that cover (cx, cy)
   for (const { dx, dy } of directions) {
     let directionScore = 0;
 
-    // A window starting offset can range from -4 to 0
-    // If offset is -4, the window covers: (cx-4, cy-4) to (cx, cy)
-    // If offset is 0, the window covers: (cx, cy) to (cx+4, cy+4)
     for (let offset = -4; offset <= 0; offset++) {
       let countMine = 0;
       let countOpponent = 0;
@@ -141,9 +150,8 @@ export function evaluateMove(
         const wx = cx + (offset + step) * dx;
         const wy = cy + (offset + step) * dy;
 
-        // Skip the candidate cell itself, since we are simulating placing a piece there
         if (wx === cx && wy === cy) {
-          countMine++; // Simulate our piece in the window
+          countMine++;
           continue;
         }
 
@@ -164,7 +172,7 @@ export function evaluateMove(
   return totalScore;
 }
 
-// AI decision maker based on difficulty ELO tier
+// Get best move for AI or Hint helper
 export function getBestMove(
   board: Record<string, PlayerSymbol>,
   aiSymbol: PlayerSymbol,
@@ -178,31 +186,27 @@ export function getBestMove(
 
   const opponentSymbol = aiSymbol === "X" ? "O" : "X";
 
-  // Different personalities have different evaluation weights
   let aiWeight = 1.0;
   let opponentWeight = 1.0;
-  let randomness = 0; // chance of picking a random move (0 to 1)
-  let noiseRange = 0; // slight random variation in scores
+  let randomness = 0;
+  let noiseRange = 0;
 
   switch (difficulty) {
     case "NOVICE":
-      // Novice plays randomly 30% of the time, weights offense less, misses obvious blocks
       aiWeight = 1.0;
-      opponentWeight = 0.5; // less defensive awareness
+      opponentWeight = 0.5;
       randomness = 0.3;
       noiseRange = 50;
       break;
 
     case "SENTINEL":
-      // Sentinel is highly defensive, prioritizing blocking player threats
       aiWeight = 0.8;
-      opponentWeight = 1.5; // very defensive
+      opponentWeight = 1.5;
       randomness = 0.05;
       noiseRange = 10;
       break;
 
     case "OVERLORD":
-      // Overlord is balanced, offensive, tactical, and completely deterministic
       aiWeight = 1.2;
       opponentWeight = 1.0;
       randomness = 0.0;
@@ -210,7 +214,6 @@ export function getBestMove(
       break;
 
     case "SINGULARITY":
-      // Singularity has expert foresight, higher weights, and deterministic search
       aiWeight = 1.5;
       opponentWeight = 1.35;
       randomness = 0.0;
@@ -218,48 +221,37 @@ export function getBestMove(
       break;
   }
 
-  // Handle randomness check
   if (randomness > 0 && Math.random() < randomness) {
     const randomIndex = Math.floor(Math.random() * candidates.length);
     return candidates[randomIndex];
   }
 
-  let bestMove = candidates[0];
-  let highestScore = -Infinity;
-
-  const scoredCandidates = candidates.map(c => {
+  const scoredCandidates = candidates.map((c) => {
     const scoreSelf = evaluateMove(board, c.x, c.y, aiSymbol);
     const scoreOpponent = evaluateMove(board, c.x, c.y, opponentSymbol);
 
-    // Apply weights to self (attack) vs opponent (defense)
     let score = scoreSelf * aiWeight + scoreOpponent * opponentWeight;
 
-    // Add slight noise if applicable
     if (noiseRange > 0) {
       score += (Math.random() - 0.5) * noiseRange;
     }
 
-    // Crucial rule: If either player can win in one move (scoreSelf has 4 of our pieces, or scoreOpponent has 4 opponent pieces),
-    // we MUST prioritize it immediately! An immediate win/block overrides standard weight sums.
     if (scoreSelf >= 100000) {
-      score += 1000000; // absolute priority: we win!
+      score += 1000000;
     } else if (scoreOpponent >= 100000) {
-      score += 500000;  // very high priority: we block opponent's win!
+      score += 500000;
     }
 
-    return { pos: c, score };
+    return { pos: c, score, scoreSelf, scoreOpponent };
   });
 
-  // Sort by score descending
   scoredCandidates.sort((a, b) => b.score - a.score);
 
-  // In Novice mode, sometimes it picks the 2nd or 3rd best move to simulate mistakes
   if (difficulty === "NOVICE" && scoredCandidates.length > 2 && Math.random() < 0.25) {
     const offset = Math.min(scoredCandidates.length - 1, 1 + Math.floor(Math.random() * 2));
     return scoredCandidates[offset].pos;
   }
 
-  // Sentinel has a slight chance of oversight (5%)
   if (difficulty === "SENTINEL" && scoredCandidates.length > 1 && Math.random() < 0.05) {
     return scoredCandidates[1].pos;
   }
@@ -267,32 +259,67 @@ export function getBestMove(
   return scoredCandidates[0].pos;
 }
 
-// FIDE-based ELO calculation
+// AI Hint Assistant
+export function getHintMove(
+  board: Record<string, PlayerSymbol>,
+  playerSymbol: PlayerSymbol
+): { pos: Position; reason: string } {
+  const candidates = getCandidates(board, 2);
+  if (candidates.length === 0) {
+    return { pos: { x: 0, y: 0 }, reason: "Khai cuộc ở vị trí trung tâm bàn cờ." };
+  }
+
+  const opponent = playerSymbol === "X" ? "O" : "X";
+
+  const scored = candidates.map((c) => {
+    const scoreSelf = evaluateMove(board, c.x, c.y, playerSymbol);
+    const scoreOpponent = evaluateMove(board, c.x, c.y, opponent);
+    let total = scoreSelf * 1.3 + scoreOpponent * 1.1;
+
+    let reason = "Nước đi mở rộng thế công tốt nhất.";
+    if (scoreSelf >= 100000) {
+      total += 10000000;
+      reason = "Nước đi dứt điểm trận đấu (Tạo 5 quân thắng)!";
+    } else if (scoreOpponent >= 100000) {
+      total += 5000000;
+      reason = "Chặn ngay thế thắng nguy hiểm của đối thủ!";
+    } else if (scoreSelf >= 6000) {
+      total += 50000;
+      reason = "Tạo chuỗi 4 quân tấn công liên hoàn (VCF).";
+    } else if (scoreOpponent >= 6000) {
+      total += 30000;
+      reason = "Hóa giải nguy cơ chuỗi 4 quân của đối thủ.";
+    }
+
+    return { pos: c, score: total, reason };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  return { pos: scored[0].pos, reason: scored[0].reason };
+}
+
+// ELO calculation
 export function calculateEloChange(
   playerElo: number,
   opponentElo: number,
   result: "WIN" | "LOSS" | "DRAW",
   matchesCount: number
 ): { eloChange: number; newElo: number; expectedScore: number } {
-  // Expected score for player
   const expectedScore = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
 
-  // Actual score
   let actualScore = 0.5;
   if (result === "WIN") actualScore = 1.0;
   if (result === "LOSS") actualScore = 0.0;
 
-  // K-factor selection
   let k = 20;
   if (matchesCount < 10) {
-    k = 40; // Calibration phase
+    k = 40;
   } else if (playerElo >= 2400) {
-    k = 10; // Master phase
+    k = 10;
   }
 
-  // Calculate change
   const eloChange = Math.round(k * (actualScore - expectedScore));
-  const newElo = Math.max(100, playerElo + eloChange); // ELO cannot drop below 100
+  const newElo = Math.max(100, playerElo + eloChange);
 
   return {
     eloChange,
@@ -301,7 +328,7 @@ export function calculateEloChange(
   };
 }
 
-// Get Rank Title and styling for ELO tiers (blended FIDE + League of Legends ranks)
+// Rank tiers
 export function getRankTier(elo: number): {
   title: string;
   colorClass: string;
@@ -358,4 +385,248 @@ export function getRankTier(elo: number): {
       borderColor: "border-rose-400/60",
     };
   }
+}
+
+// Curated Caro Tactical Puzzles (Tsumego Mode)
+export const DEFAULT_PUZZLES: CaroPuzzle[] = [
+  {
+    id: "puzzle-1",
+    title: "1. Đòn 4-3 cơ bản",
+    difficulty: "EASY",
+    description: "Bạn cầm quân X. Hãy tìm nước đi tạo bẫy 4-3 kép không thể hóa giải!",
+    playerSymbol: "X",
+    initialBoard: {
+      "0,0": "X",
+      "1,0": "X",
+      "2,0": "X",
+      "0,1": "O",
+      "0,2": "O",
+      "1,1": "O",
+    },
+    initialLastMove: { x: 1, y: 1 },
+    solutionSteps: [
+      {
+        playerMove: { x: 3, y: 0 },
+        opponentResponse: { x: 4, y: 0 },
+        explanation: "Tạo hàng 4 quân và ép đối thủ phải chặn!",
+      },
+      {
+        playerMove: { x: -1, y: 0 },
+        explanation: "Đạt chuỗi 5 quân liên tiếp và giành chiến thắng!",
+      },
+    ],
+    rewardCoins: 100,
+  },
+  {
+    id: "puzzle-2",
+    title: "2. Chặn đứng chuỗi 4 đôi công",
+    difficulty: "EASY",
+    description: "Đối thủ O đang có chuỗi 3 quân thoáng cực kỳ nguy hiểm. Chặn ngay tại điểm then chốt!",
+    playerSymbol: "X",
+    initialBoard: {
+      "0,0": "O",
+      "1,0": "O",
+      "2,0": "O",
+      "-1,1": "X",
+      "0,2": "X",
+    },
+    initialLastMove: { x: 2, y: 0 },
+    solutionSteps: [
+      {
+        playerMove: { x: 3, y: 0 },
+        opponentResponse: { x: -1, y: 0 },
+        explanation: "Chặn thành công đầu tấn công chủ lực của O!",
+      },
+      {
+        playerMove: { x: 0, y: 1 },
+        explanation: "Phát triển thế công mới cho X!",
+      },
+    ],
+    rewardCoins: 120,
+  },
+  {
+    id: "puzzle-3",
+    title: "3. VCF (Chiến thắng bằng chuỗi 4 liên hoàn)",
+    difficulty: "MEDIUM",
+    description: "Dồn đối thủ vào thế bị động bằng các đòn 4 liên tiếp và kết liễu trận đấu.",
+    playerSymbol: "X",
+    initialBoard: {
+      "0,0": "X",
+      "1,0": "X",
+      "3,0": "X",
+      "1,1": "O",
+      "2,1": "O",
+      "0,2": "O",
+    },
+    initialLastMove: { x: 0, y: 2 },
+    solutionSteps: [
+      {
+        playerMove: { x: 2, y: 0 },
+        opponentResponse: { x: 4, y: 0 },
+        explanation: "Điền vào lỗ hổng tạo 4 quân ép O phải chặn đầu!",
+      },
+      {
+        playerMove: { x: -1, y: 0 },
+        explanation: "Hoàn tất chuỗi 5 quân không thể ngăn cản!",
+      },
+    ],
+    rewardCoins: 180,
+  },
+  {
+    id: "puzzle-4",
+    title: "4. Bẫy giao điểm chữ V",
+    difficulty: "HARD",
+    description: "Xây dựng giao điểm giữa hàng chéo và hàng ngang để đối thủ chỉ chặn được một bên.",
+    playerSymbol: "X",
+    initialBoard: {
+      "0,0": "X",
+      "1,1": "X",
+      "2,2": "X",
+      "2,0": "X",
+      "2,1": "O",
+      "0,1": "O",
+      "1,2": "O",
+    },
+    initialLastMove: { x: 1, y: 2 },
+    solutionSteps: [
+      {
+        playerMove: { x: 3, y: 3 },
+        opponentResponse: { x: 4, y: 4 },
+        explanation: "Kích hoạt đòn tấn công chéo ép O phòng thủ!",
+      },
+      {
+        playerMove: { x: -1, y: -1 },
+        explanation: "Chiến thắng hoàn hảo trên đường chéo chính!",
+      },
+    ],
+    rewardCoins: 250,
+  },
+  {
+    id: "puzzle-5",
+    title: "5. Bậc thầy hóa giải bẫy kép",
+    difficulty: "MASTER",
+    description: "Thế cờ đỉnh cao: Vừa phòng ngự đường 4 của O vừa mở ra thế thắng phản công chớp nhoáng!",
+    playerSymbol: "X",
+    initialBoard: {
+      "0,0": "O",
+      "0,1": "O",
+      "0,2": "O",
+      "0,3": "O",
+      "-1,1": "X",
+      "1,1": "X",
+      "2,1": "X",
+    },
+    initialLastMove: { x: 0, y: 3 },
+    solutionSteps: [
+      {
+        playerMove: { x: 0, y: 4 },
+        opponentResponse: { x: 0, y: -1 },
+        explanation: "Chặn ngay nước 5 của đối phương!",
+      },
+      {
+        playerMove: { x: 3, y: 1 },
+        opponentResponse: { x: 4, y: 1 },
+        explanation: "Tấn công ngược lại với hàng 4 của X!",
+      },
+      {
+        playerMove: { x: -2, y: 1 },
+        explanation: "Lội ngược dòng ngoạn mục với 5 quân hoàn hảo!",
+      },
+    ],
+    rewardCoins: 350,
+  },
+];
+
+// Achievements Definition
+export const DEFAULT_ACHIEVEMENTS: Achievement[] = [
+  {
+    id: "first_blood",
+    title: "Khởi Đầu Nan",
+    description: "Chiến thắng trận đấu Caro đầu tiên trong sự nghiệp.",
+    icon: "⚔️",
+    rewardCoins: 100,
+    maxProgress: 1,
+    category: "COMBAT",
+  },
+  {
+    id: "win_streak_5",
+    title: "Chiến Thần Bất Bại",
+    description: "Đạt chuỗi 5 trận thắng liên tiếp.",
+    icon: "🔥",
+    rewardCoins: 300,
+    maxProgress: 5,
+    category: "COMBAT",
+  },
+  {
+    id: "defeat_singularity",
+    title: "Kẻ Hủy Diệt AI",
+    description: "Đánh bại Trí Tuệ Nhân Tạo Singularity AI cấp tối thượng.",
+    icon: "🤖",
+    rewardCoins: 500,
+    maxProgress: 1,
+    category: "MASTERY",
+  },
+  {
+    id: "solve_puzzles_3",
+    title: "Kỳ Thủ Chiến Thuật",
+    description: "Giải thành công 3 thế cờ trong chế độ Thế Cờ Puzzles.",
+    icon: "🧩",
+    rewardCoins: 250,
+    maxProgress: 3,
+    category: "MASTERY",
+  },
+  {
+    id: "play_20_matches",
+    title: "Kỳ Vương Kỳ Cựu",
+    description: "Thi đấu tổng cộng 20 trận đấu.",
+    icon: "🏆",
+    rewardCoins: 400,
+    maxProgress: 20,
+    category: "MASTERY",
+  },
+  {
+    id: "cosmetic_collector",
+    title: "Nhà Sưu Tầm",
+    description: "Mở khóa 2 giao diện bàn cờ hoặc phong cách quân cờ trong Shop.",
+    icon: "🎨",
+    rewardCoins: 350,
+    maxProgress: 2,
+    category: "COLLECTION",
+  },
+];
+
+// Daily Quests Generator
+export function generateDailyQuests(): DailyQuest[] {
+  return [
+    {
+      id: "quest_play_3",
+      title: "Khởi Động Ngày Mới",
+      description: "Tham gia thi đấu 3 ván cờ bất kỳ hôm nay.",
+      rewardCoins: 80,
+      targetCount: 3,
+      currentCount: 0,
+      isCompleted: false,
+      isClaimed: false,
+    },
+    {
+      id: "quest_win_ai",
+      title: "Rèn Luyện Với Bot",
+      description: "Chiến thắng 1 trận đấu với AI ở cấp độ Sentinel trở lên.",
+      rewardCoins: 120,
+      targetCount: 1,
+      currentCount: 0,
+      isCompleted: false,
+      isClaimed: false,
+    },
+    {
+      id: "quest_solve_puzzle",
+      title: "Giải Mã Thế Cờ",
+      description: "Hoàn thành 1 thế cờ Puzzle chiến thuật.",
+      rewardCoins: 100,
+      targetCount: 1,
+      currentCount: 0,
+      isCompleted: false,
+      isClaimed: false,
+    },
+  ];
 }

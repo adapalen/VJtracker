@@ -5,70 +5,102 @@
 
 import React from "react";
 import { MatchRecord } from "../types";
-import { ListOrdered, TrendingUp, TrendingDown, Clock } from "lucide-react";
+import { ListOrdered, TrendingUp, TrendingDown, Clock, PlayCircle, BarChart2 } from "lucide-react";
 
 interface MatchHistoryProps {
   history: MatchRecord[];
   theme?: "light" | "dark";
   onViewAnalysis?: (record: MatchRecord) => void;
+  onViewReplay?: (record: MatchRecord) => void;
 }
 
-export default function MatchHistory({ history, theme = "dark", onViewAnalysis }: MatchHistoryProps) {
+export default function MatchHistory({
+  history,
+  theme = "dark",
+  onViewAnalysis,
+  onViewReplay,
+}: MatchHistoryProps) {
   // Sort history newest first
-  const sortedHistory = [...history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedHistory = [...history].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
   const isDark = theme === "dark";
 
   if (history.length === 0) {
     return (
-      <div className={`p-6 text-center rounded-xl border flex flex-col items-center justify-center h-full min-h-[220px] transition-all duration-300 ${
-        isDark 
-          ? "bg-slate-900/60 border-cyan-500/15 shadow-[0_0_20px_rgba(6,182,212,0.05)]" 
-          : "bg-white border-slate-200 shadow-sm"
-      }`}>
-        <Clock className={`w-10 h-10 mb-3 animate-pulse ${isDark ? "text-cyan-500/30" : "text-cyan-500/50"}`} />
-        <p className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-600"}`}>No match history found yet.</p>
-        <p className={`text-[10px] ${isDark ? "text-cyan-400/40" : "text-cyan-600/60"} mt-1`}>Play matches against the computer or another player to see your records here.</p>
+      <div
+        className={`p-6 text-center rounded-xl border flex flex-col items-center justify-center h-full min-h-[220px] transition-all duration-300 ${
+          isDark
+            ? "bg-slate-900/60 border-cyan-500/15 shadow-[0_0_20px_rgba(6,182,212,0.05)]"
+            : "bg-white border-slate-200 shadow-sm"
+        }`}
+      >
+        <Clock
+          className={`w-10 h-10 mb-3 animate-pulse ${
+            isDark ? "text-cyan-500/30" : "text-cyan-500/50"
+          }`}
+        />
+        <p className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+          Chưa có lịch sử đấu nào.
+        </p>
+        <p className={`text-[10px] ${isDark ? "text-cyan-400/40" : "text-cyan-600/60"} mt-1`}>
+          Tham gia các trận đấu với Máy hoặc Người để lưu lại lịch sử tại đây.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className={`p-5 rounded-xl border flex flex-col h-full transition-all duration-300 ${
-      isDark 
-        ? "bg-slate-900/60 border-cyan-500/15 shadow-[0_0_20px_rgba(6,182,212,0.05)]" 
-        : "bg-white border-slate-200 shadow-sm"
-    }`}>
-      <div className={`flex items-center gap-3 mb-6 border-b pb-4 ${
-        isDark ? "border-cyan-500/20" : "border-slate-200"
-      }`}>
-        <ListOrdered className={`w-5 h-5 ${isDark ? "text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" : "text-cyan-600"}`} />
+    <div
+      className={`p-5 rounded-xl border flex flex-col h-full transition-all duration-300 ${
+        isDark
+          ? "bg-slate-900/60 border-cyan-500/15 shadow-[0_0_20px_rgba(6,182,212,0.05)]"
+          : "bg-white border-slate-200 shadow-sm"
+      }`}
+    >
+      <div
+        className={`flex items-center gap-3 mb-6 border-b pb-4 ${
+          isDark ? "border-cyan-500/20" : "border-slate-200"
+        }`}
+      >
+        <ListOrdered
+          className={`w-5 h-5 ${
+            isDark ? "text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" : "text-cyan-600"
+          }`}
+        />
         <div>
-          <h2 className={`text-sm font-sans font-semibold tracking-wide ${isDark ? "text-slate-100" : "text-slate-800"}`}>Match History</h2>
-          <p className={`text-[10px] font-mono ${isDark ? "text-cyan-400/60" : "text-cyan-600/70"}`}>Recent match results and rating changes</p>
+          <h2
+            className={`text-sm font-sans font-semibold tracking-wide ${
+              isDark ? "text-slate-100" : "text-slate-800"
+            }`}
+          >
+            Lịch Sử Trận Đấu
+          </h2>
+          <p className={`text-[10px] font-mono ${isDark ? "text-cyan-400/60" : "text-cyan-600/70"}`}>
+            Kết quả các ván đấu gần đây & biến động điểm Elo
+          </p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto max-h-[450px] pr-1 space-y-2 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto max-h-[450px] pr-1 space-y-2.5 custom-scrollbar">
         {sortedHistory.map((log) => {
           const isWin = log.result === "WIN";
           const isLoss = log.result === "LOSS";
-          const isDraw = log.result === "DRAW";
 
           return (
             <div
               key={log.id}
               id={`match-log-${log.id}`}
-              className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-300 ${
+              className={`flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl border gap-3 transition-all duration-300 ${
                 isDark
-                  ? "bg-slate-950/40 border-cyan-500/5 hover:border-cyan-500/15 hover:bg-slate-950/70"
+                  ? "bg-slate-950/40 border-cyan-500/5 hover:border-cyan-500/20 hover:bg-slate-950/70"
                   : "bg-slate-50 border-slate-100 hover:border-slate-200 hover:bg-white"
               }`}
             >
               {/* Left Side: Result Badge & Opponent */}
               <div className="flex items-center gap-3">
-                {/* Result Indicator Badge */}
                 <div
-                  className={`w-18 text-center py-1 rounded text-[9px] font-mono font-bold tracking-wider uppercase border ${
+                  className={`w-16 text-center py-1 rounded text-[9px] font-mono font-bold tracking-wider uppercase border ${
                     isWin
                       ? "bg-emerald-950/30 text-emerald-400 border-emerald-500/30"
                       : isLoss
@@ -76,28 +108,42 @@ export default function MatchHistory({ history, theme = "dark", onViewAnalysis }
                       : "bg-amber-950/30 text-amber-400 border-amber-500/30"
                   }`}
                 >
-                  {log.result}
+                  {log.result === "WIN" ? "Thắng" : log.result === "LOSS" ? "Thua" : "Hòa"}
                 </div>
 
-                {/* Opponent Identity details */}
                 <div className="flex flex-col">
-                  <span className={`text-xs font-sans font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>
+                  <span
+                    className={`text-xs font-sans font-medium ${
+                      isDark ? "text-slate-200" : "text-slate-800"
+                    }`}
+                  >
                     vs {log.opponentName}
                   </span>
-                  <div className={`flex items-center gap-2 text-[9px] font-sans ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                    <span>Opponent ELO: {log.opponentElo}</span>
+                  <div
+                    className={`flex items-center gap-2 text-[9px] font-sans ${
+                      isDark ? "text-slate-400" : "text-slate-500"
+                    }`}
+                  >
+                    <span>Elo đối thủ: {log.opponentElo}</span>
                     <span className="opacity-30">•</span>
-                    <span>{log.movesCount} moves</span>
+                    <span>{log.movesCount} nước đi</span>
+                    {log.ruleUsed && (
+                      <>
+                        <span className="opacity-30">•</span>
+                        <span className="text-cyan-400/80">
+                          {log.ruleUsed === "VN_BLOCKED_ENDS" ? "Luật VN" : "Luật Tự do"}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Right Side: Rating change, timestamp, and analysis launch trigger */}
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  {/* rating Delta */}
+              {/* Right Side: Rating change, timestamp, and actions */}
+              <div className="flex items-center justify-between sm:justify-end gap-3">
+                <div className="text-left sm:text-right">
                   <div
-                    className={`flex items-center justify-end gap-1 text-xs font-mono font-bold ${
+                    className={`flex items-center sm:justify-end gap-1 text-xs font-mono font-bold ${
                       log.eloChange > 0
                         ? "text-emerald-500"
                         : log.eloChange < 0
@@ -119,8 +165,11 @@ export default function MatchHistory({ history, theme = "dark", onViewAnalysis }
                       <span>--</span>
                     )}
                   </div>
-                  {/* Timestamp */}
-                  <span className={`text-[9px] font-mono block ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                  <span
+                    className={`text-[9px] font-mono block ${
+                      isDark ? "text-slate-500" : "text-slate-400"
+                    }`}
+                  >
                     {new Date(log.date).toLocaleDateString(undefined, {
                       month: "short",
                       day: "numeric",
@@ -129,19 +178,38 @@ export default function MatchHistory({ history, theme = "dark", onViewAnalysis }
                     })}
                   </span>
                 </div>
-                {onViewAnalysis && (
-                  <button
-                    onClick={() => onViewAnalysis(log)}
-                    className={`px-2.5 py-1.5 rounded-lg border text-[10px] font-sans font-bold uppercase tracking-wider transition cursor-pointer ${
-                      isDark
-                        ? "border-cyan-500/20 bg-cyan-950/20 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400/60"
-                        : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
-                    }`}
-                    title="View post-game analysis report"
-                  >
-                    Analysis
-                  </button>
-                )}
+
+                <div className="flex items-center gap-1.5">
+                  {onViewReplay && log.movesList && log.movesList.length > 0 && (
+                    <button
+                      onClick={() => onViewReplay(log)}
+                      className={`px-2.5 py-1.5 rounded-lg border text-[10px] font-sans font-bold flex items-center gap-1 transition cursor-pointer ${
+                        isDark
+                          ? "border-violet-500/30 bg-violet-950/30 text-violet-300 hover:bg-violet-500/20 hover:border-violet-400/60"
+                          : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white"
+                      }`}
+                      title="Xem lại từng nước đi"
+                    >
+                      <PlayCircle size={12} />
+                      <span>Replay</span>
+                    </button>
+                  )}
+
+                  {onViewAnalysis && (
+                    <button
+                      onClick={() => onViewAnalysis(log)}
+                      className={`px-2.5 py-1.5 rounded-lg border text-[10px] font-sans font-bold flex items-center gap-1 transition cursor-pointer ${
+                        isDark
+                          ? "border-cyan-500/20 bg-cyan-950/20 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400/60"
+                          : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white hover:border-slate-300"
+                      }`}
+                      title="Xem báo cáo phân tích sau trận"
+                    >
+                      <BarChart2 size={12} />
+                      <span>Phân tích</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           );
