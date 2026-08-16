@@ -55,6 +55,14 @@ class SciFiSynth {
     osc.stop(this.ctx.currentTime + 0.15);
   }
 
+  public playMove(symbol?: string) {
+    this.playPlace();
+  }
+
+  public playLoss() {
+    this.playDefeat();
+  }
+
   // Futuristic digital interface tick
   public playTick() {
     if (this.isMuted) return;

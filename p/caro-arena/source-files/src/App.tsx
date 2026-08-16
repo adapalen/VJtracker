@@ -244,39 +244,75 @@ function formatClockTime(seconds: number): string {
 
 export default function App() {
   // --- STATE ---
-  const [profile, setProfile] = useState<PlayerProfile>({
-    name: "Player_1",
-    elo: 1200,
-    matches: [],
-    countryCode: "VN",
-    countryName: "Vietnam",
-    countryFlag: "🇻🇳",
-    coins: 1000,
-    unlockedThemes: ["classic"],
-    unlockedMarkings: ["classic"],
-    activeTheme: "classic",
-    activeMarking: "classic",
-    claimedAchievements: [],
-    completedPuzzles: [],
-    dailyQuests: generateDailyQuests(),
-    dailyQuestsDate: new Date().toDateString(),
+  const [profile, setProfile] = useState<PlayerProfile>(() => {
+    try {
+      const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
+      const localRaw = (savedSsoUsername && (localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername.toLowerCase()}`) || localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername}`))) || 
+                       localStorage.getItem(STORAGE_KEYS.PROFILE);
+      if (localRaw) {
+        const loaded = JSON.parse(localRaw);
+        if (loaded && loaded.name) {
+          const today = new Date().toDateString();
+          if (loaded.dailyQuestsDate !== today || !loaded.dailyQuests) {
+            loaded.dailyQuests = generateDailyQuests();
+            loaded.dailyQuestsDate = today;
+          }
+          if (!loaded.completedPuzzles) loaded.completedPuzzles = [];
+          if (!loaded.claimedAchievements) loaded.claimedAchievements = [];
+          return loaded;
+        }
+      }
+    } catch (e) {}
+    return {
+      name: "Kỳ Thủ",
+      elo: 1200,
+      matches: [],
+      countryCode: "VN",
+      countryName: "Vietnam",
+      countryFlag: "🇻🇳",
+      coins: 1000,
+      unlockedThemes: ["classic"],
+      unlockedMarkings: ["classic"],
+      activeTheme: "classic",
+      activeMarking: "classic",
+      claimedAchievements: [],
+      completedPuzzles: [],
+      dailyQuests: generateDailyQuests(),
+      dailyQuestsDate: new Date().toDateString(),
+    };
   });
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(DEFAULT_LEADERBOARD);
+
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.LEADERBOARD);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_LEADERBOARD;
+  });
 
   const [board, setBoard] = useState<Record<string, PlayerSymbol>>({});
   const [moveHistory, setMoveHistory] = useState<MoveStep[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerSymbol>("X");
   const [gameMode, setGameMode] = useState<GameMode>("AI");
   const [difficulty, setDifficulty] = useState<AIDifficulty>("SENTINEL");
-  const [gameRule, setGameRule] = useState<GameRule>("FREE");
+  const [gameRule, setGameRule] = useState<GameRule>(() => {
+    return (localStorage.getItem(STORAGE_KEYS.GAME_RULE) as GameRule) || "FREE";
+  });
   const [gameStatus, setGameStatus] = useState<GameStatus>("PLAYING");
   const [isMatchStarted, setIsMatchStarted] = useState(false);
   
   const [winningCells, setWinningCells] = useState<Position[] | null>(null);
   const [boardLastMove, setBoardLastMove] = useState<Position | null>(null);
   const [isAiThinking, setIsAiThinking] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [isMuted, setIsMuted] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.MUTED) === "true";
+  });
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    return (localStorage.getItem(STORAGE_KEYS.THEME) as "light" | "dark") || "dark";
+  });
 
   // AI Hint Assistant state
   const [activeHint, setActiveHint] = useState<{ pos: Position; reason: string } | null>(null);
@@ -291,8 +327,19 @@ export default function App() {
   const [replayMatch, setReplayMatch] = useState<MatchRecord | null>(null);
 
   // Single Sign-On (SSO) States
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [ssoUsername, setSsoUsername] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    try {
+      const savedLoggedIn = localStorage.getItem("infinite_ttt_is_logged_in");
+      const savedUsername = localStorage.getItem("infinite_ttt_sso_username");
+      const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
+      return savedLoggedIn === "true" || !!savedUsername || !!savedProfile;
+    } catch (e) {
+      return false;
+    }
+  });
+  const [ssoUsername, setSsoUsername] = useState(() => {
+    return localStorage.getItem("infinite_ttt_sso_username") || "";
+  });
   const [ssoCountryCode, setSsoCountryCode] = useState("VN");
   const [ssoLogs, setSsoLogs] = useState<string[]>([]);
   const [isSsoLoading, setIsSsoLoading] = useState(false);
@@ -347,22 +394,18 @@ export default function App() {
 
   // --- SAVE PROFILE TO CLOUD ---
   const saveProfileToCloud = async (updatedProfile: PlayerProfile) => {
-    const authUser = auth.currentUser;
-    if (authUser) {
-      try {
+    try {
+      const authUser = auth.currentUser;
+      if (authUser) {
         await setDoc(doc(db, "users", authUser.uid), updatedProfile);
-      } catch (e) {
-        console.error("Failed to save profile to cloud:", e);
-      }
-    } else {
-      const trimmedUsername = ssoUsername.trim();
-      if (trimmedUsername) {
-        try {
+      } else {
+        const trimmedUsername = (ssoUsername || updatedProfile.name || "").trim();
+        if (trimmedUsername) {
           await setDoc(doc(db, "users", trimmedUsername.toLowerCase()), updatedProfile);
-        } catch (e) {
-          console.error("Failed to save profile to cloud:", e);
         }
       }
+    } catch (e) {
+      console.warn("Cloud profile save completed locally:", e);
     }
   };
 
@@ -497,11 +540,13 @@ export default function App() {
         } else {
           const savedLoggedIn = localStorage.getItem("infinite_ttt_is_logged_in") === "true";
           const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
-          if (savedLoggedIn && savedSsoUsername) {
+          const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
+          if (savedLoggedIn || savedSsoUsername || savedProfile) {
+            setIsLoggedIn(true);
             try {
               await signInAnonymously(auth);
             } catch (err) {
-              console.error("Anonymous authentication fallback failed:", err);
+              console.warn("Anonymous authentication fallback:", err);
             }
           }
         }
