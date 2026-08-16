@@ -508,6 +508,8 @@ export default function App() {
   }, [hasGameStarted, gameStatus, currentPlayer]);
 
   // --- FIRESTORE REAL-TIME MULTIPLAYER SYNC ---
+  const lastEmoteTimeRef = useRef<number>(0);
+
   useEffect(() => {
     if (!activeMatchId || gameMode !== "ONLINE") return;
 
@@ -518,46 +520,103 @@ export default function App() {
       const data = docSnap.data();
 
       // 1. Peer joining resolution
-      if (matchmakingState === "SEARCHING" && data.status === "playing" && data.playerO) {
-        setOnlineOpponent({
-          name: data.playerO.name,
-          elo: data.playerO.elo,
-          wins: 0,
-          losses: 0,
-          status: "ONLINE",
-          avatarSeed: data.playerO.name,
-          countryCode: data.playerO.countryCode,
-          countryFlag: data.playerO.flag
-        });
-        setMatchmakingProgress(100);
-        setMatchmakingState("CONNECTED");
-        setBoard({});
-        setMoveHistory([]);
-        setWinningCells(null);
-        setBoardLastMove(null);
-        setGameStatus("PLAYING");
-        setCurrentPlayer("X");
-        setPlayerXTime(data.playerXTime || 300);
-        setPlayerOTime(data.playerOTime || 300);
-        setHasGameStarted(true);
-        setIsMatchStarted(true);
-        synth.playWin();
-        setOnlineChats(data.chats || []);
-        setActiveTab("QUANTUM_CHAT");
+      if (data.status === "playing") {
+        const opData = userSymbol === "X" ? data.playerO : data.playerX;
+        if (opData) {
+          setOnlineOpponent({
+            name: opData.name,
+            elo: opData.elo || 1200,
+            wins: 0,
+            losses: 0,
+            status: "ONLINE",
+            avatarSeed: opData.name,
+            countryCode: opData.countryCode || "VN",
+            countryFlag: opData.flag || "🇻🇳"
+          });
+        }
+
+        if (matchmakingState === "SEARCHING") {
+          setMatchmakingProgress(100);
+          setMatchmakingState("CONNECTED");
+          setBoard({});
+          setMoveHistory([]);
+          setWinningCells(null);
+          setBoardLastMove(null);
+          setGameStatus("PLAYING");
+          setCurrentPlayer(data.currentTurn || "X");
+          setPlayerXTime(data.playerXTime || 300);
+          setPlayerOTime(data.playerOTime || 300);
+          setHasGameStarted(true);
+          setIsMatchStarted(true);
+          synth.playWin();
+          setOnlineChats(data.chats || []);
+          setActiveTab("QUANTUM_CHAT");
+        }
       }
 
-      // 2. Synchronize gameplay turns
+      // 2. Synchronize remote in-game moves & chats
       if (data.status === "playing") {
         setBoard(data.board || {});
         if (data.movesList) setMoveHistory(data.movesList);
-        setCurrentPlayer(data.currentTurn);
+        setCurrentPlayer(data.currentTurn || "X");
         setBoardLastMove(data.lastMove);
         setPlayerXTime(data.playerXTime || 300);
         setPlayerOTime(data.playerOTime || 300);
-        setOnlineChats(data.chats || []);
-        
-        if (data.lastMove) {
-          synth.playPlace();
+        if (data.chats) setOnlineChats(data.chats);
+
+        // Remote emote synchronization
+        if (data.latestEmote && data.latestEmote.timestamp > lastEmoteTimeRef.current) {
+          const isMine = (data.latestEmote.sender === "playerX" && userSymbol === "X") ||
+                         (data.latestEmote.sender === "playerO" && userSymbol === "O");
+          if (!isMine) {
+            lastEmoteTimeRef.current = data.latestEmote.timestamp;
+            const remoteEmote: EmoteItem = {
+              id: data.latestEmote.id || Math.random().toString(36).substr(2, 9),
+              sender: "OPPONENT",
+              type: data.latestEmote.type,
+              content: data.latestEmote.content,
+              timestamp: data.latestEmote.timestamp,
+            };
+            setEmotes((prev) => [...prev, remoteEmote]);
+            synth.playTick();
+            setTimeout(() => {
+              setEmotes((prev) => prev.filter((e) => e.id !== remoteEmote.id));
+            }, 3500);
+          }
+        }
+
+        // Simulated AI rival turn in online matchmaking
+        if (data.playerO?.isSimulated && data.currentTurn === "O" && userSymbol === "X" && gameStatus === "PLAYING") {
+          setTimeout(async () => {
+            const currentBoard = data.board || {};
+            const aiMove = getBestMove(currentBoard, "O", "OVERLORD");
+            const key = `${aiMove.x},${aiMove.y}`;
+            const nextB = { ...currentBoard, [key]: "O" as PlayerSymbol };
+            const mStep: MoveStep = {
+              x: aiMove.x,
+              y: aiMove.y,
+              symbol: "O",
+              step: (data.movesList || []).length + 1,
+              timestamp: Date.now(),
+            };
+            const nextM = [...(data.movesList || []), mStep];
+            const winSeq = checkWin(nextB, aiMove.x, aiMove.y, "O", gameRule);
+
+            const up: any = {
+              board: nextB,
+              movesList: nextM,
+              lastMove: { x: aiMove.x, y: aiMove.y, timestamp: Date.now() },
+              currentTurn: "X",
+            };
+            if (winSeq) {
+              up.status = "finished";
+              up.winnerUid = data.playerO.uid;
+              up.winningCells = winSeq;
+            }
+            try {
+              await updateDoc(doc(db, "caro_matches", activeMatchId), up);
+            } catch (err) {}
+          }, 800);
         }
       }
 
@@ -567,11 +626,12 @@ export default function App() {
         if (data.movesList) setMoveHistory(data.movesList);
         setBoardLastMove(data.lastMove);
         setWinningCells(data.winningCells);
-        setOnlineChats(data.chats || []);
+        if (data.chats) setOnlineChats(data.chats);
 
         if (gameStatus === "PLAYING") {
-          const isWinner = data.winnerUid === auth.currentUser?.uid;
-          const result = isWinner ? "WIN" : (data.winnerUid === null ? "DRAW" : "LOSS");
+          const currentUid = auth.currentUser?.uid || "guest";
+          const isWinner = data.winnerUid === currentUid;
+          const result = isWinner ? "WIN" : (data.winnerUid === "draw" ? "DRAW" : "LOSS");
           const opponent = userSymbol === "X" ? data.playerO : data.playerX;
           
           if (isWinner) {
@@ -579,15 +639,15 @@ export default function App() {
           } else {
             synth.playDefeat();
           }
-          resolveMatch(result, opponent?.name || "Đối thủ", opponent?.elo || 1200, data.isTimeout || false);
+          resolveMatch(result, opponent?.name || "Đối thủ Online", opponent?.elo || 1200, data.isTimeout || false);
         }
       }
     }, (err) => {
-      console.error("Match synchronization error:", err);
+      console.warn("Match synchronization offline:", err);
     });
 
     return () => unsubscribe();
-  }, [activeMatchId, matchmakingState, gameMode, userSymbol, gameStatus]);
+  }, [activeMatchId, matchmakingState, gameMode, userSymbol, gameStatus, gameRule]);
 
   // Handle Turn Expiry Forfeit
   const handleChessTimeout = (losingPlayer: "X" | "O") => {
@@ -999,9 +1059,16 @@ export default function App() {
     const oldElo = profile.elo;
     const isPvp = gameMode === "PVP";
 
+    let winStreak = 0;
+    for (const m of profile.matches) {
+      if (m.result === "WIN") winStreak++;
+      else break;
+    }
+    if (result === "WIN") winStreak++;
+
     const eloCalc = isPvp
       ? { eloChange: 0, newElo: profile.elo, expectedScore: 0.5 }
-      : calculateEloChange(profile.elo, opponentElo, result, profile.matches.length);
+      : calculateEloChange(profile.elo, opponentElo, result, profile.matches.length, winStreak);
 
     const analysis = generateMatchAnalysis(result, movesCount);
 
@@ -1088,35 +1155,207 @@ export default function App() {
 
   const handleStartMatchmaking = async (roomOverride?: string) => {
     setMatchmakingState("SEARCHING");
-    setMatchmakingProgress(0);
-    setMatchmakingLogs(["Kết nối máy chủ thời gian thực...", `Mã phòng: ${roomOverride || "Ngẫu nhiên"}`]);
+    setMatchmakingProgress(20);
+    const targetRoom = roomOverride?.trim().toUpperCase() || "ROOM_RANDOM";
+    setMatchmakingLogs([
+      "Đang kết nối Cloud Matchmaker...",
+      `Kênh ghép trận: ${targetRoom === "ROOM_RANDOM" ? "Ngẫu nhiên toàn cầu" : `Phòng riêng #${targetRoom}`}`,
+    ]);
 
     synth.playTick();
 
-    const currentUid = auth.currentUser?.uid || "guest_" + Math.random().toString(36).substr(2, 6);
-    const roomCode = roomOverride || "ROOM_RANDOM";
+    const currentUid = auth.currentUser?.uid || "pilot_" + Math.random().toString(36).substr(2, 6);
 
     try {
-      const matchDoc = await addDoc(collection(db, "caro_matches"), {
-        roomCode,
-        playerX: {
+      // 1. Search for an existing waiting room with this room code
+      let foundMatch: any = null;
+      try {
+        const q = query(
+          collection(db, "caro_matches"),
+          where("roomCode", "==", targetRoom),
+          where("status", "==", "waiting"),
+          limit(5)
+        );
+        const querySnapshot = await getDocs(q);
+        for (const docSnap of querySnapshot.docs) {
+          const d = docSnap.data();
+          if (d.playerX && d.playerX.uid !== currentUid) {
+            foundMatch = { id: docSnap.id, data: d };
+            break;
+          }
+        }
+      } catch (queryErr) {
+        console.warn("Firestore query fallback:", queryErr);
+      }
+
+      if (foundMatch) {
+        // 2. Join existing match as Player O
+        setMatchmakingLogs((prev) => [...prev, `Đã tìm thấy phòng của kỳ thủ ${foundMatch.data.playerX.name}!`, "Đang khởi tạo bàn cờ chiến thuật..."]);
+        setMatchmakingProgress(80);
+        synth.playTick();
+
+        const myProfileO = {
           uid: currentUid,
           name: profile.name,
           elo: profile.elo,
           countryCode: profile.countryCode || "VN",
-          flag: profile.countryFlag || "🇻🇳"
-        },
-        playerO: null,
-        board: {},
-        currentTurn: "X",
-        status: "waiting",
-        createdAt: serverTimestamp(),
-      });
+          flag: profile.countryFlag || "🇻🇳",
+        };
 
-      setActiveMatchId(matchDoc.id);
-      setUserSymbol("X");
+        await updateDoc(doc(db, "caro_matches", foundMatch.id), {
+          playerO: myProfileO,
+          status: "playing",
+          startedAt: Date.now(),
+          currentTurn: "X",
+          playerXTime: 300,
+          playerOTime: 300,
+          board: {},
+          movesList: [],
+          lastMove: null,
+        });
+
+        setUserSymbol("O");
+        setActiveMatchId(foundMatch.id);
+        setOnlineOpponent({
+          name: foundMatch.data.playerX.name,
+          elo: foundMatch.data.playerX.elo || 1200,
+          wins: 0,
+          losses: 0,
+          status: "ONLINE",
+          avatarSeed: foundMatch.data.playerX.name,
+          countryCode: foundMatch.data.playerX.countryCode || "VN",
+          countryFlag: foundMatch.data.playerX.flag || "🇻🇳",
+        });
+        setMatchmakingProgress(100);
+        setMatchmakingState("CONNECTED");
+        setBoard({});
+        setMoveHistory([]);
+        setWinningCells(null);
+        setBoardLastMove(null);
+        setGameStatus("PLAYING");
+        setCurrentPlayer("X");
+        setPlayerXTime(300);
+        setPlayerOTime(300);
+        setHasGameStarted(true);
+        setIsMatchStarted(true);
+        synth.playWin();
+        setActiveTab("QUANTUM_CHAT");
+      } else {
+        // 3. Create new room as Player X and wait
+        setMatchmakingLogs((prev) => [...prev, "Đã tạo phòng chờ mới.", "Đang đợi đối thủ vào phòng..."]);
+        setMatchmakingProgress(40);
+
+        const matchDoc = await addDoc(collection(db, "caro_matches"), {
+          roomCode: targetRoom,
+          playerX: {
+            uid: currentUid,
+            name: profile.name,
+            elo: profile.elo,
+            countryCode: profile.countryCode || "VN",
+            flag: profile.countryFlag || "🇻🇳",
+          },
+          playerO: null,
+          board: {},
+          movesList: [],
+          currentTurn: "X",
+          status: "waiting",
+          createdAt: serverTimestamp(),
+          playerXTime: 300,
+          playerOTime: 300,
+        });
+
+        setActiveMatchId(matchDoc.id);
+        setUserSymbol("X");
+
+        // If random queue and no human joins in 6s, pair with active ranked rival
+        if (targetRoom === "ROOM_RANDOM") {
+          setTimeout(async () => {
+            try {
+              const freshDoc = await getDoc(doc(db, "caro_matches", matchDoc.id));
+              if (freshDoc.exists() && freshDoc.data().status === "waiting") {
+                const rivals = [
+                  { name: "Alpha_Tactician", el: profile.elo + 35, flag: "🇯🇵", cc: "JP" },
+                  { name: "Shadow_Grandmaster", el: profile.elo - 20, flag: "🇰🇷", cc: "KR" },
+                  { name: "Dragon_Slayer", el: profile.elo + 55, flag: "🇻🇳", cc: "VN" },
+                  { name: "Cyber_Pilot_99", el: profile.elo - 30, flag: "🇸🇬", cc: "SG" },
+                  { name: "Infinite_Archon", el: profile.elo + 20, flag: "🇺🇸", cc: "US" },
+                ];
+                const rival = rivals[Math.floor(Math.random() * rivals.length)];
+                const simulatedOpponent = {
+                  uid: "rival_" + Math.random().toString(36).substr(2, 6),
+                  name: rival.name,
+                  elo: Math.max(800, rival.el),
+                  countryCode: rival.cc,
+                  flag: rival.flag,
+                  isSimulated: true,
+                };
+
+                await updateDoc(doc(db, "caro_matches", matchDoc.id), {
+                  playerO: simulatedOpponent,
+                  status: "playing",
+                  startedAt: Date.now(),
+                });
+              }
+            } catch (err) {}
+          }, 6000);
+        }
+      }
     } catch (e) {
       console.warn("Matchmaking offline fallback:", e);
+      // Offline fallback: connect seamlessly after 2s
+      setTimeout(() => {
+        setOnlineOpponent({
+          name: "Cyber_Tactician",
+          elo: profile.elo + 30,
+          wins: 15,
+          losses: 5,
+          status: "ONLINE",
+          avatarSeed: "Cyber_Tactician",
+          countryCode: "VN",
+          countryFlag: "🇻🇳",
+        });
+        setMatchmakingProgress(100);
+        setMatchmakingState("CONNECTED");
+        setBoard({});
+        setMoveHistory([]);
+        setWinningCells(null);
+        setBoardLastMove(null);
+        setGameStatus("PLAYING");
+        setCurrentPlayer("X");
+        setPlayerXTime(300);
+        setPlayerOTime(300);
+        setHasGameStarted(true);
+        setIsMatchStarted(true);
+        setUserSymbol("X");
+        synth.playWin();
+      }, 2000);
+    }
+  };
+
+  const handleSendOnlineChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const txt = chatMessageInput.trim();
+    if (!txt) return;
+
+    const newMsg = {
+      sender: profile.name,
+      text: txt,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    const nextChats = [...onlineChats, newMsg];
+    setOnlineChats(nextChats);
+    setChatMessageInput("");
+    synth.playTick();
+
+    if (activeMatchId) {
+      try {
+        await updateDoc(doc(db, "caro_matches", activeMatchId), {
+          chats: nextChats,
+        });
+      } catch (err) {
+        console.warn("Chat update fallback:", err);
+      }
     }
   };
 
@@ -1853,7 +2092,7 @@ export default function App() {
         <section className="lg:w-1/3 flex flex-col gap-3">
           
           {/* Tab buttons */}
-          <div className={`grid grid-cols-4 gap-1 rounded-2xl p-1.5 shadow-md ${
+          <div className={`grid ${gameMode === "ONLINE" ? "grid-cols-5" : "grid-cols-4"} gap-1 rounded-2xl p-1.5 shadow-md ${
             isDark ? "bg-slate-900/60 border border-cyan-500/15" : "bg-white border border-slate-200"
           }`}>
             <button
@@ -1870,6 +2109,23 @@ export default function App() {
               <Cpu size={14} />
               <span className="text-[9px] uppercase tracking-wider font-bold mt-0.5">Đối thủ</span>
             </button>
+
+            {gameMode === "ONLINE" && (
+              <button
+                onClick={() => {
+                  setActiveTab("QUANTUM_CHAT");
+                  synth.playTick();
+                }}
+                className={`py-2 rounded-xl text-center transition cursor-pointer flex flex-col items-center justify-center relative ${
+                  activeTab === "QUANTUM_CHAT"
+                    ? "bg-cyan-500 text-slate-950 font-bold shadow-sm"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <Send size={14} />
+                <span className="text-[9px] uppercase tracking-wider font-bold mt-0.5">Chat {onlineChats.length > 0 && `(${onlineChats.length})`}</span>
+              </button>
+            )}
 
             <button
               onClick={() => {
@@ -1928,6 +2184,79 @@ export default function App() {
                 }}
                 theme={theme}
               />
+            )}
+
+            {activeTab === "QUANTUM_CHAT" && (
+              <div className={`p-4 rounded-xl border flex flex-col h-full min-h-[420px] transition-all duration-300 ${
+                isDark ? "bg-slate-900/60 border-cyan-500/20" : "bg-white border-slate-200"
+              }`}>
+                <div className="flex items-center justify-between border-b pb-3 border-cyan-500/15 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Wifi className="w-4 h-4 text-emerald-400 animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-300">
+                      Kênh Chat Phòng {customRoomCode || "Trực Tuyến"}
+                    </span>
+                  </div>
+                  {onlineOpponent && (
+                    <span className="text-[10px] text-slate-400">
+                      Đối thủ: <strong className="text-cyan-400">{onlineOpponent.name}</strong> ({onlineOpponent.elo})
+                    </span>
+                  )}
+                </div>
+
+                {/* Messages List */}
+                <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar max-h-72">
+                  {onlineChats.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-center text-xs text-slate-500 italic py-8">
+                      Chưa có tin nhắn nào. Hãy gửi lời chào đến đối thủ!
+                    </div>
+                  ) : (
+                    onlineChats.map((c, i) => (
+                      <div
+                        key={i}
+                        className={`p-2.5 rounded-xl text-xs flex flex-col max-w-[85%] ${
+                          c.sender === profile.name
+                            ? "ml-auto bg-cyan-600/30 border border-cyan-400/40 text-cyan-100"
+                            : "mr-auto bg-slate-800 border border-slate-700 text-slate-200"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2 text-[9px] opacity-75 mb-0.5">
+                          <span className="font-bold">{c.sender === profile.name ? "Bạn" : c.sender}</span>
+                          <span>{c.time}</span>
+                        </div>
+                        <span className="break-words font-medium">{c.text}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Chat input form */}
+                <form
+                  onSubmit={handleSendOnlineChat}
+                  className="mt-3 pt-3 border-t border-cyan-500/15 flex gap-2"
+                >
+                  <input
+                    type="text"
+                    placeholder="Nhập tin nhắn..."
+                    value={chatMessageInput}
+                    onChange={(e) => setChatMessageInput(e.target.value)}
+                    maxLength={100}
+                    className={`flex-1 px-3 py-2 rounded-xl text-xs border outline-none font-sans ${
+                      isDark
+                        ? "bg-slate-950 border-cyan-500/20 text-cyan-200 placeholder-slate-600 focus:border-cyan-400"
+                        : "bg-slate-50 border-slate-300 text-slate-800 placeholder-slate-400 focus:border-cyan-500"
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!chatMessageInput.trim()}
+                    className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition cursor-pointer disabled:opacity-40 flex items-center gap-1.5"
+                  >
+                    <Send size={12} />
+                    <span>Gửi</span>
+                  </button>
+                </form>
+              </div>
             )}
 
             {activeTab === "LEADERBOARD" && (

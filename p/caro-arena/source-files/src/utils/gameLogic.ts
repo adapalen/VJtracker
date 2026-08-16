@@ -298,12 +298,13 @@ export function getHintMove(
   return { pos: scored[0].pos, reason: scored[0].reason };
 }
 
-// ELO calculation
+// Dynamic Arena ELO calculation
 export function calculateEloChange(
   playerElo: number,
   opponentElo: number,
   result: "WIN" | "LOSS" | "DRAW",
-  matchesCount: number
+  matchesCount: number,
+  winStreak: number = 0
 ): { eloChange: number; newElo: number; expectedScore: number } {
   const expectedScore = 1 / (1 + Math.pow(10, (opponentElo - playerElo) / 400));
 
@@ -311,14 +312,23 @@ export function calculateEloChange(
   if (result === "WIN") actualScore = 1.0;
   if (result === "LOSS") actualScore = 0.0;
 
-  let k = 20;
+  let k = 24;
   if (matchesCount < 10) {
-    k = 40;
-  } else if (playerElo >= 2400) {
-    k = 10;
+    k = 40; // Placement calibration
+  } else if (playerElo >= 2500) {
+    k = 12; // Elite tier stabilization
+  } else if (playerElo >= 2000) {
+    k = 18;
   }
 
-  const eloChange = Math.round(k * (actualScore - expectedScore));
+  let eloChange = Math.round(k * (actualScore - expectedScore));
+
+  // Win streak momentum bonus
+  if (result === "WIN" && winStreak >= 3) {
+    const streakBonus = Math.min(6, Math.floor(winStreak / 2));
+    eloChange += streakBonus;
+  }
+
   const newElo = Math.max(100, playerElo + eloChange);
 
   return {
@@ -328,61 +338,113 @@ export function calculateEloChange(
   };
 }
 
-// Rank tiers
+// Diversified Caro Arena Rank Tiers
 export function getRankTier(elo: number): {
+  tierId: string;
   title: string;
+  subtitle: string;
   colorClass: string;
   bgGlow: string;
   borderColor: string;
+  badgeBg: string;
+  minElo: number;
+  maxElo: number;
 } {
   if (elo < 1000) {
     return {
-      title: "Iron Candidate Master",
+      tierId: "INITIATE",
+      title: "Tân Thủ Bàn Cờ",
+      subtitle: "Grid Initiate",
       colorClass: "text-zinc-400 font-medium",
       bgGlow: "shadow-[0_0_15px_rgba(161,161,170,0.15)]",
       borderColor: "border-zinc-500/30",
+      badgeBg: "bg-zinc-500/10 text-zinc-300",
+      minElo: 0,
+      maxElo: 999,
     };
   } else if (elo < 1300) {
     return {
-      title: "Bronze FIDE Master",
-      colorClass: "text-amber-600 font-medium",
+      tierId: "VANGUARD",
+      title: "Hiệp Sĩ Ô Vuông",
+      subtitle: "Grid Vanguard",
+      colorClass: "text-amber-600 font-semibold",
       bgGlow: "shadow-[0_0_15px_rgba(217,119,6,0.15)]",
       borderColor: "border-amber-600/30",
+      badgeBg: "bg-amber-600/10 text-amber-500",
+      minElo: 1000,
+      maxElo: 1299,
     };
   } else if (elo < 1600) {
     return {
-      title: "Silver International Master",
-      colorClass: "text-slate-300 font-medium",
-      bgGlow: "shadow-[0_0_15px_rgba(203,213,225,0.15)]",
-      borderColor: "border-slate-300/30",
+      tierId: "STRATEGIST",
+      title: "Chiến Lược Gia Không Gian",
+      subtitle: "Dimensional Strategist",
+      colorClass: "text-sky-300 font-semibold",
+      bgGlow: "shadow-[0_0_15px_rgba(56,189,248,0.18)]",
+      borderColor: "border-sky-400/30",
+      badgeBg: "bg-sky-500/10 text-sky-300",
+      minElo: 1300,
+      maxElo: 1599,
     };
   } else if (elo < 1900) {
     return {
-      title: "Gold Grandmaster",
-      colorClass: "text-yellow-400 font-semibold",
-      bgGlow: "shadow-[0_0_15px_rgba(234,179,8,0.2)]",
+      tierId: "WARLORD",
+      title: "Chủ Tướng Trận Địa",
+      subtitle: "Battlefield Warlord",
+      colorClass: "text-yellow-400 font-bold",
+      bgGlow: "shadow-[0_0_15px_rgba(234,179,8,0.22)]",
       borderColor: "border-yellow-400/40",
+      badgeBg: "bg-yellow-500/15 text-yellow-300",
+      minElo: 1600,
+      maxElo: 1899,
     };
   } else if (elo < 2200) {
     return {
-      title: "Platinum Super Grandmaster",
-      colorClass: "text-emerald-400 font-semibold",
-      bgGlow: "shadow-[0_0_15px_rgba(52,211,153,0.2)]",
-      borderColor: "border-emerald-400/40",
+      tierId: "GRAND_STRATEGIST",
+      title: "Tông Sư Ngũ Tử",
+      subtitle: "Gomoku Grandmaster",
+      colorClass: "text-emerald-400 font-bold",
+      bgGlow: "shadow-[0_0_18px_rgba(52,211,153,0.25)]",
+      borderColor: "border-emerald-400/45",
+      badgeBg: "bg-emerald-500/15 text-emerald-300",
+      minElo: 1900,
+      maxElo: 2199,
     };
   } else if (elo < 2500) {
     return {
-      title: "Diamond Elite Grandmaster",
-      colorClass: "text-cyan-400 font-bold",
-      bgGlow: "shadow-[0_0_15px_rgba(34,211,238,0.25)]",
+      tierId: "ARCHON",
+      title: "Đại Sư Huyền Không",
+      subtitle: "Astral Archon",
+      colorClass: "text-cyan-300 font-extrabold tracking-wide",
+      bgGlow: "shadow-[0_0_20px_rgba(34,211,238,0.3)]",
       borderColor: "border-cyan-400/50",
+      badgeBg: "bg-cyan-500/20 text-cyan-200",
+      minElo: 2200,
+      maxElo: 2499,
+    };
+  } else if (elo < 2800) {
+    return {
+      tierId: "ZENITH",
+      title: "Huyền Thoại Vô Cực",
+      subtitle: "Infinite Zenith Legend",
+      colorClass: "text-purple-400 font-extrabold tracking-wide",
+      bgGlow: "shadow-[0_0_22px_rgba(192,132,252,0.35)]",
+      borderColor: "border-purple-400/60",
+      badgeBg: "bg-purple-500/20 text-purple-200",
+      minElo: 2500,
+      maxElo: 2799,
     };
   } else {
     return {
-      title: "Challenger Apex Master",
-      colorClass: "text-rose-400 font-extrabold tracking-wider",
-      bgGlow: "shadow-[0_0_20px_rgba(244,63,94,0.3)] animate-pulse",
-      borderColor: "border-rose-400/60",
+      tierId: "SOVEREIGN",
+      title: "Thần Vương Tối Cao",
+      subtitle: "Apex Celestial Sovereign",
+      colorClass: "text-rose-400 font-black tracking-widest uppercase",
+      bgGlow: "shadow-[0_0_25px_rgba(244,63,94,0.4)] animate-pulse",
+      borderColor: "border-rose-400/70",
+      badgeBg: "bg-rose-500/25 text-rose-200",
+      minElo: 2800,
+      maxElo: 4000,
     };
   }
 }

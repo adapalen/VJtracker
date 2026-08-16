@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { HelpCircle, Star, Target, Shield, Info, ShieldCheck, CheckCircle2, XCircle, Sparkles } from "lucide-react";
+import { HelpCircle, Star, Target, Shield, Info, ShieldCheck, CheckCircle2, XCircle, Sparkles, Award, Zap } from "lucide-react";
 
 interface RankExplanationProps {
   theme?: "light" | "dark";
@@ -15,53 +15,60 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
 
   const tiers = [
     {
-      name: "Challenger Apex Master (Đại Kiện Tướng Tối Thượng)",
-      elo: "2500+",
+      name: "Thần Vương Tối Cao (Apex Celestial Sovereign)",
+      elo: "2800+",
       color: "text-rose-400",
-      bgClass: isDark ? "bg-rose-500/10 border-rose-500/20" : "bg-rose-50 border-rose-200",
-      desc: "Đỉnh cao chiến thuật cờ Caro. Nhận diện mọi biến thể bẫy kép, VCF từ 10+ nước và kiểm soát toàn diện bàn cờ vô tận.",
+      bgClass: isDark ? "bg-rose-500/15 border-rose-500/30" : "bg-rose-50 border-rose-300",
+      desc: "Cảnh giới tối thượng của đấu trường Caro Arena. Khả năng nhìn thấu toàn cục trận địa, hóa giải mọi đòn tấn công và định đoạt thế cờ trong chớp mắt.",
     },
     {
-      name: "Diamond Elite Grandmaster (Đại Kiện Tướng Kim Cương)",
+      name: "Huyền Thoại Vô Cực (Infinite Zenith Legend)",
+      elo: "2500 - 2799",
+      color: "text-purple-400",
+      bgClass: isDark ? "bg-purple-500/15 border-purple-500/30" : "bg-purple-50 border-purple-300",
+      desc: "Bậc kỳ thủ huyền thoại với tư duy chiến thuật đỉnh cao, thành thạo chuỗi tấn công VCF 10+ nước và bẫy giao điểm đa chiều.",
+    },
+    {
+      name: "Đại Sư Huyền Không (Astral Archon)",
       elo: "2200 - 2499",
-      color: "text-cyan-400",
-      bgClass: isDark ? "bg-cyan-500/10 border-cyan-500/20" : "bg-cyan-50 border-cyan-200",
-      desc: "Kỳ thủ lão luyện, am hiểu sâu sắc các thế công đôi 4-3, 4-4 và kỹ năng phong tỏa các hướng tấn công mở của đối phương.",
+      color: "text-cyan-300",
+      bgClass: isDark ? "bg-cyan-500/10 border-cyan-500/25" : "bg-cyan-50 border-cyan-200",
+      desc: "Kỳ thủ đẳng cấp cao, am hiểu tường tận các thế công đôi 4-3, 4-4, biết cách gài bẫy và bẻ gãy đòn phản công của đối phương.",
     },
     {
-      name: "Platinum Super Grandmaster (Kiện Tướng Bạch Kim)",
+      name: "Tông Sư Ngũ Tử (Gomoku Grandmaster)",
       elo: "1900 - 2199",
       color: "text-emerald-400",
       bgClass: isDark ? "bg-emerald-500/10 border-emerald-500/20" : "bg-emerald-50 border-emerald-200",
-      desc: "Khả năng chuyển đổi mượt mà giữa tấn công chủ động và phòng thủ chặt chẽ. Ít khi mắc bẫy cơ bản.",
+      desc: "Chuyển đổi hoàn hảo giữa tấn công chủ động và phòng ngự chặt chẽ. Xây dựng cấu trúc bàn cờ an toàn và khó bị xuyên phá.",
     },
     {
-      name: "Gold Grandmaster (Kiện Tướng Vàng)",
+      name: "Chủ Tướng Trận Địa (Battlefield Warlord)",
       elo: "1600 - 1899",
       color: "text-yellow-400",
       bgClass: isDark ? "bg-yellow-500/10 border-yellow-500/20" : "bg-yellow-50 border-yellow-200",
-      desc: "Nắm vững các đòn phối hợp 3-in-a-row mở, biết cách gài bẫy chữ V và chặn các nước 4 nguy hiểm.",
+      desc: "Nắm vững các đòn phối hợp 3 quân mở, biết cách gài bẫy chữ V và chặn đứng các nước 4 nguy hiểm.",
     },
     {
-      name: "Silver International Master (Kỳ Thủ Bạc)",
+      name: "Chiến Lược Gia Không Gian (Dimensional Strategist)",
       elo: "1300 - 1599",
-      color: "text-slate-300",
-      bgClass: isDark ? "bg-slate-500/10 border-slate-500/20" : "bg-slate-50 border-slate-200",
-      desc: "Đã quen thuộc với nhịp độ thi đấu, nhận diện tốt các thế cờ nguy cấp và bắt đầu học cách phản công.",
+      color: "text-sky-300",
+      bgClass: isDark ? "bg-sky-500/10 border-sky-500/20" : "bg-sky-50 border-sky-200",
+      desc: "Kỳ thủ có tư duy phân tích tốt, nhận diện nhạy bén các hướng cờ mở và bắt đầu làm chủ nhịp độ ván đấu.",
     },
     {
-      name: "Bronze FIDE Master (Kỳ Thủ Đồng)",
+      name: "Hiệp Sĩ Ô Vuông (Grid Vanguard)",
       elo: "1000 - 1299",
-      color: "text-amber-600",
+      color: "text-amber-500",
       bgClass: isDark ? "bg-amber-500/10 border-amber-500/20" : "bg-[#fffaf0] border-amber-200",
-      desc: "Kỳ thủ đang rèn luyện kỹ năng quan sát chuỗi liên tiếp và hạn chế các nước đi sơ hở.",
+      desc: "Kỳ thủ đã nắm vững quy tắc chặn 2 đầu, biết cách bao quát các chuỗi quân mở và hạn chế sơ hở.",
     },
     {
-      name: "Iron Candidate Master (Kỳ Thủ Tập Sự)",
+      name: "Tân Thủ Bàn Cờ (Grid Initiate)",
       elo: "0 - 999",
       color: "text-zinc-400",
       bgClass: isDark ? "bg-zinc-500/10 border-zinc-500/20" : "bg-zinc-50 border-zinc-200",
-      desc: "Cấp độ nhập môn hoàn hảo để làm quen với bàn cờ mở rộng vô cực và quy tắc cờ Caro Việt Nam.",
+      desc: "Bước đệm khởi đầu để làm quen với đấu trường bàn cờ mở rộng vô tận và quy chuẩn Caro Việt Nam.",
     },
   ];
 
@@ -79,8 +86,8 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
           <HelpCircle className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-base font-sans font-bold tracking-wide">Luật Chơi & Học Viện ELO Caro Arena</h2>
-          <p className={`text-xs font-mono ${isDark ? "text-cyan-400/70" : "text-cyan-600/80"}`}>Quy chuẩn luật Caro Việt Nam và hệ thống tính điểm quốc tế</p>
+          <h2 className="text-base font-sans font-bold tracking-wide">Quy Chuẩn Luật Chơi & Hệ Thống Xếp Hạng Caro Arena</h2>
+          <p className={`text-xs font-mono ${isDark ? "text-cyan-400/70" : "text-cyan-600/80"}`}>Luật Caro Việt Nam chính thức và thang điểm Elo Đấu Trường</p>
         </div>
       </div>
 
@@ -97,7 +104,7 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
           </div>
 
           <p className={`text-xs leading-relaxed mb-4 ${isDark ? "text-slate-200" : "text-slate-700"}`}>
-            Trong <strong>Caro Arena</strong>, mọi trận đấu (Đấu Máy Ranked, Ghép Trận Online, Đấu Đôi PVP) đều áp dụng duy nhất <strong>Luật Caro Việt Nam chuẩn truyền thống</strong>.
+            Trong <strong>Caro Arena</strong>, mọi trận đấu (Đấu Máy Ranked, Ghép Trận Online, Đấu Đôi PVP, Chế Độ Thế Cờ) đều áp dụng duy nhất <strong>Luật Caro Việt Nam chuẩn truyền thống</strong>.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
@@ -141,43 +148,46 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
           </div>
         </div>
 
-        {/* Section 2: Formulas Explanation */}
+        {/* Section 2: Arena Elo Rating System */}
         <div className={`p-4 rounded-xl border ${
           isDark ? "bg-slate-950/70 border-cyan-500/15" : "bg-slate-50 border-slate-200"
         }`}>
           <h4 className={`text-xs font-bold mb-3 flex items-center gap-1.5 uppercase tracking-wider ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>
             <Target className="w-4 h-4 text-amber-400" />
-            Công Thức Tính Điểm Elo Quốc Tế (FIDE Elo)
+            Hệ Thống Tính Điểm Năng Lực Đấu Trường (Dynamic Arena Elo)
           </h4>
 
           <div className="space-y-3">
             <div className="flex flex-col items-center justify-center py-2.5 px-4 bg-black/40 rounded-xl border border-white/5 font-mono text-xs">
-              <div className="text-cyan-400 mb-1 font-bold">R_new = R_old + K * (S - E)</div>
-              <div className="text-amber-400">E = 1 / (1 + 10 ^ ((R_opponent - R_player) / 400))</div>
+              <div className="text-cyan-400 mb-1 font-bold">R_mới = R_cũ + K * (S - E) + Thưởng Chuỗi Thắng</div>
+              <div className="text-amber-400">E = 1 / (1 + 10 ^ ((R_đối_thủ - R_bạn) / 400))</div>
             </div>
 
             <div className="text-[11px] space-y-1.5 text-slate-400 leading-relaxed">
               <p>
-                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>R_new / R_old:</strong> Điểm Elo mới sau trận đấu so với điểm ban đầu của bạn.
+                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>R_mới / R_cũ:</strong> Điểm Elo cập nhật sau trận đấu so với điểm ban đầu của bạn.
               </p>
               <p>
                 <strong className={isDark ? "text-slate-200" : "text-slate-700"}>S (Kết quả thực tế):</strong> Thắng = <strong>1.0</strong>, Hòa = <strong>0.5</strong>, Thua = <strong>0.0</strong>.
               </p>
               <p>
-                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>E (Xác suất kỳ vọng):</strong> Tỷ lệ thắng dự kiến dựa trên chênh lệch trình độ. Chiến thắng trước đối thủ có Elo cao hơn sẽ nhận được lượng điểm thưởng vượt trội!
+                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>E (Xác suất kỳ vọng):</strong> Tỷ lệ thắng dự kiến dựa trên chênh lệch trình độ. Đánh bại đối thủ có mức Elo cao hơn sẽ mang lại lượng điểm cộng đột phá!
               </p>
               <p>
-                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>Hệ số K (K-Factor):</strong> K = 40 cho kỳ thủ mới (&lt; 10 trận), K = 20 cho thi đấu tiêu chuẩn, K = 10 cho bậc Kiện tướng (&ge; 2400 Elo).
+                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>Hệ số K (K-Factor):</strong> K = 40 cho kỳ thủ mới (dưới 10 trận phân hạng), K = 24 cho thi đấu tiêu chuẩn, K = 18 cho cấp cao (&ge; 2000 Elo) và K = 12 cho cấp Đại sư (&ge; 2500 Elo).
+              </p>
+              <p>
+                <strong className={isDark ? "text-slate-200" : "text-slate-700"}>Thưởng Chuỗi Thắng (Win Streak Bonus):</strong> Duy trì chuỗi thắng từ 3 trận liên tiếp trở lên sẽ được cộng thêm từ <strong>+2 đến +6 Elo thưởng</strong> mỗi ván.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Section 3: Rank Table */}
+        {/* Section 3: Diversified 8 Rank Tiers */}
         <div className="space-y-3">
           <h3 className={`text-xs uppercase tracking-wider font-bold flex items-center gap-1.5 ${isDark ? "text-cyan-400" : "text-cyan-600"}`}>
-            <Shield className="w-4 h-4" />
-            Bảng Xếp Hạng & Danh Hiệu Đấu Trường
+            <Award className="w-4 h-4" />
+            Hệ Thống 8 Bậc Danh Hiệu Đấu Trường
           </h3>
 
           <div className="space-y-2">
@@ -186,7 +196,7 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
                 key={tier.name}
                 className={`p-3 rounded-xl border flex flex-col sm:flex-row gap-2.5 items-start sm:items-center transition-all ${tier.bgClass}`}
               >
-                <div className="sm:w-56 shrink-0">
+                <div className="sm:w-64 shrink-0">
                   <div className={`text-xs font-bold tracking-tight ${tier.color}`}>
                     {tier.name}
                   </div>
@@ -208,7 +218,7 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
         }`}>
           <Info className="w-4 h-4 shrink-0 mt-0.5 text-cyan-400" />
           <div className="text-[11px] leading-relaxed">
-            <span className="font-bold">Quy định chế độ Đấu Đôi (PVP):</span> Chế độ đấu đôi 2 người trên cùng thiết bị dành cho mục đích giao hữu giải trí. Điểm Elo cá nhân sẽ được giữ nguyên không thay đổi để đảm bảo tính minh bạch cho bảng xếp hạng toàn cầu.
+            <span className="font-bold">Quy định chế độ Đấu Đôi (PVP):</span> Chế độ đấu đôi 2 người trên cùng một thiết bị dành cho mục đích giao hữu và luyện tập. Điểm Elo cá nhân được bảo lưu nguyên vẹn để đảm bảo tính công bằng trên bảng xếp hạng toàn cầu.
           </div>
         </div>
       </div>
