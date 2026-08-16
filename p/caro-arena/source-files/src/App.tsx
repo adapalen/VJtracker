@@ -692,11 +692,13 @@ export default function App() {
   };
 
   // --- GAMEPLAY ASSISTANTS (UNDO & HINT) ---
+  // Available strictly in Training and Local PVP modes. Disabled in competitive Ranked matches.
   const handleUndo = () => {
+    if (gameMode !== "TRAINING" && gameMode !== "PVP") return;
     if (gameStatus !== "PLAYING" || isAiThinking || moveHistory.length === 0) return;
 
-    if (gameMode === "AI") {
-      // In AI mode, undo last 2 moves (Player + AI) so it's player's turn again
+    if (gameMode === "TRAINING") {
+      // In Training mode, undo last 2 moves (Player + AI) so it's player's turn again
       if (moveHistory.length < 2) return;
       const newHistory = moveHistory.slice(0, -2);
       const newBoard: Record<string, PlayerSymbol> = {};
@@ -728,6 +730,7 @@ export default function App() {
   };
 
   const handleHint = () => {
+    if (gameMode !== "TRAINING" && gameMode !== "PVP") return;
     if (gameStatus !== "PLAYING" || isAiThinking) return;
     const hint = getHintMove(board, currentPlayer);
     setActiveHint(hint);
@@ -1057,7 +1060,7 @@ export default function App() {
     
     const movesCount = Object.keys(board).length;
     const oldElo = profile.elo;
-    const isPvp = gameMode === "PVP";
+    const isUnranked = gameMode === "PVP" || gameMode === "TRAINING";
 
     let winStreak = 0;
     for (const m of profile.matches) {
@@ -1066,7 +1069,7 @@ export default function App() {
     }
     if (result === "WIN") winStreak++;
 
-    const eloCalc = isPvp
+    const eloCalc = isUnranked
       ? { eloChange: 0, newElo: profile.elo, expectedScore: 0.5 }
       : calculateEloChange(profile.elo, opponentElo, result, profile.matches.length, winStreak);
 
@@ -1100,7 +1103,7 @@ export default function App() {
         const nextCount = q.currentCount + 1;
         return { ...q, currentCount: nextCount, isCompleted: nextCount >= q.targetCount };
       }
-      if (q.id === "quest_win_ai" && gameMode === "AI" && result === "WIN" && (difficulty === "SENTINEL" || difficulty === "OVERLORD" || difficulty === "SINGULARITY")) {
+      if (q.id === "quest_win_ai" && (gameMode === "AI" || gameMode === "TRAINING") && result === "WIN" && (difficulty === "SENTINEL" || difficulty === "OVERLORD" || difficulty === "SINGULARITY")) {
         return { ...q, currentCount: 1, isCompleted: true };
       }
       return q;
@@ -1147,7 +1150,7 @@ export default function App() {
       newElo: eloCalc.newElo,
       deltaElo: eloCalc.eloChange,
       movesCount,
-      isPvpUnchanged: isPvp,
+      isPvpUnchanged: isUnranked,
       isTimeout,
       analysis,
     });
@@ -1423,8 +1426,8 @@ export default function App() {
         setWinningCells(winSequence);
         synth.playWin();
 
-        const opponentName = gameMode === "AI" ? getAiDetails(difficulty).name : "Guest Player";
-        const opponentElo = gameMode === "AI" ? getAiDetails(difficulty).elo : 1200;
+        const opponentName = (gameMode === "AI" || gameMode === "TRAINING") ? getAiDetails(difficulty).name : "Guest Player";
+        const opponentElo = (gameMode === "AI" || gameMode === "TRAINING") ? getAiDetails(difficulty).elo : 1200;
         resolveMatch("WIN", opponentName, opponentElo);
         return;
       }
@@ -1737,25 +1740,36 @@ export default function App() {
           <div className={`p-3 px-4 rounded-2xl flex flex-wrap justify-between items-center gap-3 transition-colors duration-300 ${
             isDark ? "bg-slate-900/40 border border-cyan-500/15" : "bg-white border border-slate-200 shadow-sm"
           }`}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Chế độ:</span>
-              <div className="flex gap-1">
-                {(["AI", "ONLINE", "PVP"] as const).map((m) => (
+              <div className={`p-0.5 rounded-xl border flex items-center gap-1 ${
+                isDark ? "bg-slate-900 border-cyan-500/20" : "bg-slate-100 border-slate-300"
+              }`}>
+                {(["AI", "ONLINE", "TRAINING", "PVP"] as const).map((m) => (
                   <button
                     key={m}
                     onClick={() => {
                       setGameMode(m);
                       handleResetBoard();
+                      synth.playTick();
                     }}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1 ${
                       gameMode === m
-                        ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20"
+                        ? m === "AI" || m === "ONLINE"
+                          ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20"
+                          : "bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20"
                         : isDark
                         ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-200"
                     }`}
                   >
-                    {m === "AI" ? "Đấu Máy (Ranked)" : m === "ONLINE" ? "Online" : "Đấu Đôi (PVP)"}
+                    {m === "AI" && <Swords size={12} />}
+                    {m === "ONLINE" && <Globe size={12} />}
+                    {m === "TRAINING" && <Lightbulb size={12} />}
+                    {m === "PVP" && <Users size={12} />}
+                    <span>
+                      {m === "AI" ? "Đấu Máy (Ranked)" : m === "ONLINE" ? "Online Ranked" : m === "TRAINING" ? "Luyện Tập (AI)" : "Đấu Đôi (PVP)"}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -1797,25 +1811,29 @@ export default function App() {
                       isDark ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.15)]" : "bg-cyan-50 text-cyan-600 border border-cyan-200 shadow-sm"
                     }`}>
                       {gameMode === "AI" ? (
-                        <Cpu size={32} className="animate-pulse" />
+                        <Swords size={32} className="animate-pulse text-cyan-400" />
                       ) : gameMode === "ONLINE" ? (
-                        <Globe size={32} className="animate-pulse" />
+                        <Globe size={32} className="animate-pulse text-cyan-400" />
+                      ) : gameMode === "TRAINING" ? (
+                        <Lightbulb size={32} className="text-amber-400 animate-bounce" />
                       ) : (
-                        <Users size={32} />
+                        <Users size={32} className="text-emerald-400" />
                       )}
                     </div>
                   </div>
 
                   <div>
                     <h2 className="text-xl font-extrabold uppercase tracking-wide">
-                      {gameMode === "AI" ? "Chiến Dịch Đấu Máy" : gameMode === "ONLINE" ? "Đấu Trường Online" : "Đấu Đôi Cùng Thiết Bị"}
+                      {gameMode === "AI" ? "Chiến Dịch Đấu Máy (Ranked)" : gameMode === "ONLINE" ? "Đấu Trường Online (Ranked)" : gameMode === "TRAINING" ? "Phòng Luyện Tập Kỹ Năng" : "Đấu Đôi Cùng Thiết Bị"}
                     </h2>
                     <p className={`text-xs mt-1 px-4 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
                       {gameMode === "AI"
-                        ? "Thử thách kỹ năng với các cấp độ AI. Tích lũy điểm Elo khi chiến thắng."
+                        ? "Trận đấu xếp hạng nghiêm túc. Tích lũy hoặc trừ điểm Elo. Khóa tính năng gợi ý & lùi nước."
                         : gameMode === "ONLINE"
-                        ? "Ghép trận tự động hoặc tạo phòng riêng chia sẻ link để đấu cùng bạn bè."
-                        : "Hai người chơi luân phiên trên cùng một thiết bị."}
+                        ? "Ghép trận trực tuyến thời gian thực hoặc tạo phòng riêng chia sẻ link để tranh tài."
+                        : gameMode === "TRAINING"
+                        ? "Tự do thử nghiệm các thế cờ, lùi nước và nhận gợi ý nước đi tối ưu từ AI. Kết quả không ảnh hưởng đến điểm Elo xếp hạng."
+                        : "Hai người chơi luân phiên trên cùng một thiết bị với tính năng lùi nước."}
                     </p>
                   </div>
 
@@ -1823,11 +1841,11 @@ export default function App() {
                   <div className={`p-4 rounded-xl border text-left space-y-3 font-sans ${
                     isDark ? "bg-slate-900/40 border-cyan-500/10" : "bg-slate-50 border-slate-150"
                   }`}>
-                    {gameMode === "AI" && (
+                    {(gameMode === "AI" || gameMode === "TRAINING") && (
                       <div className="space-y-2.5">
                         <div className="flex justify-between items-center border-b pb-2 border-cyan-500/10">
-                          <span className="text-[10px] uppercase font-bold text-slate-400">Đối thủ</span>
-                          <span className="text-xs font-bold text-cyan-400">{getAiDetails(difficulty).name}</span>
+                          <span className="text-[10px] uppercase font-bold text-slate-400">Đối thủ AI</span>
+                          <span className="text-xs font-bold text-cyan-400">{getAiDetails(difficulty).name} ({getAiDetails(difficulty).elo} Elo)</span>
                         </div>
                         <div className="space-y-1.5">
                           <span className="text-[10px] uppercase font-bold text-slate-400 block">Cấp độ AI:</span>
@@ -1935,10 +1953,14 @@ export default function App() {
                         synth.playPlace();
                         startMatchSetup();
                       }}
-                      className="w-full py-3.5 bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white text-xs uppercase tracking-wider font-extrabold rounded-xl cursor-pointer transition shadow-lg flex items-center justify-center gap-2"
+                      className={`w-full py-3.5 bg-gradient-to-r text-white text-xs uppercase tracking-wider font-extrabold rounded-xl cursor-pointer transition shadow-lg flex items-center justify-center gap-2 ${
+                        gameMode === "TRAINING"
+                          ? "from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400"
+                          : "from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400"
+                      }`}
                     >
-                      <Sparkles size={14} />
-                      <span>{gameMode === "AI" ? "Bắt Đầu Ván Đấu" : "Vào Bàn Cờ Đấu Đôi"}</span>
+                      {gameMode === "TRAINING" ? <Lightbulb size={14} /> : <Sparkles size={14} />}
+                      <span>{gameMode === "AI" ? "Bắt Đầu Ván Đấu (Ranked)" : gameMode === "TRAINING" ? "Vào Bàn Cờ Luyện Tập" : "Vào Bàn Cờ Đấu Đôi"}</span>
                     </button>
                   )}
                 </motion.div>
@@ -2029,8 +2051,8 @@ export default function App() {
 
             {/* In-Game Action Buttons */}
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Undo Move Button */}
-              {isMatchStarted && gameStatus === "PLAYING" && gameMode !== "ONLINE" && (
+              {/* Training / PVP only: Undo Move Button */}
+              {isMatchStarted && gameStatus === "PLAYING" && (gameMode === "TRAINING" || gameMode === "PVP") && (
                 <button
                   onClick={handleUndo}
                   disabled={moveHistory.length === 0 || isAiThinking}
@@ -2039,15 +2061,15 @@ export default function App() {
                       ? "border-cyan-500/30 bg-cyan-950/20 text-cyan-300 hover:bg-cyan-500/20"
                       : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
                   }`}
-                  title="Lùi lại nước đi"
+                  title="Lùi lại nước đi (Khả dụng trong Luyện tập & Đấu đôi)"
                 >
                   <Undo2 size={13} />
                   <span>Lùi nước</span>
                 </button>
               )}
 
-              {/* AI Hint Button */}
-              {isMatchStarted && gameStatus === "PLAYING" && (
+              {/* Training / PVP only: AI Hint Button */}
+              {isMatchStarted && gameStatus === "PLAYING" && (gameMode === "TRAINING" || gameMode === "PVP") && (
                 <button
                   onClick={handleHint}
                   disabled={isAiThinking}
@@ -2056,11 +2078,21 @@ export default function App() {
                       ? "border-amber-500/30 bg-amber-950/20 text-amber-300 hover:bg-amber-500/20"
                       : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
                   }`}
-                  title="Nhận gợi ý từ trợ lý AI"
+                  title="Nhận gợi ý từ trợ lý AI (Khả dụng trong Luyện tập & Đấu đôi)"
                 >
                   <Lightbulb size={13} />
                   <span>Gợi ý</span>
                 </button>
+              )}
+
+              {/* Competitive Ranked Lock Badge */}
+              {isMatchStarted && gameStatus === "PLAYING" && (gameMode === "AI" || gameMode === "ONLINE") && (
+                <div className={`px-2.5 py-1 rounded-xl border text-[10px] font-bold flex items-center gap-1.5 ${
+                  isDark ? "bg-cyan-950/30 border-cyan-500/30 text-cyan-300" : "bg-cyan-50 border-cyan-200 text-cyan-800"
+                }`}>
+                  <ShieldAlert size={12} className="text-cyan-400" />
+                  <span>Đấu Hạng (Khóa Lùi & Gợi Ý)</span>
+                </div>
               )}
 
               {/* Surrender Button */}

@@ -10,7 +10,7 @@ export interface Position {
   y: number;
 }
 
-export type GameMode = "PVP" | "AI" | "ONLINE" | "PUZZLE";
+export type GameMode = "PVP" | "AI" | "ONLINE" | "PUZZLE" | "TRAINING";
 
 export type AIDifficulty = "NOVICE" | "SENTINEL" | "OVERLORD" | "SINGULARITY";
 

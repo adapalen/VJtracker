@@ -212,13 +212,21 @@ export default function RankExplanation({ theme = "dark" }: RankExplanationProps
           </div>
         </div>
 
-        {/* Section 4: Local vs Multiplayer Mode Rules */}
-        <div className={`p-3.5 rounded-xl border flex gap-2.5 ${
+        {/* Section 4: Ranked vs Training Mode Rules */}
+        <div className={`p-4 rounded-xl border flex flex-col gap-2 ${
           isDark ? "bg-cyan-950/20 border-cyan-500/20 text-cyan-300" : "bg-blue-50 border-blue-200 text-blue-900"
         }`}>
-          <Info className="w-4 h-4 shrink-0 mt-0.5 text-cyan-400" />
-          <div className="text-[11px] leading-relaxed">
-            <span className="font-bold">Quy định chế độ Đấu Đôi (PVP):</span> Chế độ đấu đôi 2 người trên cùng một thiết bị dành cho mục đích giao hữu và luyện tập. Điểm Elo cá nhân được bảo lưu nguyên vẹn để đảm bảo tính công bằng trên bảng xếp hạng toàn cầu.
+          <div className="flex items-center gap-2 font-bold text-xs">
+            <Info className="w-4 h-4 shrink-0 text-cyan-400" />
+            <span>Quy Định Chế Độ Đấu Hạng vs Luyện Tập</span>
+          </div>
+          <div className={`text-[11px] leading-relaxed space-y-1.5 ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+            <p>
+              • <strong className="text-cyan-400">Đấu Hạng (Ranked AI & Online Ranked):</strong> Trận đấu cạnh tranh công bằng. Kết quả trực tiếp cập nhật điểm Elo và thứ hạng Đấu Trường. <strong>Nghiêm cấm và khóa hoàn toàn tính năng Lùi Nước (Undo) & Gợi Ý Nước Đi (AI Hint)</strong>.
+            </p>
+            <p>
+              • <strong className="text-emerald-400">Luyện Tập (Training AI) & Đấu Đôi (PVP):</strong> Không gian rèn luyện chiến thuật tự do. Điểm Elo được bảo lưu tuyệt đối (0 Elo thay đổi). Kỳ thủ được <strong>toàn quyền sử dụng Lùi Nước và nhận Gợi Ý phân tích nước cờ tối ưu từ AI</strong>.
+            </p>
           </div>
         </div>
       </div>

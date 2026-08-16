@@ -314,19 +314,29 @@ export function calculateEloChange(
 
   let k = 24;
   if (matchesCount < 10) {
-    k = 40; // Placement calibration
-  } else if (playerElo >= 2500) {
-    k = 12; // Elite tier stabilization
-  } else if (playerElo >= 2000) {
-    k = 18;
+    k = 36; // Calibration phase
+  } else if (playerElo >= 2600) {
+    k = 12; // Apex Grandmaster phase
+  } else if (playerElo >= 2200) {
+    k = 16;
+  } else if (playerElo >= 1600) {
+    k = 20;
+  } else {
+    k = 28;
   }
 
   let eloChange = Math.round(k * (actualScore - expectedScore));
 
-  // Win streak momentum bonus
-  if (result === "WIN" && winStreak >= 3) {
-    const streakBonus = Math.min(6, Math.floor(winStreak / 2));
-    eloChange += streakBonus;
+  // Ensure reasonable minimum outcome for victories & defeats
+  if (result === "WIN") {
+    if (eloChange <= 0) eloChange = 2; // Guaranteed progress on victory
+    // Win streak momentum bonus
+    if (winStreak >= 3) {
+      const streakBonus = Math.min(6, Math.floor(winStreak / 2));
+      eloChange += streakBonus;
+    }
+  } else if (result === "LOSS") {
+    if (eloChange >= 0) eloChange = -2;
   }
 
   const newElo = Math.max(100, playerElo + eloChange);
