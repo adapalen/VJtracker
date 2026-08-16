@@ -97,6 +97,7 @@ import {
   Copy,
   Link,
   ShieldCheck,
+  X,
 } from "lucide-react";
 
 const STORAGE_KEYS = {
@@ -298,9 +299,7 @@ export default function App() {
   const [currentPlayer, setCurrentPlayer] = useState<PlayerSymbol>("X");
   const [gameMode, setGameMode] = useState<GameMode>("AI");
   const [difficulty, setDifficulty] = useState<AIDifficulty>("SENTINEL");
-  const [gameRule, setGameRule] = useState<GameRule>(() => {
-    return (localStorage.getItem(STORAGE_KEYS.GAME_RULE) as GameRule) || "FREE";
-  });
+  const [gameRule] = useState<GameRule>("VN_BLOCKED_ENDS");
   const [gameStatus, setGameStatus] = useState<GameStatus>("PLAYING");
   const [isMatchStarted, setIsMatchStarted] = useState(false);
   
@@ -917,13 +916,6 @@ export default function App() {
     synth.playTick();
   };
 
-  const handleToggleGameRule = () => {
-    const nextRule: GameRule = gameRule === "FREE" ? "VN_BLOCKED_ENDS" : "FREE";
-    setGameRule(nextRule);
-    localStorage.setItem(STORAGE_KEYS.GAME_RULE, nextRule);
-    synth.playTick();
-  };
-
   // Surrender / Forfeit current active match
   const handleSurrender = async () => {
     if (gameStatus !== "PLAYING" || isAiThinking) return;
@@ -1530,20 +1522,20 @@ export default function App() {
               </div>
             </div>
 
-            {/* Rule Switcher: Free vs VN Blocked Ends */}
+            {/* Standard Rule Badge */}
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Luật:</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Luật chơi:</span>
               <button
-                onClick={handleToggleGameRule}
-                className={`px-3 py-1 rounded-lg text-xs font-bold border transition cursor-pointer flex items-center gap-1.5 ${
-                  gameRule === "VN_BLOCKED_ENDS"
-                    ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-sm"
-                    : "bg-cyan-500/10 border-cyan-500/30 text-cyan-300"
-                }`}
-                title="Click để chuyển đổi luật chơi"
+                onClick={() => {
+                  setIsEloModalOpen(true);
+                  synth.playTick();
+                }}
+                className="px-3 py-1 rounded-lg text-xs font-bold border bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-sm flex items-center gap-1.5 cursor-pointer hover:bg-emerald-500/30 transition"
+                title="Xem chi tiết Luật Caro VN (Chặn 2 đầu)"
               >
                 <ShieldCheck size={13} />
-                <span>{gameRule === "VN_BLOCKED_ENDS" ? "Luật Caro VN (Chặn 2 đầu)" : "Luật Tự Do (5 liên tiếp)"}</span>
+                <span>Luật Caro VN (Chặn 2 đầu)</span>
+                <Info size={11} className="opacity-70 ml-0.5" />
               </button>
             </div>
           </div>
@@ -2041,6 +2033,36 @@ export default function App() {
       <AnimatePresence>
         {showCelebration && (
           <CelebrationOverlay isDark={isDark} />
+        )}
+      </AnimatePresence>
+
+      {/* Elo & Vietnamese Caro Rules Explanation Modal */}
+      <AnimatePresence>
+        {isEloModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className={`relative w-full max-w-2xl max-h-[85vh] overflow-hidden rounded-2xl shadow-2xl border flex flex-col ${
+                isDark ? "border-cyan-500/20 bg-slate-900 shadow-[0_0_50px_rgba(6,182,212,0.15)]" : "border-slate-200 bg-white"
+              }`}
+            >
+              <button
+                onClick={() => {
+                  setIsEloModalOpen(false);
+                  synth.playTick();
+                }}
+                className={`absolute top-4 right-4 z-10 p-1.5 rounded-lg transition cursor-pointer ${
+                  isDark ? "bg-slate-800 text-slate-400 hover:text-white" : "bg-slate-100 text-slate-600 hover:text-slate-900"
+                }`}
+                title="Đóng"
+              >
+                <X size={16} />
+              </button>
+              <RankExplanation theme={theme} />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
