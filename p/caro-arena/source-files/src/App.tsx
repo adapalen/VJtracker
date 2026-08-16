@@ -411,20 +411,6 @@ export default function App() {
 
   // --- INITIAL LOAD & SYNC WITH FIREBASE AUTH ---
   useEffect(() => {
-    // Load theme setting
-    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) as "light" | "dark" | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-      setTheme("dark");
-    }
-
-    // Load game rule setting
-    const savedRule = localStorage.getItem(STORAGE_KEYS.GAME_RULE) as GameRule | null;
-    if (savedRule) {
-      setGameRule(savedRule);
-    }
-
     // Check URL parameters for private room code (?room=XYZ or #room=XYZ)
     const urlParams = new URLSearchParams(window.location.search);
     const roomParam = urlParams.get("room") || window.location.hash.replace("#room=", "");
@@ -433,127 +419,59 @@ export default function App() {
       setGameMode("ONLINE");
     }
 
-    // Load mute setting
-    const savedMuted = localStorage.getItem(STORAGE_KEYS.MUTED);
-    if (savedMuted === "true") {
-      setIsMuted(true);
+    // Sync mute to audio engine (state already initialized from localStorage)
+    if (localStorage.getItem(STORAGE_KEYS.MUTED) === "true") {
       synth.toggleMute();
     }
 
-    // Load basic leaderboard first
-    const savedLeaderboard = localStorage.getItem(STORAGE_KEYS.LEADERBOARD);
-    let currentLeaderboard = DEFAULT_LEADERBOARD;
-    if (savedLeaderboard) {
-      try {
-        currentLeaderboard = JSON.parse(savedLeaderboard);
-      } catch (e) {
-        currentLeaderboard = [...DEFAULT_LEADERBOARD];
-      }
-    }
-    setLeaderboard(currentLeaderboard);
-
-    // Load SSO authentication state and profile
-    const loadProfileAndCredentials = async () => {
-      auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          setIsLoggedIn(true);
-          try {
-            let loadedProfile: PlayerProfile | null = null;
-            
-            try {
-              const docRef = doc(db, "users", user.uid);
-              const docSnap = await getDoc(docRef);
-              if (docSnap.exists()) {
-                loadedProfile = docSnap.data() as PlayerProfile;
-              }
-            } catch (firestoreErr) {
-              console.warn("Firestore offline or inaccessible. Resorting to local profiles.", firestoreErr);
-            }
-
-            if (!loadedProfile) {
-              const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
-              const localRaw = localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername.toLowerCase()}`) || 
-                               localStorage.getItem(`infinite_ttt_player_profile_${savedSsoUsername}`) || 
-                               localStorage.getItem(STORAGE_KEYS.PROFILE);
-              if (localRaw) {
-                try {
-                  loadedProfile = JSON.parse(localRaw);
-                } catch (err) {}
-              }
-            }
-
-            if (loadedProfile) {
-              // Ensure daily quests are refreshed if date changed
+    // --- Firebase Auth: background cloud sync only ---
+    // IMPORTANT: onAuthStateChanged must NEVER call setIsLoggedIn.
+    // The login gate is controlled exclusively by localStorage + handleSsoLogin/handleLogout.
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Try to sync profile from cloud (non-blocking, won't affect login state)
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            const cloudProfile = docSnap.data() as PlayerProfile;
+            // Only update profile if it has a valid name and matches current session
+            const currentUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
+            if (cloudProfile && cloudProfile.name && 
+                (!currentUsername || cloudProfile.name.toLowerCase() === currentUsername.toLowerCase())) {
               const today = new Date().toDateString();
-              if (loadedProfile.dailyQuestsDate !== today || !loadedProfile.dailyQuests) {
-                loadedProfile.dailyQuests = generateDailyQuests();
-                loadedProfile.dailyQuestsDate = today;
+              if (cloudProfile.dailyQuestsDate !== today || !cloudProfile.dailyQuests) {
+                cloudProfile.dailyQuests = generateDailyQuests();
+                cloudProfile.dailyQuestsDate = today;
               }
-              if (!loadedProfile.completedPuzzles) loadedProfile.completedPuzzles = [];
-              if (!loadedProfile.claimedAchievements) loadedProfile.claimedAchievements = [];
-
-              setProfile(loadedProfile);
-              setTempCallsign(loadedProfile.name);
-              setSsoUsername(loadedProfile.name);
-
-              const playerWins = loadedProfile.matches.filter(m => m.result === "WIN").length;
-              const playerLosses = loadedProfile.matches.filter(m => m.result === "LOSS").length;
-              
-              const updatedLeaderboard = currentLeaderboard.map(e => {
-                if (e.name.toLowerCase() === loadedProfile!.name.toLowerCase() || e.isPlayer) {
-                  return {
-                    ...e,
-                    name: loadedProfile!.name,
-                    elo: loadedProfile!.elo,
-                    wins: playerWins,
-                    losses: playerLosses,
-                    isPlayer: true,
-                    countryCode: loadedProfile!.countryCode || "VN",
-                    countryName: loadedProfile!.countryName || "Vietnam",
-                    countryFlag: loadedProfile!.countryFlag || "🇻🇳"
-                  };
-                }
-                return e;
-              });
-
-              if (!updatedLeaderboard.some(e => e.name.toLowerCase() === loadedProfile!.name.toLowerCase())) {
-                updatedLeaderboard.push({
-                  name: loadedProfile.name,
-                  elo: loadedProfile.elo,
-                  wins: playerWins,
-                  losses: playerLosses,
-                  isPlayer: true,
-                  status: "ONLINE",
-                  avatarSeed: loadedProfile.name,
-                  countryCode: loadedProfile.countryCode || "VN",
-                  countryName: loadedProfile.countryName || "Vietnam",
-                  countryFlag: loadedProfile.countryFlag || "🇻🇳"
-                });
-              }
-
-              setLeaderboard(updatedLeaderboard);
-              localStorage.setItem(STORAGE_KEYS.LEADERBOARD, JSON.stringify(updatedLeaderboard));
+              if (!cloudProfile.completedPuzzles) cloudProfile.completedPuzzles = [];
+              if (!cloudProfile.claimedAchievements) cloudProfile.claimedAchievements = [];
+              setProfile(cloudProfile);
+              setTempCallsign(cloudProfile.name);
             }
-          } catch (e) {
-            console.error("Error loading profile:", e);
           }
-        } else {
-          const savedLoggedIn = localStorage.getItem("infinite_ttt_is_logged_in") === "true";
-          const savedSsoUsername = localStorage.getItem("infinite_ttt_sso_username") || "";
-          const savedProfile = localStorage.getItem(STORAGE_KEYS.PROFILE);
-          if (savedLoggedIn || savedSsoUsername || savedProfile) {
-            setIsLoggedIn(true);
-            try {
-              await signInAnonymously(auth);
-            } catch (err) {
-              console.warn("Anonymous authentication fallback:", err);
-            }
+        } catch (firestoreErr) {
+          // Cloud sync failed silently — local profile is authoritative
+          console.warn("Cloud profile sync skipped:", firestoreErr);
+        }
+      } else {
+        // Firebase user is null — try to re-authenticate in background
+        // This does NOT affect the login state in any way
+        const hasLocalSession = localStorage.getItem("infinite_ttt_is_logged_in") === "true" ||
+                                !!localStorage.getItem("infinite_ttt_sso_username") ||
+                                !!localStorage.getItem(STORAGE_KEYS.PROFILE);
+        if (hasLocalSession) {
+          try {
+            await signInAnonymously(auth);
+          } catch (err) {
+            // Auth failed — game continues with local profile, no sign-out
+            console.warn("Background re-auth skipped:", err);
           }
         }
-      });
-    };
+      }
+    });
 
-    loadProfileAndCredentials();
+    return () => unsubscribe();
   }, []);
 
   // --- CHESS CLOCK TIMER HOOK ---
